@@ -1,0 +1,131 @@
+{
+  "lastUpdated": "2026-03-08",
+  "embeddingModel": "all-MiniLM-L6-v2",
+  "bmb": {
+    "description": "Belief Maintenance Benchmark",
+    "tasks": 48,
+    "categories": 8,
+    "checks": 100,
+    "overall": [
+      { "adapter": "mnemebrain (full)", "score": 100 },
+      { "adapter": "mnemebrain_lite", "score": 93 },
+      { "adapter": "structured_memory", "score": 36 },
+      { "adapter": "mem0 (real API)", "score": 29 },
+      { "adapter": "naive_baseline", "score": 0 },
+      { "adapter": "rag_baseline", "score": 0 },
+      { "adapter": "openai_rag (real)", "score": 0 },
+      { "adapter": "langchain_buffer", "score": 0 }
+    ],
+    "categories_detail": [
+      {
+        "category": "Contradiction Detection",
+        "scores": {
+          "mnemebrain": 100, "mnemebrain_lite": 91.7, "structured_memory": 0,
+          "mem0": 0, "naive": 0, "rag": 0, "openai_rag": 0, "langchain": 0
+        }
+      },
+      {
+        "category": "Belief Revision",
+        "scores": {
+          "mnemebrain": 100, "mnemebrain_lite": 100, "structured_memory": 39,
+          "mem0": 39, "naive": null, "rag": null, "openai_rag": null, "langchain": null
+        }
+      },
+      {
+        "category": "Evidence Tracking",
+        "scores": {
+          "mnemebrain": 100, "mnemebrain_lite": 100, "structured_memory": 69,
+          "mem0": 47, "naive": null, "rag": null, "openai_rag": null, "langchain": null
+        }
+      },
+      {
+        "category": "Temporal Updates",
+        "scores": {
+          "mnemebrain": 100, "mnemebrain_lite": 83.3, "structured_memory": null,
+          "mem0": null, "naive": null, "rag": null, "openai_rag": null, "langchain": null
+        }
+      },
+      {
+        "category": "Counterfactual Reasoning",
+        "scores": {
+          "mnemebrain": 100, "mnemebrain_lite": null, "structured_memory": null,
+          "mem0": null, "naive": null, "rag": null, "openai_rag": null, "langchain": null
+        }
+      },
+      {
+        "category": "Consolidation",
+        "scores": {
+          "mnemebrain": 100, "mnemebrain_lite": null, "structured_memory": null,
+          "mem0": null, "naive": null, "rag": null, "openai_rag": null, "langchain": null
+        }
+      },
+      {
+        "category": "Multi-hop Retrieval",
+        "scores": {
+          "mnemebrain": 100, "mnemebrain_lite": null, "structured_memory": null,
+          "mem0": null, "naive": null, "rag": null, "openai_rag": null, "langchain": null
+        }
+      },
+      {
+        "category": "Pattern Separation",
+        "scores": {
+          "mnemebrain": 100, "mnemebrain_lite": null, "structured_memory": null,
+          "mem0": null, "naive": null, "rag": null, "openai_rag": null, "langchain": null
+        }
+      }
+    ]
+  },
+  "system": {
+    "description": "System Benchmark",
+    "scenarios": 22,
+    "categories": 6,
+    "results": [
+      { "category": "Contradiction", "mnemebrain_lite": 87.5, "naive_baseline": null },
+      { "category": "Decay", "mnemebrain_lite": 100, "naive_baseline": null },
+      { "category": "Dedup", "mnemebrain_lite": 50.0, "naive_baseline": 75.0 },
+      { "category": "Extraction", "mnemebrain_lite": 100, "naive_baseline": 75.0 },
+      { "category": "Lifecycle", "mnemebrain_lite": 62.5, "naive_baseline": 50.0 },
+      { "category": "Retraction", "mnemebrain_lite": 83.3, "naive_baseline": null },
+      { "category": "Overall", "mnemebrain_lite": 80.6, "naive_baseline": 66.7 }
+    ]
+  },
+  "taskEvals": {
+    "description": "Task-Level Evaluations",
+    "scenarios": 18,
+    "questions": 59,
+    "preference": {
+      "title": "Preference Tracking",
+      "scenarios": 10,
+      "questions": 31,
+      "results": [
+        { "adapter": "mnemebrain_lite", "correct": 23, "total": 31, "accuracy": 74.2 },
+        { "adapter": "naive_baseline", "correct": 10, "total": 31, "accuracy": 32.3 }
+      ]
+    },
+    "longHorizon": {
+      "title": "Long-Horizon QA",
+      "scenarios": 8,
+      "questions": 25,
+      "results": [
+        { "adapter": "mnemebrain_lite", "correct": 19, "total": 25, "accuracy": 76.0 },
+        { "adapter": "naive_baseline", "correct": 6, "total": 25, "accuracy": 24.0 }
+      ]
+    }
+  },
+  "capabilities": {
+    "headers": ["store", "query", "retract", "explain", "contradiction", "decay", "revise", "sandbox", "attack", "consolidation", "hipporag", "pattern_separation"],
+    "adapters": [
+      { "name": "mnemebrain", "caps": [true, true, true, true, true, true, true, true, true, true, true, true] },
+      { "name": "mnemebrain_lite", "caps": [true, true, true, true, true, true, true, false, false, false, false, false] },
+      { "name": "mem0", "caps": [true, true, true, true, false, false, true, false, false, false, false, false] },
+      { "name": "structured_memory", "caps": [true, true, true, true, false, false, true, false, false, false, false, false] },
+      { "name": "naive / rag / langchain", "caps": [true, true, false, false, false, false, false, false, false, false, false, false] }
+    ]
+  },
+  "findings": [
+    "Core belief engine is the differentiator: MnemeBrain Lite scores 93% BMB vs 0\u201336% for all baselines using only 7 of 12 capabilities.",
+    "Baselines fail structurally: No baseline supports Belnap four-valued logic, temporal decay, or sandbox reasoning.",
+    "Mem0 (real API, graph enabled): 29% despite graph memory \u2014 no epistemic operations, aggressive deduplication loses evidence.",
+    "Task accuracy follows capability: 74\u201376% downstream accuracy (Lite) vs 24\u201332% (baselines) confirms memory capabilities translate to correct answers."
+  ]
+}

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaderboard &mdash; MnemeBrain Benchmark</title>
+<meta name="description" content="Full leaderboard for the Belief Maintenance Benchmark. Per-category breakdowns, system benchmarks, task evaluations, and capability matrix.">
+<meta property="og:title" content="MnemeBrain Benchmark Leaderboard">
+<meta property="og:description" content="48-task benchmark leaderboard. MnemeBrain 100%, Mem0 29%, RAG 0%. Per-category breakdowns, system benchmarks, capability matrix.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #f4f1eb;
+  --cream: #eae6dd;
+  --ink: #0a0a0f;
+  --neural: #2a5aff;
+  --pulse: #c8f542;
+  --danger: #ff4040;
+  --muted: rgba(10,10,15,0.48);
+  --border: rgba(10,10,15,0.08);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection { background: rgba(200,245,66,0.35); }
+
+a { color: var(--neural); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
+
+.label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--muted);
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;
+}
+.label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+h2 {
+  font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  line-height: 1.12; letter-spacing: -0.02em; margin-bottom: 1.2rem;
+}
+h2 em { font-style: italic; color: var(--neural); }
+
+h3 {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+  margin-bottom: 1.2rem;
+}
+
+.reveal {
+  opacity: 0; transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.on { opacity: 1; transform: none; }
+
+/* ---- NAV ---- */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.4rem 3rem;
+  background: rgba(244,241,235,0.88); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 0.6rem;
+  cursor: pointer; text-decoration: none;
+}
+.nav-logo:hover { text-decoration: none; }
+.nav-logo-wordmark {
+  font-family: 'Playfair Display', serif; font-size: 1.5rem;
+  letter-spacing: -0.03em; display: flex; align-items: baseline; line-height: 1;
+}
+.nav-logo-wordmark .mneme { color: var(--ink); font-weight: 400; }
+.nav-logo-wordmark .brain { color: var(--neural); font-weight: 700; }
+.nav-logo-tag {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.5rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted); margin-left: 0.6rem;
+  border: 1px solid var(--border); padding: 0.15rem 0.4rem;
+}
+.nav-links {
+  display: flex; gap: 2.5rem; list-style: none;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem;
+  font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.nav-links a {
+  text-decoration: none; color: var(--ink); opacity: 0.7;
+  transition: color 0.2s, opacity 0.2s;
+}
+.nav-links a:hover { color: var(--neural); opacity: 1; text-decoration: none; }
+.nav-links a.active { opacity: 1; color: var(--neural); }
+.nav-cta {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  background: var(--ink); color: var(--pulse);
+  padding: 0.6rem 1.4rem; text-decoration: none;
+  transition: background 0.2s;
+}
+.nav-cta:hover { background: var(--neural); color: #fff; text-decoration: none; }
+
+/* ---- HERO ---- */
+.hero { padding: 9rem 0 4rem; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--neural);
+  background: rgba(42,90,255,0.06); border: 1px solid rgba(42,90,255,0.18);
+  padding: 0.35rem 0.7rem; width: fit-content; margin-bottom: 2rem;
+}
+.hero-badge .dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--neural);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  line-height: 1.08; letter-spacing: -0.025em; margin-bottom: 1.4rem;
+}
+.hero h1 em { font-style: italic; color: var(--neural); }
+.hero-sub {
+  font-size: 1rem; line-height: 1.85; color: var(--muted);
+  max-width: 56ch; margin-bottom: 1rem;
+}
+.hero-meta {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+  color: var(--muted); letter-spacing: 0.04em;
+}
+
+/* ---- BAR CHART ---- */
+.chart-sec {
+  padding: 5rem 0; background: var(--ink); color: var(--paper);
+  border-top: 1px solid rgba(244,241,235,0.06);
+}
+.chart-sec .label { color: rgba(244,241,235,0.3); }
+.chart-sec .label::after { background: rgba(244,241,235,0.06); }
+.chart-sec h2 { color: var(--paper); }
+.chart-sec h2 em { color: var(--pulse); }
+.chart-sub {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem;
+  color: rgba(244,241,235,0.35); letter-spacing: 0.04em;
+  margin-bottom: 3rem;
+}
+.bar-chart { margin-bottom: 2rem; }
+.bar-row {
+  display: grid; grid-template-columns: 180px 1fr 50px;
+  gap: 1rem; align-items: center; margin-bottom: 0.5rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;
+}
+.bar-name { color: rgba(244,241,235,0.55); text-align: right; }
+.bar-name.top { color: var(--paper); }
+.bar-track {
+  height: 28px; background: rgba(244,241,235,0.03);
+  position: relative; overflow: hidden;
+}
+.bar-fill {
+  height: 100%; position: absolute; left: 0; top: 0;
+  width: 0; transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bar-pct { color: rgba(244,241,235,0.4); font-size: 0.65rem; }
+.bar-pct.top { color: var(--pulse); font-weight: 500; }
+
+/* ---- TABLES ---- */
+.table-sec { padding: 5rem 0; border-top: 1px solid var(--border); }
+.table-sec + .table-sec { padding-top: 3rem; }
+
+.data-table {
+  width: 100%; border-collapse: collapse; margin-top: 1.5rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+}
+.data-table th {
+  text-align: left; padding: 0.7rem 1rem;
+  border-bottom: 2px solid var(--ink);
+  font-weight: 500; font-size: 0.62rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted); white-space: nowrap;
+}
+.data-table th.num { text-align: center; }
+.data-table td {
+  padding: 0.6rem 1rem; border-bottom: 1px solid var(--border);
+  color: var(--ink);
+}
+.data-table td.num { text-align: center; }
+.data-table td.adapter { font-weight: 500; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr.overall-row td {
+  border-top: 2px solid var(--ink); font-weight: 500;
+}
+
+.score-best { color: var(--neural); font-weight: 500; }
+.score-zero { color: var(--danger); opacity: 0.6; }
+.score-skip { color: var(--muted); opacity: 0.4; }
+.score-mid { color: var(--ink); }
+
+/* ---- CAPABILITY MATRIX ---- */
+.cap-sec {
+  padding: 5rem 0; background: var(--ink); color: var(--paper);
+  border-top: 1px solid rgba(244,241,235,0.06);
+}
+.cap-sec .label { color: rgba(244,241,235,0.3); }
+.cap-sec .label::after { background: rgba(244,241,235,0.06); }
+.cap-sec h2 { color: var(--paper); }
+.cap-sec h2 em { color: var(--pulse); }
+
+.cap-table {
+  width: 100%; border-collapse: collapse; margin-top: 1.5rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem;
+}
+.cap-table th {
+  text-align: center; padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid rgba(244,241,235,0.1);
+  font-weight: 500; font-size: 0.58rem;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: rgba(244,241,235,0.4); white-space: nowrap;
+}
+.cap-table th:first-child { text-align: left; }
+.cap-table td {
+  padding: 0.55rem 0.5rem; text-align: center;
+  border-bottom: 1px solid rgba(244,241,235,0.04);
+}
+.cap-table td:first-child {
+  text-align: left; color: rgba(244,241,235,0.6); font-weight: 400;
+}
+.cap-yes { color: var(--pulse); }
+.cap-no { color: rgba(244,241,235,0.15); }
+
+/* ---- FINDINGS ---- */
+.findings-sec { padding: 5rem 0; border-top: 1px solid var(--border); }
+.finding-card {
+  background: var(--cream); padding: 1.4rem 1.8rem; margin-bottom: 0.8rem;
+  border-left: 3px solid var(--neural);
+  font-size: 0.9rem; line-height: 1.75; color: var(--muted);
+}
+.finding-num {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.1em; color: var(--neural); margin-bottom: 0.3rem;
+}
+.finding-card strong { color: var(--ink); font-weight: 500; }
+
+/* ---- FOOTER ---- */
+footer {
+  background: var(--ink); color: rgba(244,241,235,0.3);
+  padding: 2rem 2.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  border-top: 1px solid rgba(244,241,235,0.06);
+}
+footer a { color: rgba(244,241,235,0.3); }
+footer a:hover { color: rgba(244,241,235,0.6); }
+.footer-brand {
+  font-family: 'Playfair Display', serif; font-size: 0.9rem;
+  letter-spacing: -0.02em; color: var(--paper);
+}
+.footer-brand .b { color: var(--neural); font-weight: 700; }
+
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+  .wrap { padding: 0 1.5rem; }
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  .hero { padding: 7rem 0 3rem; }
+  .bar-row { grid-template-columns: 120px 1fr 40px; }
+  .bar-name { font-size: 0.6rem; }
+  .cap-table { font-size: 0.55rem; }
+  .cap-table th, .cap-table td { padding: 0.4rem 0.3rem; }
+  footer { flex-direction: column; gap: 0.8rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="./">
+    <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 50 80 C 46 80 43 78 41 76 C 37 76 33 73 31 69 C 27 69 22 65 22 60 C 18 58 16 53 18 49 C 15 45 15 41 18 38 C 16 34 18 30 22 28 C 20 24 24 20 29 20 C 30 16 35 14 39 15 C 41 11 46 10 50 10 C 54 10 59 11 61 15 C 65 14 70 17 71 21 C 75 21 79 25 78 30 C 82 32 84 37 82 41 C 85 45 85 49 82 53 C 84 57 82 62 78 64 C 78 69 74 72 70 73 C 68 76 64 78 60 78 C 58 80 54 80 50 80 Z" stroke="#c8f542" stroke-width="3" fill="#0a0a0f" stroke-linejoin="round"/>
+      <line x1="34" y1="40" x2="50" y2="54" stroke="#4a7fff" stroke-width="2"/>
+      <line x1="66" y1="40" x2="50" y2="54" stroke="#4a7fff" stroke-width="2"/>
+      <line x1="34" y1="40" x2="66" y2="40" stroke="#4a7fff" stroke-width="1.4" stroke-dasharray="3,2" opacity="0.6"/>
+      <circle cx="34" cy="40" r="4.5" fill="#2a5aff"/>
+      <circle cx="66" cy="40" r="4.5" fill="#2a5aff"/>
+      <circle cx="50" cy="54" r="5.5" fill="#c8f542"/>
+    </svg>
+    <div class="nav-logo-wordmark">
+      <span class="mneme">mneme</span><span class="brain">brain</span>
+    </div>
+    <span class="nav-logo-tag">benchmark</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="./">Overview</a></li>
+    <li><a href="leaderboard.html" class="active">Leaderboard</a></li>
+  </ul>
+  <a class="nav-cta" href="https://github.com/mnemebrain/mnemebrain-benchmark" target="_blank" rel="noopener noreferrer">GitHub</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-badge reveal"><span class="dot"></span>Live benchmark data</div>
+    <h1 class="reveal">Benchmark <em>leaderboard.</em></h1>
+    <p class="hero-sub reveal">
+      Full results across all benchmark suites. Per-category breakdowns, system benchmarks,
+      task-level evaluations, and the capability matrix.
+    </p>
+    <p class="hero-meta reveal" id="meta-line">Loading data&hellip;</p>
+  </div>
+</section>
+
+<!-- BMB OVERALL -->
+<section class="chart-sec" id="bmb">
+  <div class="wrap">
+    <div class="label reveal">Belief Maintenance Benchmark</div>
+    <h2 class="reveal">Overall <em>scores.</em></h2>
+    <div class="chart-sub reveal" id="bmb-sub"></div>
+    <div class="bar-chart reveal" id="bar-chart"></div>
+  </div>
+</section>
+
+<!-- PER-CATEGORY -->
+<section class="table-sec" id="categories">
+  <div class="wrap">
+    <div class="label reveal">Per-category breakdown</div>
+    <h2 class="reveal">Where each system <em>fails.</em></h2>
+    <div class="table-scroll reveal" id="category-table"></div>
+  </div>
+</section>
+
+<!-- SYSTEM BENCHMARK -->
+<section class="table-sec" id="system">
+  <div class="wrap">
+    <div class="label reveal">System benchmark</div>
+    <h2 class="reveal">End-to-end <em>scenarios.</em></h2>
+    <div class="table-scroll reveal" id="system-table"></div>
+  </div>
+</section>
+
+<!-- TASK EVALUATIONS -->
+<section class="table-sec" id="tasks">
+  <div class="wrap">
+    <div class="label reveal">Task-level evaluations</div>
+    <h2 class="reveal">Downstream <em>accuracy.</em></h2>
+    <p class="reveal" style="font-size:0.9rem; color:var(--muted); margin-bottom:2rem; line-height:1.7;">
+      Does better memory capability translate to correct answers on real tasks?
+    </p>
+    <div id="task-tables" class="reveal"></div>
+  </div>
+</section>
+
+<!-- CAPABILITY MATRIX -->
+<section class="cap-sec" id="capabilities">
+  <div class="wrap">
+    <div class="label reveal">Capability matrix</div>
+    <h2 class="reveal">What each system <em>can do.</em></h2>
+    <div class="table-scroll reveal" id="cap-table"></div>
+  </div>
+</section>
+
+<!-- KEY FINDINGS -->
+<section class="findings-sec" id="findings">
+  <div class="wrap">
+    <div class="label reveal">Key findings</div>
+    <h2 class="reveal">What the data <em>shows.</em></h2>
+    <div id="findings-list" class="reveal"></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">mneme<span class="b">brain</span></div>
+  <div>Belief memory infrastructure for AI agents. &copy; 2026</div>
+  <div>
+    <a href="https://github.com/mnemebrain/mnemebrain-benchmark">GitHub</a> &middot;
+    <a href="https://github.com/mnemebrain/mnemebrain-benchmark/blob/main/leaderboard/reports/BMB_REPORT.md">BMB Report</a> &middot;
+    <a href="https://github.com/mnemebrain/mnemebrain-benchmark/blob/main/CONTRIBUTING.md">Contributing</a>
+  </div>
+</footer>
+
+<script>
+(function() {
+  // Reveal on scroll
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('on'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(function(el) { obs.observe(el); });
+
+  function barColor(score) {
+    if (score >= 90) return 'var(--pulse)';
+    if (score >= 50) return 'rgba(42,90,255,0.6)';
+    if (score > 0) return 'rgba(244,241,235,0.18)';
+    return 'rgba(255,64,64,0.25)';
+  }
+
+  function esc(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.textContent;
+  }
+
+  function scoreCell(val, best) {
+    if (val === null || val === undefined) return '<td class="num"><span class="score-skip">\u2013</span></td>';
+    var cls = val === best ? 'score-best' : val === 0 ? 'score-zero' : 'score-mid';
+    return '<td class="num"><span class="' + cls + '">' + esc(String(val)) + '%</span></td>';
+  }
+
+  function taskTableHTML(data) {
+    var html = '<h3>' + esc(data.title) + ' <span style="font-weight:300;text-transform:none;letter-spacing:0;">(' + data.scenarios + ' scenarios, ' + data.questions + ' questions)</span></h3>';
+    html += '<table class="data-table"><thead><tr><th>Adapter</th><th class="num">Correct</th><th class="num">Total</th><th class="num">Accuracy</th></tr></thead><tbody>';
+    data.results.forEach(function(r, i) {
+      var cls = i === 0 ? 'score-best' : 'score-mid';
+      html += '<tr><td class="adapter">' + esc(r.adapter) + '</td><td class="num">' + r.correct + '</td><td class="num">' + r.total + '</td><td class="num"><span class="' + cls + '">' + r.accuracy + '%</span></td></tr>';
+    });
+    html += '</tbody></table>';
+    return html;
+  }
+
+  fetch('data.json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      // Meta
+      document.getElementById('meta-line').textContent =
+        'Last updated: ' + data.lastUpdated + '  \u00b7  Embedding model: ' + data.embeddingModel;
+
+      // BMB sub
+      document.getElementById('bmb-sub').textContent =
+        data.bmb.tasks + ' tasks \u00b7 ' + data.bmb.categories + ' categories \u00b7 ~' + data.bmb.checks + ' checks \u00b7 zero LLM calls \u00b7 fully deterministic';
+
+      // Bar chart
+      var chartEl = document.getElementById('bar-chart');
+      var frag = document.createDocumentFragment();
+      data.bmb.overall.forEach(function(item) {
+        var isTop = item.score >= 90;
+        var w = Math.max(item.score, 0.3);
+        var row = document.createElement('div');
+        row.className = 'bar-row';
+
+        var name = document.createElement('div');
+        name.className = 'bar-name' + (isTop ? ' top' : '');
+        name.textContent = item.adapter;
+
+        var track = document.createElement('div');
+        track.className = 'bar-track';
+        var fill = document.createElement('div');
+        fill.className = 'bar-fill';
+        fill.dataset.width = String(w);
+        fill.style.background = barColor(item.score);
+        track.appendChild(fill);
+
+        var pct = document.createElement('div');
+        pct.className = 'bar-pct' + (isTop ? ' top' : '');
+        pct.textContent = item.score + '%';
+
+        row.appendChild(name);
+        row.appendChild(track);
+        row.appendChild(pct);
+        frag.appendChild(row);
+      });
+      chartEl.appendChild(frag);
+
+      // Animate bars on scroll
+      var chartObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) {
+            e.target.querySelectorAll('.bar-fill').forEach(function(bar, i) {
+              setTimeout(function() { bar.style.width = bar.dataset.width + '%'; }, i * 100);
+            });
+            chartObs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.3 });
+      chartObs.observe(chartEl);
+
+      // Per-category table
+      var adapters = ['mnemebrain', 'mnemebrain_lite', 'structured_memory', 'mem0', 'naive', 'rag', 'openai_rag', 'langchain'];
+      var adapterLabels = ['MnemeBrain', 'Lite', 'Structured', 'Mem0', 'Naive', 'RAG', 'OpenAI RAG', 'LangChain'];
+      var catTable = document.createElement('table');
+      catTable.className = 'data-table';
+      var thead = '<thead><tr><th>Category</th>';
+      adapterLabels.forEach(function(a) { thead += '<th class="num">' + esc(a) + '</th>'; });
+      thead += '</tr></thead>';
+      var tbody = '<tbody>';
+      data.bmb.categories_detail.forEach(function(cat) {
+        tbody += '<tr><td class="adapter">' + esc(cat.category) + '</td>';
+        var vals = adapters.map(function(a) { return cat.scores[a]; });
+        var validVals = vals.filter(function(v) { return v !== null && v !== undefined; });
+        var best = validVals.length > 0 ? Math.max.apply(null, validVals) : -1;
+        adapters.forEach(function(a) { tbody += scoreCell(cat.scores[a], best); });
+        tbody += '</tr>';
+      });
+      tbody += '</tbody>';
+      catTable.innerHTML = thead + tbody;
+      document.getElementById('category-table').appendChild(catTable);
+
+      // System benchmark table
+      var sysTable = document.createElement('table');
+      sysTable.className = 'data-table';
+      var sHead = '<thead><tr><th>Category</th><th class="num">MnemeBrain Lite</th><th class="num">Naive Baseline</th></tr></thead>';
+      var sBody = '<tbody>';
+      data.system.results.forEach(function(row) {
+        var isOverall = row.category === 'Overall';
+        var trCls = isOverall ? ' class="overall-row"' : '';
+        var vals = [row.mnemebrain_lite, row.naive_baseline].filter(function(v) { return v !== null && v !== undefined; });
+        var best = vals.length > 0 ? Math.max.apply(null, vals) : -1;
+        sBody += '<tr' + trCls + '><td class="adapter">' + esc(row.category) + '</td>';
+        sBody += scoreCell(row.mnemebrain_lite, best);
+        sBody += scoreCell(row.naive_baseline, best);
+        sBody += '</tr>';
+      });
+      sBody += '</tbody>';
+      sysTable.innerHTML = sHead + sBody;
+      document.getElementById('system-table').appendChild(sysTable);
+
+      // Task eval tables
+      var taskContainer = document.getElementById('task-tables');
+      var taskDiv = document.createElement('div');
+      taskDiv.innerHTML = taskTableHTML(data.taskEvals.preference) +
+        '<div style="margin-top:2.5rem;"></div>' +
+        taskTableHTML(data.taskEvals.longHorizon);
+      taskContainer.appendChild(taskDiv);
+
+      // Capability matrix
+      var capTable = document.createElement('table');
+      capTable.className = 'cap-table';
+      var cHead = '<thead><tr><th>Adapter</th>';
+      data.capabilities.headers.forEach(function(h) {
+        cHead += '<th>' + esc(h.replace(/_/g, ' ')) + '</th>';
+      });
+      cHead += '</tr></thead>';
+      var cBody = '<tbody>';
+      data.capabilities.adapters.forEach(function(a) {
+        cBody += '<tr><td>' + esc(a.name) + '</td>';
+        a.caps.forEach(function(c) {
+          cBody += '<td><span class="' + (c ? 'cap-yes' : 'cap-no') + '">' + (c ? '\u2713' : '\u2014') + '</span></td>';
+        });
+        cBody += '</tr>';
+      });
+      cBody += '</tbody>';
+      capTable.innerHTML = cHead + cBody;
+      document.getElementById('cap-table').appendChild(capTable);
+
+      // Findings
+      var findContainer = document.getElementById('findings-list');
+      var findFrag = document.createDocumentFragment();
+      data.findings.forEach(function(f, i) {
+        var parts = f.split(': ');
+        var title = parts[0];
+        var body = parts.slice(1).join(': ');
+        var card = document.createElement('div');
+        card.className = 'finding-card';
+        var num = document.createElement('div');
+        num.className = 'finding-num';
+        num.textContent = 'Finding ' + String(i + 1).padStart(2, '0');
+        card.appendChild(num);
+        var content = document.createElement('span');
+        var strong = document.createElement('strong');
+        strong.textContent = title + ': ';
+        content.appendChild(strong);
+        content.appendChild(document.createTextNode(body));
+        card.appendChild(content);
+        findFrag.appendChild(card);
+      });
+      findContainer.appendChild(findFrag);
+    })
+    .catch(function(err) {
+      document.getElementById('meta-line').textContent = 'Failed to load data. Check data.json.';
+      console.error(err);
+    });
+})();
+</script>
+
+</body>
+</html>

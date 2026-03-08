@@ -74,37 +74,43 @@ code {
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 1.2rem 2.5rem;
+  padding: 1.4rem 3rem;
   background: rgba(244,241,235,0.88); backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
 .nav-logo {
-  font-family: 'Playfair Display', serif; font-size: 1.35rem;
-  letter-spacing: -0.03em; text-decoration: none; color: var(--ink);
-  display: flex; align-items: baseline; gap: 0;
+  display: flex; align-items: center; gap: 0.6rem;
+  cursor: pointer; text-decoration: none;
 }
-.nav-logo .b { color: var(--neural); font-weight: 700; }
-.nav-logo .tag {
+.nav-logo:hover { text-decoration: none; }
+.nav-logo-wordmark {
+  font-family: 'Playfair Display', serif; font-size: 1.5rem;
+  letter-spacing: -0.03em; display: flex; align-items: baseline; line-height: 1;
+}
+.nav-logo-wordmark .mneme { color: var(--ink); font-weight: 400; }
+.nav-logo-wordmark .brain { color: var(--neural); font-weight: 700; }
+.nav-logo-tag {
   font-family: 'IBM Plex Mono', monospace; font-size: 0.5rem;
   letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--muted); margin-left: 0.6rem;
   border: 1px solid var(--border); padding: 0.15rem 0.4rem;
 }
 .nav-links {
-  display: flex; gap: 1rem; list-style: none;
-  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem;
-  letter-spacing: 0.06em;
+  display: flex; gap: 2.5rem; list-style: none;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem;
+  font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
 }
 .nav-links a {
-  text-decoration: none; color: var(--ink); opacity: 0.55;
-  padding: 0.4rem 0.7rem; transition: opacity 0.2s;
+  text-decoration: none; color: var(--ink); opacity: 0.7;
+  transition: color 0.2s, opacity 0.2s;
 }
-.nav-links a:hover { opacity: 1; text-decoration: none; }
+.nav-links a:hover { color: var(--neural); opacity: 1; text-decoration: none; }
+.nav-links a.active { opacity: 1; color: var(--neural); }
 .nav-cta {
-  font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
   letter-spacing: 0.08em; text-transform: uppercase;
   background: var(--ink); color: var(--pulse);
-  padding: 0.5rem 1.2rem; text-decoration: none;
+  padding: 0.6rem 1.4rem; text-decoration: none;
   transition: background 0.2s;
 }
 .nav-cta:hover { background: var(--neural); color: #fff; text-decoration: none; }
@@ -446,12 +452,24 @@ footer a:hover { color: rgba(244,241,235,0.6); }
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="#">mneme<span class="b">brain</span><span class="tag">benchmark</span></a>
+  <a class="nav-logo" href="./">
+    <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 50 80 C 46 80 43 78 41 76 C 37 76 33 73 31 69 C 27 69 22 65 22 60 C 18 58 16 53 18 49 C 15 45 15 41 18 38 C 16 34 18 30 22 28 C 20 24 24 20 29 20 C 30 16 35 14 39 15 C 41 11 46 10 50 10 C 54 10 59 11 61 15 C 65 14 70 17 71 21 C 75 21 79 25 78 30 C 82 32 84 37 82 41 C 85 45 85 49 82 53 C 84 57 82 62 78 64 C 78 69 74 72 70 73 C 68 76 64 78 60 78 C 58 80 54 80 50 80 Z" stroke="#c8f542" stroke-width="3" fill="#0a0a0f" stroke-linejoin="round"/>
+      <line x1="34" y1="40" x2="50" y2="54" stroke="#4a7fff" stroke-width="2"/>
+      <line x1="66" y1="40" x2="50" y2="54" stroke="#4a7fff" stroke-width="2"/>
+      <line x1="34" y1="40" x2="66" y2="40" stroke="#4a7fff" stroke-width="1.4" stroke-dasharray="3,2" opacity="0.6"/>
+      <circle cx="34" cy="40" r="4.5" fill="#2a5aff"/>
+      <circle cx="66" cy="40" r="4.5" fill="#2a5aff"/>
+      <circle cx="50" cy="54" r="5.5" fill="#c8f542"/>
+    </svg>
+    <div class="nav-logo-wordmark">
+      <span class="mneme">mneme</span><span class="brain">brain</span>
+    </div>
+    <span class="nav-logo-tag">benchmark</span>
+  </a>
   <ul class="nav-links">
-    <li><a href="#problem">Problem</a></li>
-    <li><a href="#results">Results</a></li>
-    <li><a href="#quickstart">Quickstart</a></li>
-    <li><a href="#adapters">Adapters</a></li>
+    <li><a href="./" class="active">Overview</a></li>
+    <li><a href="leaderboard.html">Leaderboard</a></li>
   </ul>
   <a class="nav-cta" href="https://github.com/mnemebrain/mnemebrain-benchmark" target="_blank" rel="noopener noreferrer">GitHub</a>
 </nav>
