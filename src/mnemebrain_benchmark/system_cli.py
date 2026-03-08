@@ -1,4 +1,5 @@
 """CLI entry point for the system benchmark."""
+
 from __future__ import annotations
 
 import argparse
@@ -6,6 +7,7 @@ import os
 import sys
 
 from mnemebrain_benchmark.interface import MemorySystem
+from mnemebrain_benchmark.providers import SentenceTransformerProvider
 from mnemebrain_benchmark.scenarios.loader import load_scenarios
 from mnemebrain_benchmark.system_report import export_json, format_scorecard
 from mnemebrain_benchmark.system_runner import SystemBenchmarkRunner
@@ -16,23 +18,9 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
 
     if adapter_filter is None or adapter_filter == "naive_baseline":
         try:
-            import numpy as np
-            from sentence_transformers import SentenceTransformer
-
             from mnemebrain_benchmark.adapters.naive_baseline import NaiveBaseline
 
-            class _STProvider:
-                def __init__(self) -> None:
-                    self._model = SentenceTransformer("all-MiniLM-L6-v2")
-                def embed(self, text: str) -> list[float]:
-                    return self._model.encode(text).tolist()
-                def similarity(self, a: list[float], b: list[float]) -> float:
-                    a_arr, b_arr = np.array(a), np.array(b)
-                    dot = np.dot(a_arr, b_arr)
-                    norm = np.linalg.norm(a_arr) * np.linalg.norm(b_arr)
-                    return float(dot / norm) if norm > 0 else 0.0
-
-            adapters.append(NaiveBaseline(_STProvider()))
+            adapters.append(NaiveBaseline(SentenceTransformerProvider()))
         except ImportError:
             if adapter_filter == "naive_baseline":
                 print(
@@ -44,6 +32,7 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
     if adapter_filter is None or adapter_filter == "mnemebrain":
         try:
             from mnemebrain_benchmark.adapters.mnemebrain_adapter import MnemeBrainAdapter
+
             base_url = os.environ.get("MNEMEBRAIN_URL", "http://localhost:8000")
             adapters.append(MnemeBrainAdapter(base_url=base_url))
         except ImportError:
@@ -54,19 +43,33 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
                 )
                 sys.exit(1)
 
+    if adapter_filter is None or adapter_filter == "mnemebrain_lite":
+        try:
+            from mnemebrain_benchmark.adapters.mnemebrain_lite_adapter import (
+                MnemeBrainLiteAdapter,
+            )
+
+            adapters.append(MnemeBrainLiteAdapter(SentenceTransformerProvider()))
+        except ImportError:
+            if adapter_filter == "mnemebrain_lite":
+                print("mnemebrain_lite adapter requires: pip install mnemebrain-lite[embeddings]")
+                sys.exit(1)
+
     return adapters
 
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(
-        description="MnemeBrain System Benchmark"
+    parser = argparse.ArgumentParser(description="MnemeBrain System Benchmark")
+    parser.add_argument(
+        "--adapter",
+        type=str,
+        default=None,
+        choices=["mnemebrain", "mnemebrain_lite", "naive_baseline"],
     )
     parser.add_argument(
-        "--adapter", type=str, default=None,
-        choices=["mnemebrain", "naive_baseline"],
-    )
-    parser.add_argument(
-        "--category", type=str, default=None,
+        "--category",
+        type=str,
+        default=None,
         choices=["contradiction", "retraction", "decay", "dedup", "extraction", "lifecycle"],
     )
     parser.add_argument("--scenario", type=str, default=None)

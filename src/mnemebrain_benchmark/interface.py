@@ -1,4 +1,5 @@
 """MemorySystem interface for the system benchmark."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -60,9 +61,9 @@ class ExplainResult:
 @dataclass
 class ReviseResult:
     belief_id: str
-    truth_state: str
-    confidence: float
-    superseded_count: int
+    truth_state: str | None = None
+    confidence: float | None = None
+    superseded_count: int = 0
 
 
 @dataclass
@@ -106,7 +107,7 @@ class MemorySystem(ABC):
     @abstractmethod
     def query(self, claim: str) -> list[QueryResult]: ...
 
-    def retract(self, evidence_id: str) -> RetractResult:
+    def retract(self, belief_id: str) -> RetractResult:
         raise NotImplementedError
 
     def explain(self, claim: str) -> ExplainResult:
@@ -140,8 +141,11 @@ class MemorySystem(ABC):
         raise NotImplementedError
 
     def add_attack(
-        self, attacker_id: str, target_id: str,
-        attack_type: str, weight: float,
+        self,
+        attacker_id: str,
+        target_id: str,
+        attack_type: str,
+        weight: float,
     ) -> AttackResult:
         raise NotImplementedError
 

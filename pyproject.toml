@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mnemebrain-benchmark"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "Vendor-neutral evaluation harness for memory systems"
 requires-python = ">=3.12"
 license = "MIT"
@@ -14,10 +14,11 @@ dependencies = [
 
 [project.optional-dependencies]
 mnemebrain = ["mnemebrain>=1.0.0a1"]
-embeddings = ["sentence-transformers>=2.2"]
-mem0 = ["mem0ai>=0.1"]
-openai = ["openai>=1.0"]
-all = ["mnemebrain-benchmark[mnemebrain,embeddings,mem0,openai]"]
+mnemebrain-lite = ["mnemebrain-lite>=0.1.0a1"]
+embeddings = ["sentence-transformers>=2.2,<4.0"]
+mem0 = ["mem0ai>=0.1,<2.0"]
+openai = ["openai>=1.0,<3.0"]
+all = ["mnemebrain-benchmark[mnemebrain,mnemebrain-lite,embeddings,mem0,openai]"]
 dev = ["pytest>=8.0", "pytest-cov>=5.0", "ruff>=0.8", "mypy>=1.13"]
 
 [project.scripts]
@@ -39,6 +40,7 @@ select = ["E", "F", "I", "UP", "B"]
 python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
+warn_unused_ignores = true
 disallow_untyped_defs = false
 
 [tool.pytest.ini_options]

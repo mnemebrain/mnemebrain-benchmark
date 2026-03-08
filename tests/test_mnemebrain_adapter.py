@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.adapters.mnemebrain_adapter (mocked SDK)."""
+
 from __future__ import annotations
 
 import sys
@@ -17,8 +18,12 @@ def mock_mnemebrain_sdk():
 
     class FakeEvidenceInput:
         def __init__(
-            self, source_ref="", content="",
-            polarity="supports", weight=0.7, reliability=0.8,
+            self,
+            source_ref="",
+            content="",
+            polarity="supports",
+            weight=0.7,
+            reliability=0.8,
         ):
             self.source_ref = source_ref
             self.content = content
@@ -48,7 +53,7 @@ def mock_mnemebrain_sdk():
             r.results = [item]
             return r
 
-        def retract(self, evidence_id=""):
+        def retract(self, belief_id=""):
             r = MagicMock()
             r.id = "b-1#1"
             r.truth_state = "false"
@@ -142,6 +147,7 @@ def mock_mnemebrain_sdk():
 
 def _get_adapter():
     from mnemebrain_benchmark.adapters.mnemebrain_adapter import MnemeBrainAdapter
+
     return MnemeBrainAdapter(base_url="http://test:8000")
 
 

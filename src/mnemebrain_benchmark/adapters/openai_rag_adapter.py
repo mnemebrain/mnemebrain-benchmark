@@ -2,6 +2,7 @@
 
 Requires OPENAI_API_KEY environment variable and openai package.
 """
+
 from __future__ import annotations
 
 import os
@@ -77,11 +78,13 @@ class OpenAIRAGAdapter(MemorySystem):
                 )
 
         entry_id = str(uuid4())
-        self._entries.append({
-            "id": entry_id,
-            "claim": claim,
-            "embedding": embedding,
-        })
+        self._entries.append(
+            {
+                "id": entry_id,
+                "claim": claim,
+                "embedding": embedding,
+            }
+        )
         return StoreResult(
             belief_id=entry_id,
             merged=False,
@@ -98,12 +101,14 @@ class OpenAIRAGAdapter(MemorySystem):
         for entry in self._entries:
             sim = _cosine_sim(embedding, entry["embedding"])
             if sim >= 0.5:
-                results.append(QueryResult(
-                    belief_id=entry["id"],
-                    claim=entry["claim"],
-                    confidence=None,
-                    truth_state=None,
-                ))
+                results.append(
+                    QueryResult(
+                        belief_id=entry["id"],
+                        claim=entry["claim"],
+                        confidence=None,
+                        truth_state=None,
+                    )
+                )
         return results
 
     def reset(self) -> None:

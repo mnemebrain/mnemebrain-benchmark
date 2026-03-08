@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.system_runner -- SystemBenchmarkRunner."""
+
 from __future__ import annotations
 
 from mnemebrain_benchmark.interface import (
@@ -36,7 +37,7 @@ class FakeSystem(MemorySystem):
     def query(self, claim):
         return [QueryResult("b-1#1", claim, 0.9, "true")]
 
-    def retract(self, evidence_id):
+    def retract(self, belief_id):
         return RetractResult(1, 1)
 
     def explain(self, claim):
@@ -83,7 +84,9 @@ class TestRunScenario:
 
     def test_store_and_query(self):
         scenario = Scenario(
-            name="basic", description="d", category="contradiction",
+            name="basic",
+            description="d",
+            category="contradiction",
             requires=["store", "query"],
             actions=[
                 Action(label="s1", type="store", claim="test", evidence=[{}]),
@@ -104,7 +107,9 @@ class TestRunScenario:
                 return {Capability.STORE}
 
         scenario = Scenario(
-            name="needs_retract", description="d", category="retraction",
+            name="needs_retract",
+            description="d",
+            category="retraction",
             requires=["retract"],
             actions=[Action(label="r1", type="retract", target_label="s1")],
             expectations=[],
@@ -114,7 +119,9 @@ class TestRunScenario:
 
     def test_retract_action(self):
         scenario = Scenario(
-            name="retract_test", description="d", category="retraction",
+            name="retract_test",
+            description="d",
+            category="retraction",
             requires=["store", "retract"],
             actions=[
                 Action(label="s1", type="store", claim="test", evidence=[{}]),
@@ -127,7 +134,9 @@ class TestRunScenario:
 
     def test_explain_action(self):
         scenario = Scenario(
-            name="explain_test", description="d", category="extraction",
+            name="explain_test",
+            description="d",
+            category="extraction",
             requires=["explain"],
             actions=[Action(label="e1", type="explain", claim="test")],
             expectations=[Expectation(action_label="e1", explanation_has_evidence=True)],
@@ -137,7 +146,9 @@ class TestRunScenario:
 
     def test_wait_days_action(self):
         scenario = Scenario(
-            name="decay_test", description="d", category="decay",
+            name="decay_test",
+            description="d",
+            category="decay",
             requires=["decay"],
             actions=[Action(label="w1", type="wait_days", wait_days=30)],
             expectations=[],
@@ -151,7 +162,9 @@ class TestRunScenario:
                 raise NotImplementedError
 
         scenario = Scenario(
-            name="decay_test", description="d", category="decay",
+            name="decay_test",
+            description="d",
+            category="decay",
             requires=["decay"],
             actions=[Action(label="w1", type="wait_days", wait_days=30)],
             expectations=[],
@@ -161,7 +174,9 @@ class TestRunScenario:
 
     def test_revise_action(self):
         scenario = Scenario(
-            name="revise_test", description="d", category="belief_revision",
+            name="revise_test",
+            description="d",
+            category="belief_revision",
             requires=["store", "revise"],
             actions=[
                 Action(label="s1", type="store", claim="test", evidence=[{}]),
@@ -174,14 +189,18 @@ class TestRunScenario:
 
     def test_sandbox_fork_assume_resolve_discard(self):
         scenario = Scenario(
-            name="sandbox_test", description="d", category="counterfactual",
+            name="sandbox_test",
+            description="d",
+            category="counterfactual",
             requires=["store", "sandbox"],
             actions=[
                 Action(label="s1", type="store", claim="test", evidence=[{}]),
                 Action(label="sf1", type="sandbox_fork", scenario_label="test"),
                 Action(
-                    label="sa1", type="sandbox_assume",
-                    sandbox_label="sf1", belief_label="s1",
+                    label="sa1",
+                    type="sandbox_assume",
+                    sandbox_label="sf1",
+                    belief_label="s1",
                     truth_state_override="false",
                 ),
                 Action(label="sr1", type="sandbox_resolve", sandbox_label="sf1", belief_label="s1"),
@@ -196,7 +215,9 @@ class TestRunScenario:
 
     def test_add_attack_action(self):
         scenario = Scenario(
-            name="attack_test", description="d", category="contradiction",
+            name="attack_test",
+            description="d",
+            category="contradiction",
             requires=["store", "attack"],
             actions=[
                 Action(label="s1", type="store", claim="claim a", evidence=[{}]),
@@ -210,7 +231,9 @@ class TestRunScenario:
 
     def test_consolidate_action(self):
         scenario = Scenario(
-            name="consolidate_test", description="d", category="consolidation",
+            name="consolidate_test",
+            description="d",
+            category="consolidation",
             requires=["consolidation"],
             actions=[Action(label="c1", type="consolidate")],
             expectations=[Expectation(action_label="c1", semantic_beliefs_created_gte=1)],
@@ -220,7 +243,9 @@ class TestRunScenario:
 
     def test_query_multihop_action(self):
         scenario = Scenario(
-            name="multihop_test", description="d", category="multihop_retrieval",
+            name="multihop_test",
+            description="d",
+            category="multihop_retrieval",
             requires=["hipporag"],
             actions=[Action(label="mh1", type="query_multihop", claim="multi query")],
             expectations=[Expectation(action_label="mh1", multihop_returns_claim=True)],
@@ -230,7 +255,9 @@ class TestRunScenario:
 
     def test_get_memory_tier_action(self):
         scenario = Scenario(
-            name="tier_test", description="d", category="consolidation",
+            name="tier_test",
+            description="d",
+            category="consolidation",
             requires=["store", "consolidation"],
             actions=[
                 Action(label="s1", type="store", claim="test", evidence=[{}]),
@@ -243,8 +270,12 @@ class TestRunScenario:
 
     def test_reset_called(self):
         scenario = Scenario(
-            name="reset_test", description="d", category="contradiction",
-            requires=[], actions=[], expectations=[],
+            name="reset_test",
+            description="d",
+            category="contradiction",
+            requires=[],
+            actions=[],
+            expectations=[],
         )
         self.runner.run_scenario(self.system, scenario)
         assert self.system.reset_count == 1
@@ -256,7 +287,9 @@ class TestRunAll:
         system1 = FakeSystem()
         system2 = FakeSystem()
         scenario = Scenario(
-            name="basic", description="d", category="contradiction",
+            name="basic",
+            description="d",
+            category="contradiction",
             requires=["store"],
             actions=[Action(label="s1", type="store", claim="x", evidence=[{}])],
             expectations=[Expectation(action_label="s1", beliefs_stored=1)],
@@ -273,7 +306,9 @@ class TestRunAll:
                 raise RuntimeError("boom")
 
         scenario = Scenario(
-            name="crash", description="d", category="contradiction",
+            name="crash",
+            description="d",
+            category="contradiction",
             requires=["store"],
             actions=[Action(label="s1", type="store", claim="x", evidence=[{}])],
             expectations=[Expectation(action_label="s1", beliefs_stored=1)],

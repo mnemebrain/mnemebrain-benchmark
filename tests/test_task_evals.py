@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.task_evals.base."""
+
 from __future__ import annotations
 
 from mnemebrain_benchmark.interface import QueryResult
@@ -45,7 +46,9 @@ class TestTaskResult:
 class TestTaskScenario:
     def test_construction(self):
         s = TaskScenario(
-            name="s1", description="d", category="cat",
+            name="s1",
+            description="d",
+            category="cat",
             actions=[TaskAction(type="store")],
             questions=[TaskQuestion(query="q", expected_keywords=["k"])],
         )

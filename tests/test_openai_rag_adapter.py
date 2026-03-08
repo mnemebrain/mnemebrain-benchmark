@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.adapters.openai_rag_adapter (mocked OpenAI)."""
+
 from __future__ import annotations
 
 import sys
@@ -40,6 +41,7 @@ def mock_openai_module():
 
 def _get_adapter_class():
     from mnemebrain_benchmark.adapters.openai_rag_adapter import OpenAIRAGAdapter
+
     return OpenAIRAGAdapter
 
 
@@ -99,12 +101,15 @@ class TestOpenAIRAGAdapter:
 class TestCosineSimHelper:
     def test_identical_vectors(self):
         from mnemebrain_benchmark.adapters.openai_rag_adapter import _cosine_sim
+
         assert _cosine_sim([1.0, 0.0], [1.0, 0.0]) == 1.0
 
     def test_orthogonal_vectors(self):
         from mnemebrain_benchmark.adapters.openai_rag_adapter import _cosine_sim
+
         assert abs(_cosine_sim([1.0, 0.0], [0.0, 1.0])) < 0.001
 
     def test_zero_vector(self):
         from mnemebrain_benchmark.adapters.openai_rag_adapter import _cosine_sim
+
         assert _cosine_sim([0.0, 0.0], [1.0, 0.0]) == 0.0

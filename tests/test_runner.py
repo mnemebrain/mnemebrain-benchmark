@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.runner -- embedding benchmark orchestrator."""
+
 from __future__ import annotations
 
 import json

@@ -1,4 +1,5 @@
 """Tests for task evaluation runner."""
+
 from __future__ import annotations
 
 from mnemebrain_benchmark.interface import (
@@ -33,17 +34,25 @@ class FakeMemory(MemorySystem):
     def store(self, claim: str, evidence: list[dict]) -> StoreResult:
         self._claims.append(claim)
         return StoreResult(
-            belief_id=str(len(self._claims) - 1), merged=False,
-            contradiction_detected=False, truth_state="true", confidence=0.8,
+            belief_id=str(len(self._claims) - 1),
+            merged=False,
+            contradiction_detected=False,
+            truth_state="true",
+            confidence=0.8,
         )
 
     def query(self, claim: str) -> list[QueryResult]:
         results = []
         for i, c in enumerate(self._claims):
             if any(w in c.lower() for w in claim.lower().split() if len(w) > 3):
-                results.append(QueryResult(
-                    belief_id=str(i), claim=c, confidence=0.8, truth_state="true",
-                ))
+                results.append(
+                    QueryResult(
+                        belief_id=str(i),
+                        claim=c,
+                        confidence=0.8,
+                        truth_state="true",
+                    )
+                )
         return results
 
     def reset(self) -> None:
@@ -54,10 +63,15 @@ class TestTaskEvalRunner:
     def test_run_scenario(self):
         system = FakeMemory()
         scenario = TaskScenario(
-            name="test_scenario", description="test", category="test",
+            name="test_scenario",
+            description="test",
+            category="test",
             actions=[
-                TaskAction(type="store", claim="User likes pizza",
-                           evidence=[{"content": "said so", "polarity": "supports"}]),
+                TaskAction(
+                    type="store",
+                    claim="User likes pizza",
+                    evidence=[{"content": "said so", "polarity": "supports"}],
+                ),
             ],
             questions=[
                 TaskQuestion(query="pizza", expected_keywords=["pizza"], rejected_keywords=[]),
@@ -73,10 +87,15 @@ class TestTaskEvalRunner:
         system = FakeMemory()
         scenarios = [
             TaskScenario(
-                name="s1", description="d", category="c",
+                name="s1",
+                description="d",
+                category="c",
                 actions=[
-                    TaskAction(type="store", claim="User likes Thai",
-                               evidence=[{"content": "c", "polarity": "supports"}]),
+                    TaskAction(
+                        type="store",
+                        claim="User likes Thai",
+                        evidence=[{"content": "c", "polarity": "supports"}],
+                    ),
                 ],
                 questions=[
                     TaskQuestion(query="Thai", expected_keywords=["Thai"], rejected_keywords=[]),

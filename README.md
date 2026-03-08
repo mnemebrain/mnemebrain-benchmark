@@ -29,17 +29,18 @@ mnemebrain-task-eval
 Belief Maintenance Benchmark (BMB)
 48 tasks | 8 categories | ~100 checks
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  mnemebrain           ████████████████████ 100%
-  structured_memory    ███████ 36%
-  mem0 (real API)      █████ 29%
-  naive_baseline        0%
-  rag_baseline          0%
-  openai_rag (real API) 0%
-  langchain_buffer      0%
+  mnemebrain (full)    ████████████████████ 100%
+  mnemebrain_lite      ██████████████████   93%
+  structured_memory    ███████              36%
+  mem0 (real API)      █████                29%
+  naive_baseline                             0%
+  rag_baseline                               0%
+  openai_rag (real API)                      0%
+  langchain_buffer                           0%
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Full analysis with failure breakdowns: [BMB_REPORT.md](BMB_REPORT.md)
+Full analysis with failure breakdowns: [BMB_REPORT.md](BMB_REPORT.md) | Lite vs full comparison: [LITE_VS_FULL_REPORT.md](LITE_VS_FULL_REPORT.md)
 
 ## What's Tested
 
@@ -77,13 +78,16 @@ Evaluates 5 embedding providers on claim deduplication accuracy and latency.
 
 | Adapter | Capabilities | Type |
 |---------|-------------|------|
-| `mnemebrain` | All 12 | SDK |
+| `mnemebrain` | All 12 | SDK (HTTP) |
+| `mnemebrain_lite` | 7 (store, query, retract, explain, contradiction, decay, revise) | Library (embedded) |
 | `structured_memory` | store, query, retract, explain, revise, contradiction | Local |
 | `mem0` | store, query, retract, explain, revise | Cloud API |
 | `naive_baseline` | store, query | Local |
 | `rag_baseline` | store, query | Local |
 | `openai_rag` | store, query | Cloud API |
 | `langchain_buffer` | store, query | Local |
+
+`mnemebrain_lite` wraps `mnemebrain-lite` directly — no server, no SDK, no HTTP. Install with `pip install mnemebrain-lite[embeddings]`.
 
 Scenarios requiring capabilities the adapter lacks are automatically skipped.
 
@@ -92,7 +96,8 @@ Scenarios requiring capabilities the adapter lacks are automatically skipped.
 ```bash
 # BMB benchmark
 mnemebrain-bmb                                    # All adapters
-mnemebrain-bmb --adapter mnemebrain               # Single adapter
+mnemebrain-bmb --adapter mnemebrain               # Full backend (requires server)
+mnemebrain-bmb --adapter mnemebrain_lite          # Lite (no server needed)
 mnemebrain-bmb --category contradiction            # Single category
 mnemebrain-bmb --scenario bmb_vegetarian_contradiction  # Single scenario
 mnemebrain-bmb --output results/bmb_report.json    # Custom output
@@ -112,6 +117,22 @@ python -m mnemebrain.benchmark --provider sentence_transformers --model all-Mini
 ```
 
 API-based adapters (`mem0`, `openai_rag`) require environment variables or `.env` file.
+
+## Architecture
+
+```
+mnemebrain_benchmark/
+├── interface.py          # MemorySystem ABC + result dataclasses
+├── protocols.py          # EmbeddingProvider protocol
+├── providers.py          # Shared SentenceTransformerProvider + cosine_similarity
+├── scoring.py            # Expectation evaluation engine
+├── system_runner.py      # Scenario executor (dispatch-table based)
+├── system_report.py      # Scorecard formatting
+├── runner.py             # Embedding benchmark runner
+├── adapters/             # 8 memory system implementations
+├── scenarios/            # Scenario schema + JSON loader
+└── task_evals/           # Task-level evaluation framework
+```
 
 ## Adding Adapters and Scenarios
 

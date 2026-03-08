@@ -1,4 +1,5 @@
 """RAG (Retrieval-Augmented Generation) baseline adapter."""
+
 from __future__ import annotations
 
 from uuid import uuid4
@@ -44,11 +45,13 @@ class RAGBaseline(MemorySystem):
                     confidence=None,
                 )
         entry_id = str(uuid4())
-        self._entries.append({
-            "id": entry_id,
-            "claim": claim,
-            "embedding": embedding,
-        })
+        self._entries.append(
+            {
+                "id": entry_id,
+                "claim": claim,
+                "embedding": embedding,
+            }
+        )
         return StoreResult(
             belief_id=entry_id,
             merged=False,
@@ -65,12 +68,14 @@ class RAGBaseline(MemorySystem):
         for entry in self._entries:
             sim = self._embedder.similarity(embedding, entry["embedding"])
             if sim >= 0.5:
-                results.append(QueryResult(
-                    belief_id=entry["id"],
-                    claim=entry["claim"],
-                    confidence=None,
-                    truth_state=None,
-                ))
+                results.append(
+                    QueryResult(
+                        belief_id=entry["id"],
+                        claim=entry["claim"],
+                        confidence=None,
+                        truth_state=None,
+                    )
+                )
         return results
 
     def reset(self) -> None:

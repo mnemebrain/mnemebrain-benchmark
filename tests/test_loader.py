@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.scenarios.loader."""
+
 from __future__ import annotations
 
 import json
@@ -16,16 +17,22 @@ from mnemebrain_benchmark.scenarios.schema import Action, Expectation, Scenario
 class TestValidateScenario:
     def test_valid_scenario(self):
         s = Scenario(
-            name="test", description="d", category="contradiction",
-            requires=[], actions=[Action(label="s1", type="store")],
+            name="test",
+            description="d",
+            category="contradiction",
+            requires=[],
+            actions=[Action(label="s1", type="store")],
             expectations=[Expectation(action_label="s1")],
         )
         validate_scenario(s)  # should not raise
 
     def test_invalid_action_type(self):
         s = Scenario(
-            name="test", description="d", category="contradiction",
-            requires=[], actions=[Action(label="s1", type="invalid_type")],
+            name="test",
+            description="d",
+            category="contradiction",
+            requires=[],
+            actions=[Action(label="s1", type="invalid_type")],
             expectations=[],
         )
         with pytest.raises(ValueError, match="Invalid action type"):
@@ -33,7 +40,9 @@ class TestValidateScenario:
 
     def test_duplicate_label(self):
         s = Scenario(
-            name="test", description="d", category="contradiction",
+            name="test",
+            description="d",
+            category="contradiction",
             requires=[],
             actions=[
                 Action(label="s1", type="store"),
@@ -46,8 +55,11 @@ class TestValidateScenario:
 
     def test_unknown_expectation_label(self):
         s = Scenario(
-            name="test", description="d", category="contradiction",
-            requires=[], actions=[Action(label="s1", type="store")],
+            name="test",
+            description="d",
+            category="contradiction",
+            requires=[],
+            actions=[Action(label="s1", type="store")],
             expectations=[Expectation(action_label="nonexistent")],
         )
         with pytest.raises(ValueError, match="unknown action"):

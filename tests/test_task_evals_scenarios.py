@@ -1,4 +1,5 @@
 """Tests for task evaluation scenario loading."""
+
 from __future__ import annotations
 
 from mnemebrain_benchmark.interface import (
@@ -30,17 +31,13 @@ class TestPreferenceScenarios:
     def test_has_contradictions(self):
         scenarios = load_preference_scenarios()
         has_multi_store = any(
-            sum(1 for a in s.actions if a.type == "store") >= 2
-            for s in scenarios
+            sum(1 for a in s.actions if a.type == "store") >= 2 for s in scenarios
         )
         assert has_multi_store
 
     def test_questions_have_rejected_keywords(self):
         scenarios = load_preference_scenarios()
-        has_rejected = any(
-            any(q.rejected_keywords for q in s.questions)
-            for s in scenarios
-        )
+        has_rejected = any(any(q.rejected_keywords for q in s.questions) for s in scenarios)
         assert has_rejected
 
 
@@ -60,10 +57,7 @@ class TestQAScenarios:
 
     def test_has_retractions(self):
         scenarios = load_qa_scenarios()
-        has_retract = any(
-            any(a.type == "retract" for a in s.actions)
-            for s in scenarios
-        )
+        has_retract = any(any(a.type == "retract" for a in s.actions) for s in scenarios)
         assert has_retract
 
 
@@ -81,8 +75,10 @@ class KeywordMemory(MemorySystem):
         self._claims.append(claim)
         return StoreResult(
             belief_id=str(len(self._claims) - 1),
-            merged=False, contradiction_detected=False,
-            truth_state=None, confidence=None,
+            merged=False,
+            contradiction_detected=False,
+            truth_state=None,
+            confidence=None,
         )
 
     def query(self, claim: str) -> list[QueryResult]:
@@ -90,9 +86,14 @@ class KeywordMemory(MemorySystem):
         results = []
         for i, c in enumerate(self._claims):
             if any(w in c.lower() for w in words if len(w) > 3):
-                results.append(QueryResult(
-                    belief_id=str(i), claim=c, confidence=None, truth_state=None,
-                ))
+                results.append(
+                    QueryResult(
+                        belief_id=str(i),
+                        claim=c,
+                        confidence=None,
+                        truth_state=None,
+                    )
+                )
         return results
 
     def reset(self) -> None:
@@ -102,6 +103,7 @@ class KeywordMemory(MemorySystem):
 class TestIntegration:
     def test_preference_scenarios_run(self):
         from mnemebrain_benchmark.task_evals.runner import TaskEvalRunner
+
         scenarios = load_preference_scenarios()
         runner = TaskEvalRunner()
         system = KeywordMemory()
@@ -113,6 +115,7 @@ class TestIntegration:
 
     def test_qa_scenarios_run(self):
         from mnemebrain_benchmark.task_evals.runner import TaskEvalRunner
+
         scenarios = load_qa_scenarios()
         runner = TaskEvalRunner()
         system = KeywordMemory()
@@ -124,6 +127,7 @@ class TestIntegration:
 
     def test_table_output(self):
         from mnemebrain_benchmark.task_evals.runner import TaskEvalRunner, format_task_eval_table
+
         scenarios = load_preference_scenarios()[:2]
         runner = TaskEvalRunner()
         system = KeywordMemory()

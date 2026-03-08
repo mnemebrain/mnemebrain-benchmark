@@ -1,4 +1,5 @@
 """Report generation for the system benchmark."""
+
 from __future__ import annotations
 
 import json
@@ -12,6 +13,9 @@ from mnemebrain_benchmark.scoring import (
 
 def format_scorecard(results: dict[str, list[ScenarioScore]]) -> str:
     """Format benchmark results as a terminal scorecard."""
+    if not results:
+        return "No results"
+
     all_categories: set[str] = set()
     system_cats: dict[str, dict[str, CategoryScore]] = {}
 
@@ -24,7 +28,7 @@ def format_scorecard(results: dict[str, list[ScenarioScore]]) -> str:
     system_names = list(results.keys())
 
     col_width = max(15, *(len(n) for n in system_names)) + 2
-    cat_width = max(20, *(len(c) for c in sorted_cats)) + 2
+    cat_width = max(20, *(len(c) for c in sorted_cats)) + 2 if sorted_cats else 22
 
     separator_width = cat_width + col_width * len(system_names)
     lines: list[str] = []
@@ -75,21 +79,23 @@ def export_json(results: dict[str, list[ScenarioScore]], path: str) -> None:
     for system_name, scores in results.items():
         data[system_name] = []
         for score in scores:
-            data[system_name].append({
-                "scenario": score.scenario_name,
-                "category": score.category,
-                "skipped": score.skipped,
-                "score": score.score(),
-                "checks": [
-                    {
-                        "name": c.name,
-                        "passed": c.passed,
-                        "expected": str(c.expected),
-                        "actual": str(c.actual),
-                    }
-                    for c in score.checks
-                ],
-            })
+            data[system_name].append(
+                {
+                    "scenario": score.scenario_name,
+                    "category": score.category,
+                    "skipped": score.skipped,
+                    "score": score.score(),
+                    "checks": [
+                        {
+                            "name": c.name,
+                            "passed": c.passed,
+                            "expected": str(c.expected),
+                            "actual": str(c.actual),
+                        }
+                        for c in score.checks
+                    ],
+                }
+            )
 
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)

@@ -1,4 +1,5 @@
 """LangChain-style ConversationBufferMemory adapter."""
+
 from __future__ import annotations
 
 from uuid import uuid4
@@ -43,12 +44,14 @@ class LangChainBufferBaseline(MemorySystem):
             entry_words = set(entry["claim"].lower().split())
             overlap = len(query_words & entry_words)
             if overlap >= 2 or any(w in entry["claim"].lower() for w in query_words if len(w) > 4):
-                results.append(QueryResult(
-                    belief_id=entry["id"],
-                    claim=entry["claim"],
-                    confidence=None,
-                    truth_state=None,
-                ))
+                results.append(
+                    QueryResult(
+                        belief_id=entry["id"],
+                        claim=entry["claim"],
+                        confidence=None,
+                        truth_state=None,
+                    )
+                )
         return results
 
     def reset(self) -> None:

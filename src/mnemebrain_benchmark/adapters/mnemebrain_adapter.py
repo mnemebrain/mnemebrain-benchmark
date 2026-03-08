@@ -1,4 +1,5 @@
 """MnemeBrain adapter -- uses the mnemebrain Python SDK to talk to the backend."""
+
 from __future__ import annotations
 
 import os
@@ -89,8 +90,8 @@ class MnemeBrainAdapter(MemorySystem):
             for r in response.results
         ]
 
-    def retract(self, evidence_id: str) -> RetractResult:
-        results = self._client.retract(evidence_id)
+    def retract(self, belief_id: str) -> RetractResult:
+        results = self._client.retract(belief_id)
         return RetractResult(
             affected_beliefs=len(results),
             truth_states_changed=len(results),
@@ -203,8 +204,11 @@ class MnemeBrainAdapter(MemorySystem):
     # -- Attack (benchmark) --
 
     def add_attack(
-        self, attacker_id: str, target_id: str,
-        attack_type: str, weight: float,
+        self,
+        attacker_id: str,
+        target_id: str,
+        attack_type: str,
+        weight: float,
     ) -> AttackResult:
         result = self._client.benchmark_attack(attacker_id, target_id, attack_type, weight)
         return AttackResult(

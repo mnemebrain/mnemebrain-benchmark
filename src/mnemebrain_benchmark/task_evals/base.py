@@ -1,7 +1,10 @@
 """Base types and scoring for task-level evaluations."""
+
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from mnemebrain_benchmark.interface import QueryResult
 
@@ -36,6 +39,43 @@ class TaskScenario:
     category: str
     actions: list[TaskAction]
     questions: list[TaskQuestion]
+
+
+def _load_task_scenarios(data_path: Path) -> list[TaskScenario]:
+    """Parse task scenarios from a JSON file at the given path."""
+    with open(data_path, encoding="utf-8") as f:
+        raw = json.load(f)
+
+    scenarios: list[TaskScenario] = []
+    for entry in raw:
+        actions = [
+            TaskAction(
+                type=a["type"],
+                claim=a.get("claim"),
+                evidence=a.get("evidence"),
+                target_index=a.get("target_index"),
+                wait_days=a.get("wait_days"),
+            )
+            for a in entry["actions"]
+        ]
+        questions = [
+            TaskQuestion(
+                query=q["query"],
+                expected_keywords=q["expected_keywords"],
+                rejected_keywords=q.get("rejected_keywords", []),
+            )
+            for q in entry["questions"]
+        ]
+        scenarios.append(
+            TaskScenario(
+                name=entry["name"],
+                description=entry["description"],
+                category=entry["category"],
+                actions=actions,
+                questions=questions,
+            )
+        )
+    return scenarios
 
 
 def score_question(question: TaskQuestion, results: list[QueryResult]) -> TaskResult:

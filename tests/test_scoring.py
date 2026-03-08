@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.scoring -- evaluate_expectations and aggregate_by_category."""
+
 from __future__ import annotations
 
 from mnemebrain_benchmark.interface import (
@@ -20,6 +21,7 @@ from mnemebrain_benchmark.scoring import (
 )
 
 # -- ScenarioScore --
+
 
 class TestScenarioScore:
     def test_score_with_checks(self):
@@ -46,6 +48,7 @@ class TestScenarioScore:
 
 
 # -- evaluate_expectations: StoreResult --
+
 
 class TestEvaluateExpectationsStore:
     def test_beliefs_stored(self):
@@ -100,6 +103,7 @@ class TestEvaluateExpectationsStore:
 
 # -- evaluate_expectations: QueryResult (list) --
 
+
 class TestEvaluateExpectationsQuery:
     def test_query_returns_claim(self):
         result = [QueryResult("b1", "test", 0.9, "true")]
@@ -150,6 +154,7 @@ class TestEvaluateExpectationsQuery:
 
 # -- evaluate_expectations: ExplainResult --
 
+
 class TestEvaluateExpectationsExplain:
     def test_explanation_has_evidence(self):
         result = ExplainResult("c", True, 2, 0, "true", 0.9)
@@ -196,6 +201,7 @@ class TestEvaluateExpectationsExplain:
 
 # -- evaluate_expectations: RetractResult --
 
+
 class TestEvaluateExpectationsRetract:
     def test_affected_beliefs(self):
         result = RetractResult(affected_beliefs=2, truth_states_changed=1)
@@ -211,6 +217,7 @@ class TestEvaluateExpectationsRetract:
 
 
 # -- evaluate_expectations: ReviseResult --
+
 
 class TestEvaluateExpectationsRevise:
     def test_truth_state_from_revise(self):
@@ -240,6 +247,7 @@ class TestEvaluateExpectationsRevise:
 
 # -- evaluate_expectations: SandboxResult --
 
+
 class TestEvaluateExpectationsSandbox:
     def test_sandbox_resolved_state(self):
         result = SandboxResult("sb1", "false", True)
@@ -255,6 +263,7 @@ class TestEvaluateExpectationsSandbox:
 
 
 # -- evaluate_expectations: ConsolidateResult --
+
 
 class TestEvaluateExpectationsConsolidate:
     def test_semantic_beliefs_created_gte(self):
@@ -278,6 +287,7 @@ class TestEvaluateExpectationsConsolidate:
 
 # -- evaluate_expectations: MemoryTierResult --
 
+
 class TestEvaluateExpectationsMemoryTier:
     def test_memory_tier(self):
         result = MemoryTierResult("b1", "semantic", 3)
@@ -293,6 +303,7 @@ class TestEvaluateExpectationsMemoryTier:
 
 
 # -- evaluate_expectations: missing action --
+
 
 class TestEvaluateExpectationsMissing:
     def test_missing_action_label(self):
@@ -310,6 +321,7 @@ class TestEvaluateExpectationsMissing:
 
 
 # -- aggregate_by_category --
+
 
 class TestAggregateByCategory:
     def test_basic_aggregation(self):
