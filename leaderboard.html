@@ -157,7 +157,7 @@ nav {
 }
 .bar-chart { margin-bottom: 2rem; }
 .bar-row {
-  display: grid; grid-template-columns: 180px 1fr 50px;
+  display: grid; grid-template-columns: 180px 1fr 50px 90px;
   gap: 1rem; align-items: center; margin-bottom: 0.5rem;
   font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;
 }
@@ -173,6 +173,26 @@ nav {
 }
 .bar-pct { color: rgba(244,241,235,0.4); font-size: 0.65rem; }
 .bar-pct.top { color: var(--pulse); font-weight: 500; }
+.bar-meta {
+  font-size: 0.55rem; color: rgba(244,241,235,0.22); text-align: left;
+  white-space: nowrap;
+}
+.bar-header {
+  display: grid; grid-template-columns: 180px 1fr 50px 90px;
+  gap: 1rem; margin-bottom: 0.8rem; padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(244,241,235,0.06);
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(244,241,235,0.25);
+}
+.bar-header span:first-child { text-align: right; }
+.type-badge {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.52rem;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 0.15rem 0.4rem; border: 1px solid rgba(244,241,235,0.08);
+  color: rgba(244,241,235,0.3); display: inline-block;
+}
+.type-badge.api { border-color: rgba(42,90,255,0.3); color: rgba(42,90,255,0.6); }
 
 /* ---- TABLES ---- */
 .table-sec { padding: 5rem 0; border-top: 1px solid var(--border); }
@@ -276,7 +296,10 @@ footer a:hover { color: rgba(244,241,235,0.6); }
   nav { padding: 1rem 1.5rem; }
   .nav-links { display: none; }
   .hero { padding: 7rem 0 3rem; }
-  .bar-row { grid-template-columns: 120px 1fr 40px; }
+  .bar-row { grid-template-columns: 120px 1fr 40px; } /* hide meta on mobile */
+  .bar-meta { display: none; }
+  .bar-header { grid-template-columns: 120px 1fr 40px; }
+  .bar-header span:last-child { display: none; }
   .bar-name { font-size: 0.6rem; }
   .cap-table { font-size: 0.55rem; }
   .cap-table th, .cap-table td { padding: 0.4rem 0.3rem; }
@@ -435,16 +458,22 @@ footer a:hover { color: rgba(244,241,235,0.6); }
     .then(function(data) {
       // Meta
       document.getElementById('meta-line').textContent =
-        'Last updated: ' + data.lastUpdated + '  \u00b7  Embedding model: ' + data.embeddingModel;
+        'Benchmark v' + data.benchmarkVersion + '  \u00b7  Run: ' + data.runDate + '  \u00b7  Embedding: ' + data.embeddingModel;
 
       // BMB sub
       document.getElementById('bmb-sub').textContent =
         data.bmb.tasks + ' tasks \u00b7 ' + data.bmb.categories + ' categories \u00b7 ~' + data.bmb.checks + ' checks \u00b7 zero LLM calls \u00b7 fully deterministic';
 
-      // Bar chart
+      // Bar chart header
       var chartEl = document.getElementById('bar-chart');
+      var header = document.createElement('div');
+      header.className = 'bar-header';
+      header.innerHTML = '<span>System</span><span></span><span>Score</span><span>Attempted</span>';
+      chartEl.appendChild(header);
+
+      // Bar chart rows
       var frag = document.createDocumentFragment();
-      data.bmb.overall.forEach(function(item) {
+      data.bmb.systems.forEach(function(item) {
         var isTop = item.score >= 90;
         var w = Math.max(item.score, 0.3);
         var row = document.createElement('div');
@@ -452,7 +481,7 @@ footer a:hover { color: rgba(244,241,235,0.6); }
 
         var name = document.createElement('div');
         name.className = 'bar-name' + (isTop ? ' top' : '');
-        name.textContent = item.adapter;
+        name.textContent = item.name;
 
         var track = document.createElement('div');
         track.className = 'bar-track';
@@ -466,9 +495,17 @@ footer a:hover { color: rgba(244,241,235,0.6); }
         pct.className = 'bar-pct' + (isTop ? ' top' : '');
         pct.textContent = item.score + '%';
 
+        var meta = document.createElement('div');
+        meta.className = 'bar-meta';
+        meta.textContent = item.attempted + '/' + data.bmb.tasks + ' tasks';
+        if (item.runType === 'API') {
+          meta.textContent += ' \u00b7 API';
+        }
+
         row.appendChild(name);
         row.appendChild(track);
         row.appendChild(pct);
+        row.appendChild(meta);
         frag.appendChild(row);
       });
       chartEl.appendChild(frag);
@@ -491,12 +528,12 @@ footer a:hover { color: rgba(244,241,235,0.6); }
       var adapterLabels = ['MnemeBrain', 'Lite', 'Structured', 'Mem0', 'Naive', 'RAG', 'OpenAI RAG', 'LangChain'];
       var catTable = document.createElement('table');
       catTable.className = 'data-table';
-      var thead = '<thead><tr><th>Category</th>';
+      var thead = '<thead><tr><th>Category</th><th class="num">Tasks</th>';
       adapterLabels.forEach(function(a) { thead += '<th class="num">' + esc(a) + '</th>'; });
       thead += '</tr></thead>';
       var tbody = '<tbody>';
       data.bmb.categories_detail.forEach(function(cat) {
-        tbody += '<tr><td class="adapter">' + esc(cat.category) + '</td>';
+        tbody += '<tr><td class="adapter">' + esc(cat.category) + '</td><td class="num">' + (cat.tasks || '') + '</td>';
         var vals = adapters.map(function(a) { return cat.scores[a]; });
         var validVals = vals.filter(function(v) { return v !== null && v !== undefined; });
         var best = validVals.length > 0 ? Math.max.apply(null, validVals) : -1;
@@ -537,14 +574,15 @@ footer a:hover { color: rgba(244,241,235,0.6); }
       // Capability matrix
       var capTable = document.createElement('table');
       capTable.className = 'cap-table';
-      var cHead = '<thead><tr><th>Adapter</th>';
+      var cHead = '<thead><tr><th>Adapter</th><th>Type</th>';
       data.capabilities.headers.forEach(function(h) {
         cHead += '<th>' + esc(h.replace(/_/g, ' ')) + '</th>';
       });
       cHead += '</tr></thead>';
       var cBody = '<tbody>';
       data.capabilities.adapters.forEach(function(a) {
-        cBody += '<tr><td>' + esc(a.name) + '</td>';
+        var badgeCls = a.type === 'cloud API' ? 'type-badge api' : 'type-badge';
+        cBody += '<tr><td>' + esc(a.name) + '</td><td><span class="' + badgeCls + '">' + esc(a.type) + '</span></td>';
         a.caps.forEach(function(c) {
           cBody += '<td><span class="' + (c ? 'cap-yes' : 'cap-no') + '">' + (c ? '\u2713' : '\u2014') + '</span></td>';
         });

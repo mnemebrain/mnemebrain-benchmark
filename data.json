@@ -1,4 +1,6 @@
 {
+  "benchmarkVersion": "0.1.0a1",
+  "runDate": "2026-03-08",
   "lastUpdated": "2026-03-08",
   "embeddingModel": "all-MiniLM-L6-v2",
   "bmb": {
@@ -6,19 +8,92 @@
     "tasks": 48,
     "categories": 8,
     "checks": 100,
-    "overall": [
-      { "adapter": "mnemebrain (full)", "score": 100 },
-      { "adapter": "mnemebrain_lite", "score": 93 },
-      { "adapter": "structured_memory", "score": 36 },
-      { "adapter": "mem0 (real API)", "score": 29 },
-      { "adapter": "naive_baseline", "score": 0 },
-      { "adapter": "rag_baseline", "score": 0 },
-      { "adapter": "openai_rag (real)", "score": 0 },
-      { "adapter": "langchain_buffer", "score": 0 }
+    "systems": [
+      {
+        "name": "mnemebrain (full)",
+        "key": "mnemebrain",
+        "type": "embedded",
+        "score": 100,
+        "attempted": 48,
+        "skipped": 0,
+        "capabilities": 12,
+        "runType": "local"
+      },
+      {
+        "name": "mnemebrain_lite",
+        "key": "mnemebrain_lite",
+        "type": "embedded",
+        "score": 93,
+        "attempted": 42,
+        "skipped": 6,
+        "capabilities": 7,
+        "runType": "local"
+      },
+      {
+        "name": "structured_memory",
+        "key": "structured_memory",
+        "type": "embedded",
+        "score": 36,
+        "attempted": 28,
+        "skipped": 20,
+        "capabilities": 5,
+        "runType": "local"
+      },
+      {
+        "name": "mem0 (real API)",
+        "key": "mem0",
+        "type": "cloud API",
+        "score": 29,
+        "attempted": 28,
+        "skipped": 20,
+        "capabilities": 5,
+        "runType": "API"
+      },
+      {
+        "name": "naive_baseline",
+        "key": "naive",
+        "type": "embedded",
+        "score": 0,
+        "attempted": 12,
+        "skipped": 36,
+        "capabilities": 2,
+        "runType": "local"
+      },
+      {
+        "name": "rag_baseline",
+        "key": "rag",
+        "type": "embedded",
+        "score": 0,
+        "attempted": 12,
+        "skipped": 36,
+        "capabilities": 2,
+        "runType": "local"
+      },
+      {
+        "name": "openai_rag (real)",
+        "key": "openai_rag",
+        "type": "cloud API",
+        "score": 0,
+        "attempted": 12,
+        "skipped": 36,
+        "capabilities": 2,
+        "runType": "API"
+      },
+      {
+        "name": "langchain_buffer",
+        "key": "langchain",
+        "type": "embedded",
+        "score": 0,
+        "attempted": 12,
+        "skipped": 36,
+        "capabilities": 2,
+        "runType": "local"
+      }
     ],
     "categories_detail": [
       {
         "category": "Contradiction Detection",
+        "tasks": 12,
         "scores": {
           "mnemebrain": 100, "mnemebrain_lite": 91.7, "structured_memory": 0,
           "mem0": 0, "naive": 0, "rag": 0, "openai_rag": 0, "langchain": 0
@@ -26,6 +101,7 @@
       },
       {
         "category": "Belief Revision",
+        "tasks": 8,
         "scores": {
           "mnemebrain": 100, "mnemebrain_lite": 100, "structured_memory": 39,
           "mem0": 39, "naive": null, "rag": null, "openai_rag": null, "langchain": null
@@ -33,6 +109,7 @@
       },
       {
         "category": "Evidence Tracking",
+        "tasks": 8,
         "scores": {
           "mnemebrain": 100, "mnemebrain_lite": 100, "structured_memory": 69,
           "mem0": 47, "naive": null, "rag": null, "openai_rag": null, "langchain": null
@@ -40,6 +117,7 @@
       },
       {
         "category": "Temporal Updates",
+        "tasks": 6,
         "scores": {
           "mnemebrain": 100, "mnemebrain_lite": 83.3, "structured_memory": null,
           "mem0": null, "naive": null, "rag": null, "openai_rag": null, "langchain": null
@@ -47,6 +125,7 @@
       },
       {
         "category": "Counterfactual Reasoning",
+        "tasks": 4,
         "scores": {
           "mnemebrain": 100, "mnemebrain_lite": null, "structured_memory": null,
           "mem0": null, "naive": null, "rag": null, "openai_rag": null, "langchain": null
@@ -54,6 +133,7 @@
       },
       {
         "category": "Consolidation",
+        "tasks": 4,
         "scores": {
           "mnemebrain": 100, "mnemebrain_lite": null, "structured_memory": null,
           "mem0": null, "naive": null, "rag": null, "openai_rag": null, "langchain": null
@@ -61,6 +141,7 @@
       },
       {
         "category": "Multi-hop Retrieval",
+        "tasks": 3,
         "scores": {
           "mnemebrain": 100, "mnemebrain_lite": null, "structured_memory": null,
           "mem0": null, "naive": null, "rag": null, "openai_rag": null, "langchain": null
@@ -68,6 +149,7 @@
       },
       {
         "category": "Pattern Separation",
+        "tasks": 3,
         "scores": {
           "mnemebrain": 100, "mnemebrain_lite": null, "structured_memory": null,
           "mem0": null, "naive": null, "rag": null, "openai_rag": null, "langchain": null
@@ -115,11 +197,11 @@
   "capabilities": {
     "headers": ["store", "query", "retract", "explain", "contradiction", "decay", "revise", "sandbox", "attack", "consolidation", "hipporag", "pattern_separation"],
     "adapters": [
-      { "name": "mnemebrain", "caps": [true, true, true, true, true, true, true, true, true, true, true, true] },
-      { "name": "mnemebrain_lite", "caps": [true, true, true, true, true, true, true, false, false, false, false, false] },
-      { "name": "mem0", "caps": [true, true, true, true, false, false, true, false, false, false, false, false] },
-      { "name": "structured_memory", "caps": [true, true, true, true, false, false, true, false, false, false, false, false] },
-      { "name": "naive / rag / langchain", "caps": [true, true, false, false, false, false, false, false, false, false, false, false] }
+      { "name": "mnemebrain", "type": "embedded", "caps": [true, true, true, true, true, true, true, true, true, true, true, true] },
+      { "name": "mnemebrain_lite", "type": "embedded", "caps": [true, true, true, true, true, true, true, false, false, false, false, false] },
+      { "name": "mem0", "type": "cloud API", "caps": [true, true, true, true, false, false, true, false, false, false, false, false] },
+      { "name": "structured_memory", "type": "embedded", "caps": [true, true, true, true, false, false, true, false, false, false, false, false] },
+      { "name": "naive / rag / langchain", "type": "embedded", "caps": [true, true, false, false, false, false, false, false, false, false, false, false] }
     ]
   },
   "findings": [

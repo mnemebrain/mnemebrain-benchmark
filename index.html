@@ -304,6 +304,28 @@ nav {
   font-size: 0.58rem; color: rgba(244,241,235,0.2); line-height: 1.7;
 }
 
+/* ---- METHODOLOGY ---- */
+.method-sec { padding: 6rem 0; border-top: 1px solid var(--border); }
+.method-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+.method-card {
+  background: var(--cream); padding: 1.4rem 1.6rem;
+  border-left: 3px solid var(--neural);
+}
+.method-card h4 {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink); margin-bottom: 0.5rem; font-weight: 500;
+}
+.method-card p {
+  font-size: 0.85rem; line-height: 1.7; color: var(--muted);
+}
+.method-link {
+  margin-top: 2rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem;
+}
+
 /* ---- QUICKSTART ---- */
 .qs-sec { padding: 6rem 0; border-top: 1px solid var(--border); }
 .qs-block {
@@ -441,7 +463,7 @@ footer a:hover { color: rgba(244,241,235,0.6); }
   nav { padding: 1rem 1.5rem; }
   .nav-links { display: none; }
   .hero { padding: 7rem 0 4rem; }
-  .belief-layout, .api-layout, .stack-grid { grid-template-columns: 1fr; }
+  .belief-layout, .api-layout, .stack-grid, .method-grid { grid-template-columns: 1fr; }
   .stack-arrow { display: none; }
   .belnap-grid { grid-template-columns: repeat(2, 1fr); }
   .bar-row { grid-template-columns: 120px 1fr 40px; }
@@ -637,9 +659,43 @@ footer a:hover { color: rgba(244,241,235,0.6); }
     </div>
 
     <div class="results-meta reveal">
-      Benchmark run: 2026-03-07. Real sentence-transformers embeddings (all-MiniLM-L6-v2).<br>
+      Benchmark v0.1.0a1 &middot; Run: 2026-03-08 &middot; Embeddings: all-MiniLM-L6-v2 (sentence-transformers).<br>
       Mem0 tested with real cloud API, graph memory enabled. OpenAI RAG with real text-embedding-3-small.<br>
-      Full report: <a href="https://github.com/mnemebrain/mnemebrain-benchmark/blob/main/BMB_REPORT.md" style="color: rgba(200,245,66,0.5);">BMB_REPORT.md</a>
+      <a href="leaderboard.html" style="color: rgba(200,245,66,0.5);">Full leaderboard &rarr;</a> &middot;
+      <a href="https://github.com/mnemebrain/mnemebrain-benchmark/blob/main/leaderboard/reports/BMB_REPORT.md" style="color: rgba(200,245,66,0.5);">BMB Report</a>
+    </div>
+  </div>
+</section>
+
+<!-- METHODOLOGY -->
+<section class="method-sec" id="methodology">
+  <div class="wrap">
+    <div class="label reveal">Methodology</div>
+    <h2 class="reveal">How the benchmark <em>works.</em></h2>
+
+    <div class="method-grid">
+      <div class="method-card reveal">
+        <h4>Capability-aware scoring</h4>
+        <p>Each adapter declares its capabilities (store, query, retract, explain, contradiction, etc.). Tasks requiring undeclared capabilities are skipped, not scored as failures. A system that only supports 2 of 12 capabilities is measured on the tasks it can attempt.</p>
+      </div>
+      <div class="method-card reveal">
+        <h4>Deterministic evaluation</h4>
+        <p>Zero LLM calls during evaluation. All scoring is computed by the belief engine against structural assertions: truth states, evidence counts, confidence values. Same inputs always produce the same results.</p>
+      </div>
+      <div class="method-card reveal">
+        <h4>Real API baselines</h4>
+        <p>Mem0 and OpenAI RAG are tested against their real cloud APIs with default configurations. No synthetic mocks. Graph memory enabled for Mem0. text-embedding-3-small for OpenAI.</p>
+      </div>
+      <div class="method-card reveal">
+        <h4>Versioned releases</h4>
+        <p>Benchmark version, run date, and embedding model are tracked per run. Results are pinned to a specific benchmark version (currently v0.1.0a1) to ensure comparability across time.</p>
+      </div>
+    </div>
+
+    <div class="method-link reveal">
+      Full methodology: <a href="https://github.com/mnemebrain/mnemebrain-benchmark/blob/main/leaderboard/reports/BMB_REPORT.md">BMB Technical Report</a>
+      &nbsp;&middot;&nbsp;
+      <a href="leaderboard.html">Full leaderboard with per-category data &rarr;</a>
     </div>
   </div>
 </section>
