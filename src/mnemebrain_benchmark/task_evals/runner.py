@@ -53,11 +53,11 @@ class TaskEvalRunner:
                 if action.target_index is not None and action.target_index < len(store_results):
                     target = store_results[action.target_index]
                     if hasattr(target, "belief_id"):
-                        result = system.revise(
+                        revise_result = system.revise(
                             belief_id=target.belief_id,
                             evidence=action.evidence or [],
                         )
-                        store_results.append(result)
+                        store_results.append(revise_result)
             elif action.type == "wait_days":
                 if action.wait_days:
                     try:

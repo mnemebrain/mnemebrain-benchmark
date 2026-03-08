@@ -43,6 +43,10 @@ warn_unused_configs = true
 warn_unused_ignores = true
 disallow_untyped_defs = false
 
+[[tool.mypy.overrides]]
+module = ["mnemebrain", "mnemebrain_core.*", "mem0", "sentence_transformers", "openai"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]

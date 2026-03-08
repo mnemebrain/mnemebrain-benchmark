@@ -166,7 +166,7 @@ def _print_bmb_chart(results: dict[str, list]) -> None:
         cats = aggregate_by_category(scores)
         scored = [c for c in cats.values() if not c.skipped and c.score is not None]
         if scored:
-            avg = sum(c.score for c in scored) / len(scored)
+            avg = sum(c.score or 0.0 for c in scored) / len(scored)
             pct = int(avg * 100)
             filled = "\u2588" * (pct // 5)
             print(f"  {system_name:<20} {filled} {pct}%")

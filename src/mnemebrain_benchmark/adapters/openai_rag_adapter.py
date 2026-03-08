@@ -57,7 +57,7 @@ class OpenAIRAGAdapter(MemorySystem):
             input=[text],
             model=self._model,
         )
-        return response.data[0].embedding
+        return list(response.data[0].embedding)
 
     def store(self, claim: str, evidence: list[dict]) -> StoreResult:
         embedding = self._embed(claim)

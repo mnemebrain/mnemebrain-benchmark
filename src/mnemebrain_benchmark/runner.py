@@ -51,7 +51,7 @@ def _create_provider(provider_type: str, model_name: str) -> EmbeddingProvider:
 
             def embed(self, text: str) -> list[float]:
                 resp = self._client.embeddings.create(input=[text], model=self._model)
-                return resp.data[0].embedding
+                return list(resp.data[0].embedding)
 
             def similarity(self, a: list[float], b: list[float]) -> float:
                 return cosine_similarity(a, b)
@@ -103,7 +103,7 @@ def _serialize_report(report: dict) -> dict:
             return round(obj, 6)
         return obj
 
-    return _convert(report)
+    return _convert(report)  # type: ignore[return-value]
 
 
 def save_report(report: dict, path: Path | str) -> None:
