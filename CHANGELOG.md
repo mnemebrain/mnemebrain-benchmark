@@ -42,3 +42,31 @@ All notable changes to mnemebrain-benchmark will be documented in this file.
 ### Known Issues
 
 - `mnemebrain_lite_adapter` accesses private internals (`_store.get()`, `_store._conn.execute()`) — requires upstream API changes to fix
+
+## [0.1.0a1] - 2026-03-08
+
+Initial alpha release.
+
+### Added
+
+- **Belief Maintenance Benchmark (BMB)** — 48 tasks across 8 categories: contradiction detection, belief revision, evidence tracking, temporal updates, counterfactual reasoning, consolidation, multi-hop retrieval, pattern separation
+- **System Benchmark** — 20 end-to-end scenarios across contradiction, retraction, decay, dedup, extraction, and lifecycle categories
+- **Task-Level Evaluations** — 18 scenarios (~59 questions) for preference tracking (10) and long-horizon QA (8)
+- **Embedding Provider Benchmark** — evaluates 5 providers on claim deduplication accuracy and latency
+- **8 memory system adapters**: `mnemebrain` (SDK/HTTP), `mnemebrain_lite` (embedded), `structured_memory`, `mem0` (cloud API), `naive_baseline`, `rag_baseline`, `openai_rag` (cloud API), `langchain_buffer`
+- `MemorySystem` ABC with `Capability` enum and frozen result dataclasses (`StoreResult`, `QueryResult`, `RetractResult`, `ReviseResult`, `ExplainResult`, etc.)
+- `EmbeddingProvider` runtime-checkable protocol
+- Scoring engine with expectation evaluation, category aggregation, and scorecard formatting
+- JSON report export for all benchmark tracks
+- CLI entry points: `mnemebrain-bmb`, `mnemebrain-benchmark`, `mnemebrain-task-eval`
+- 259 tests (76% coverage)
+
+### Infrastructure
+
+- CI workflow: lint (ruff), type check (mypy), unit tests, coverage gate (80% min)
+- CodeQL and dependency review workflows
+- Pylint workflow
+- Release workflow: test → build → publish to PyPI + GitHub Release
+- GitHub issue templates: bug report, feature request, new adapter proposal
+- CONTRIBUTING.md with development setup and PR guidelines
+- Documentation: `docs/architecture.md`, `docs/adding-adapters.md`
