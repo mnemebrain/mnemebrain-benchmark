@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MnemeBrain &mdash; Belief Maintenance Benchmark</title>
+<meta name="description" content="48-task benchmark proving most AI memory systems cannot detect contradictions. MnemeBrain scores 100%. Every RAG system scores 0%.">
+<meta property="og:title" content="MnemeBrain Benchmark: Most AI memory systems cannot detect contradictions">
+<meta property="og:description" content="48-task deterministic benchmark for belief dynamics. MnemeBrain 100%, Mem0 29%, RAG 0%. Reproduce in 60 seconds.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   BMB Landing — self-contained, no build step
+   Design system matched to mnemebrain.ai HN landing
+   ============================================================ */
+
+:root {
+  --paper: #f4f1eb;
+  --cream: #eae6dd;
+  --ink: #0a0a0f;
+  --neural: #2a5aff;
+  --pulse: #c8f542;
+  --danger: #ff4040;
+  --muted: rgba(10,10,15,0.48);
+  --border: rgba(10,10,15,0.08);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection { background: rgba(200,245,66,0.35); }
+
+/* ---- SHARED ---- */
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+.label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--muted);
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;
+}
+.label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+h2 {
+  font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  line-height: 1.12; letter-spacing: -0.02em; margin-bottom: 1.2rem;
+}
+h2 em { font-style: italic; color: var(--neural); }
+.reveal {
+  opacity: 0; transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.on { opacity: 1; transform: none; }
+
+a { color: var(--neural); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.88em;
+  background: rgba(42,90,255,0.06); padding: 0.1em 0.35em;
+  border: 1px solid rgba(42,90,255,0.1);
+}
+
+/* ---- NAV ---- */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.2rem 2.5rem;
+  background: rgba(244,241,235,0.88); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif; font-size: 1.35rem;
+  letter-spacing: -0.03em; text-decoration: none; color: var(--ink);
+  display: flex; align-items: baseline; gap: 0;
+}
+.nav-logo .b { color: var(--neural); font-weight: 700; }
+.nav-logo .tag {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.5rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted); margin-left: 0.6rem;
+  border: 1px solid var(--border); padding: 0.15rem 0.4rem;
+}
+.nav-links {
+  display: flex; gap: 1rem; list-style: none;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.06em;
+}
+.nav-links a {
+  text-decoration: none; color: var(--ink); opacity: 0.55;
+  padding: 0.4rem 0.7rem; transition: opacity 0.2s;
+}
+.nav-links a:hover { opacity: 1; text-decoration: none; }
+.nav-cta {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  background: var(--ink); color: var(--pulse);
+  padding: 0.5rem 1.2rem; text-decoration: none;
+  transition: background 0.2s;
+}
+.nav-cta:hover { background: var(--neural); color: #fff; text-decoration: none; }
+
+/* ---- HERO ---- */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; padding: 8rem 0 5rem;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--neural);
+  background: rgba(42,90,255,0.06); border: 1px solid rgba(42,90,255,0.18);
+  padding: 0.35rem 0.7rem; width: fit-content; margin-bottom: 2rem;
+}
+.hero-badge .dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--neural);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  line-height: 1.08; letter-spacing: -0.025em; margin-bottom: 1.4rem;
+  max-width: 18ch;
+}
+.hero h1 em { font-style: italic; color: var(--neural); }
+.hero-sub {
+  font-size: 1.05rem; line-height: 1.85; color: var(--muted);
+  max-width: 52ch; margin-bottom: 2.5rem;
+}
+.hero-btns { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+.btn-solid {
+  display: inline-block; background: var(--ink); color: var(--pulse);
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.85rem 1.8rem; text-decoration: none; transition: background 0.2s;
+}
+.btn-solid:hover { background: var(--neural); color: #fff; text-decoration: none; }
+.btn-line {
+  display: inline-block; background: transparent; color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.85rem 1.8rem; border: 1px solid var(--border);
+  text-decoration: none; transition: border-color 0.2s;
+}
+.btn-line:hover { border-color: var(--ink); text-decoration: none; }
+
+/* ---- PROBLEM ---- */
+.problem { padding: 6rem 0; border-top: 1px solid var(--border); }
+.problem-example {
+  background: var(--ink); padding: 2rem 2.2rem; margin: 2.5rem 0;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; line-height: 2;
+}
+.problem-example .ts { color: rgba(244,241,235,0.22); }
+.problem-example .speaker { color: rgba(244,241,235,0.45); }
+.problem-example .msg { color: rgba(244,241,235,0.82); }
+.problem-example .gap { display: block; height: 0.6rem; }
+.problem-list {
+  list-style: none; margin: 1.5rem 0 0;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+  color: var(--muted); line-height: 2;
+}
+.problem-list li::before { content: '\2022'; color: var(--danger); margin-right: 0.7rem; }
+.problem-list .strike { text-decoration: line-through; opacity: 0.5; }
+.problem-verdict {
+  margin-top: 1.5rem; font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem; color: var(--danger); line-height: 1.7;
+}
+
+/* ---- STACK ---- */
+.stack-sec {
+  padding: 6rem 0; background: var(--ink); color: var(--paper);
+  border-top: 1px solid rgba(244,241,235,0.06);
+}
+.stack-sec .label { color: rgba(244,241,235,0.3); }
+.stack-sec .label::after { background: rgba(244,241,235,0.06); }
+.stack-sec h2 { color: var(--paper); }
+.stack-sec h2 em { color: var(--pulse); }
+.stack-grid {
+  display: grid; grid-template-columns: 1fr 40px 1fr; gap: 0;
+  margin-top: 3rem; align-items: start;
+}
+.stack-col {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+}
+.stack-row {
+  padding: 0.65rem 1.2rem; border: 1px solid rgba(244,241,235,0.06);
+  margin-bottom: -1px; color: rgba(244,241,235,0.45);
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.stack-row.highlight {
+  background: rgba(200,245,66,0.08); border-color: rgba(200,245,66,0.2);
+  color: var(--pulse); border-left: 3px solid var(--pulse);
+}
+.stack-row.dim { opacity: 0.35; }
+.stack-arrow {
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 1.4rem;
+  color: rgba(244,241,235,0.15); padding-top: 4rem;
+}
+.stack-caption {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(244,241,235,0.22); margin-bottom: 0.8rem;
+}
+
+/* ---- BELIEF STRUCT ---- */
+.belief-sec { padding: 6rem 0; border-top: 1px solid var(--border); }
+.belief-layout {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem;
+  margin-top: 2.5rem; align-items: start;
+}
+.belief-text { font-size: 0.95rem; line-height: 1.85; color: var(--muted); }
+.belief-text p { margin-bottom: 1rem; }
+.belief-block {
+  background: var(--ink); padding: 2rem 2.2rem;
+  border-left: 3px solid var(--pulse);
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; line-height: 2;
+}
+.belief-block .k { color: rgba(244,241,235,0.32); }
+.belief-block .v { color: rgba(200,245,66,0.82); }
+.belief-block .ev { color: #88aaff; }
+.belief-block .claim { color: var(--pulse); font-size: 0.78rem; }
+.belief-block .sep { border-top: 1px solid rgba(244,241,235,0.06); margin: 0.5rem 0; }
+.belnap-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+  margin-top: 1.5rem; background: var(--border);
+}
+.belnap-cell {
+  background: var(--cream); padding: 0.8rem 1rem; text-align: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;
+}
+.belnap-cell .state { font-weight: 500; color: var(--ink); display: block; margin-bottom: 0.2rem; }
+.belnap-cell .desc { font-size: 0.58rem; color: var(--muted); }
+.belnap-cell.active { background: var(--ink); }
+.belnap-cell.active .state { color: var(--pulse); }
+.belnap-cell.active .desc { color: rgba(244,241,235,0.4); }
+
+/* ---- RESULTS ---- */
+.results-sec {
+  padding: 6rem 0; background: var(--ink); color: var(--paper);
+}
+.results-sec .label { color: rgba(244,241,235,0.3); }
+.results-sec .label::after { background: rgba(244,241,235,0.06); }
+.results-sec h2 { color: var(--paper); }
+.results-sec h2 em { color: var(--pulse); }
+.results-sub {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem;
+  color: rgba(244,241,235,0.35); letter-spacing: 0.04em;
+  margin-bottom: 3rem;
+}
+.bar-chart { margin-bottom: 2rem; }
+.bar-row {
+  display: grid; grid-template-columns: 180px 1fr 50px;
+  gap: 1rem; align-items: center; margin-bottom: 0.5rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;
+}
+.bar-name { color: rgba(244,241,235,0.55); text-align: right; }
+.bar-name.top { color: var(--paper); }
+.bar-track {
+  height: 28px; background: rgba(244,241,235,0.03);
+  position: relative; overflow: hidden;
+}
+.bar-fill {
+  height: 100%; position: absolute; left: 0; top: 0;
+  width: 0; transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bar-fill.f100 { background: var(--pulse); }
+.bar-fill.f36 { background: rgba(244,241,235,0.18); }
+.bar-fill.f29 { background: rgba(244,241,235,0.12); }
+.bar-fill.f0 { background: rgba(255,64,64,0.25); width: 2px !important; }
+.bar-pct { color: rgba(244,241,235,0.4); font-size: 0.65rem; }
+.bar-pct.top { color: var(--pulse); font-weight: 500; }
+.bar-fill.animated.f100 { width: 100%; }
+.bar-fill.animated.f36 { width: 36%; }
+.bar-fill.animated.f29 { width: 29%; }
+.results-callout {
+  background: rgba(200,245,66,0.06); border: 1px solid rgba(200,245,66,0.15);
+  border-left: 3px solid var(--pulse);
+  padding: 1.2rem 1.6rem; margin-top: 2.5rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+  line-height: 1.75; color: rgba(244,241,235,0.55);
+}
+.results-callout strong { color: var(--pulse); font-weight: 400; }
+.results-meta {
+  margin-top: 2rem; font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem; color: rgba(244,241,235,0.2); line-height: 1.7;
+}
+
+/* ---- QUICKSTART ---- */
+.qs-sec { padding: 6rem 0; border-top: 1px solid var(--border); }
+.qs-block {
+  background: var(--ink); padding: 2rem 2.2rem; margin-top: 2rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; line-height: 2.2;
+}
+.qs-block .c { color: rgba(244,241,235,0.2); }
+.qs-block .cmd { color: var(--pulse); }
+.qs-block .flag { color: #88aaff; }
+.qs-note {
+  margin-top: 1.2rem; font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem; color: var(--muted); line-height: 1.7;
+}
+
+/* ---- API EXAMPLE ---- */
+.api-sec { padding: 6rem 0; background: var(--cream); border-top: 1px solid var(--border); }
+.api-layout {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;
+  margin-top: 2.5rem; align-items: start;
+}
+.api-text { font-size: 0.95rem; line-height: 1.85; color: var(--muted); }
+.api-text p { margin-bottom: 1rem; }
+.api-code {
+  background: var(--ink); padding: 2rem 2.2rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; line-height: 2;
+}
+.api-code .kw { color: var(--pulse); }
+.api-code .fn { color: var(--pulse); }
+.api-code .str { color: #88aaff; }
+.api-code .cm { color: rgba(244,241,235,0.2); }
+.api-code .var { color: rgba(244,241,235,0.6); }
+.api-code .out { color: rgba(200,245,66,0.75); }
+.api-code .sep { border-top: 1px solid rgba(244,241,235,0.06); margin: 0.6rem 0; }
+
+/* ---- ARCHITECTURE ---- */
+.arch-sec { padding: 6rem 0; border-top: 1px solid var(--border); }
+.arch-flow {
+  display: flex; flex-direction: column; align-items: flex-start;
+  gap: 0; margin: 2.5rem 0; max-width: 360px;
+}
+.arch-node {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+  padding: 0.7rem 1.4rem; border: 1px solid var(--border);
+  background: var(--paper); width: 100%; position: relative;
+  margin-bottom: -1px;
+}
+.arch-node.active {
+  background: var(--ink); color: var(--pulse);
+  border-color: var(--ink); border-left: 3px solid var(--pulse);
+}
+.arch-props {
+  list-style: none; margin-top: 1.5rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+  color: var(--muted); line-height: 2.2;
+}
+.arch-props li::before {
+  content: '\2022'; color: var(--neural); margin-right: 0.7rem;
+}
+
+/* ---- ADAPTERS ---- */
+.adapt-sec {
+  padding: 6rem 0; background: var(--ink); color: var(--paper);
+  border-top: 1px solid rgba(244,241,235,0.06);
+}
+.adapt-sec .label { color: rgba(244,241,235,0.3); }
+.adapt-sec .label::after { background: rgba(244,241,235,0.06); }
+.adapt-sec h2 { color: var(--paper); }
+.adapt-sec h2 em { color: var(--pulse); }
+.adapt-code {
+  background: #0c0c14; padding: 2rem 2.2rem; margin-top: 2.5rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; line-height: 2;
+  border-left: 3px solid rgba(42,90,255,0.3);
+}
+.adapt-code .kw { color: var(--pulse); }
+.adapt-code .cls { color: #88aaff; }
+.adapt-code .fn { color: rgba(244,241,235,0.6); }
+.adapt-code .cm { color: rgba(244,241,235,0.2); }
+.adapt-code .param { color: rgba(200,245,66,0.6); }
+.adapt-wanted {
+  margin-top: 2.5rem; font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem; color: rgba(244,241,235,0.4); line-height: 2;
+}
+.adapt-wanted strong { color: rgba(244,241,235,0.6); font-weight: 400; }
+.adapt-list {
+  display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem;
+}
+.adapt-chip {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.06em; padding: 0.3rem 0.7rem;
+  border: 1px solid rgba(244,241,235,0.1); color: rgba(244,241,235,0.4);
+  transition: border-color 0.2s;
+}
+.adapt-chip:hover { border-color: var(--neural); color: var(--neural); }
+
+/* ---- CTA ---- */
+.cta-sec {
+  padding: 6rem 0; text-align: center;
+  background: var(--cream); border-top: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.cta-sec h2 { margin-bottom: 0.8rem; }
+.cta-sub {
+  font-size: 0.95rem; color: var(--muted); margin-bottom: 2.5rem;
+  max-width: 42ch; margin-left: auto; margin-right: auto;
+}
+.cta-btns { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+.btn-pulse {
+  background: var(--pulse); color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.9rem 2rem; text-decoration: none; transition: background 0.2s;
+}
+.btn-pulse:hover { background: #d4ff44; text-decoration: none; }
+
+/* ---- FOOTER ---- */
+footer {
+  background: var(--ink); color: rgba(244,241,235,0.3);
+  padding: 2rem 2.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  border-top: 1px solid rgba(244,241,235,0.06);
+}
+footer a { color: rgba(244,241,235,0.3); }
+footer a:hover { color: rgba(244,241,235,0.6); }
+.footer-brand {
+  font-family: 'Playfair Display', serif; font-size: 0.9rem;
+  letter-spacing: -0.02em; color: var(--paper);
+}
+.footer-brand .b { color: var(--neural); font-weight: 700; }
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+  .wrap { padding: 0 1.5rem; }
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  .hero { padding: 7rem 0 4rem; }
+  .belief-layout, .api-layout, .stack-grid { grid-template-columns: 1fr; }
+  .stack-arrow { display: none; }
+  .belnap-grid { grid-template-columns: repeat(2, 1fr); }
+  .bar-row { grid-template-columns: 120px 1fr 40px; }
+  .bar-name { font-size: 0.6rem; }
+  footer { flex-direction: column; gap: 0.8rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">mneme<span class="b">brain</span><span class="tag">benchmark</span></a>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#results">Results</a></li>
+    <li><a href="#quickstart">Quickstart</a></li>
+    <li><a href="#adapters">Adapters</a></li>
+  </ul>
+  <a class="nav-cta" href="https://github.com/mnemebrain/mnemebrain-benchmark" target="_blank" rel="noopener noreferrer">GitHub</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-badge"><span class="dot"></span>Open-source &mdash; pip install mnemebrain-benchmark</div>
+    <h1>Most AI memory systems <em>cannot detect contradictions.</em></h1>
+    <p class="hero-sub">
+      We built a 48-task benchmark to measure belief dynamics in AI memory systems.
+      MnemeBrain scores 100%. Every RAG system scores 0%. Not because they implemented it badly &mdash;
+      because their architecture cannot represent contradictions.
+    </p>
+    <div class="hero-btns">
+      <a href="#quickstart" class="btn-solid">Reproduce in 60s</a>
+      <a href="#results" class="btn-line">See results</a>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="wrap">
+    <div class="label reveal">The problem</div>
+    <h2 class="reveal">Agents accumulate facts.<br/>Facts <em>conflict.</em></h2>
+
+    <div class="problem-example reveal">
+      <span class="ts">Week 1:</span><br>
+      <span class="speaker">User:</span> <span class="msg">"I'm vegetarian."</span>
+      <span class="gap"></span>
+      <span class="ts">Week 6:</span><br>
+      <span class="speaker">User:</span> <span class="msg">"I ate steak last night."</span>
+    </div>
+
+    <p class="reveal" style="font-size: 0.95rem; line-height: 1.8; color: var(--muted); max-width: 52ch;">
+      A correct system should detect a contradiction. Instead, most memory systems:
+    </p>
+    <ul class="problem-list reveal">
+      <li class="strike">overwrite the old fact silently</li>
+      <li class="strike">return whichever sentence is retrieved first</li>
+      <li class="strike">hallucinate a resolution</li>
+    </ul>
+    <p class="problem-verdict reveal">They cannot represent contradiction.</p>
+  </div>
+</section>
+
+<!-- STACK -->
+<section class="stack-sec" id="stack">
+  <div class="wrap">
+    <div class="label reveal">The missing layer</div>
+    <h2 class="reveal">Where belief memory fits<br/>in the <em>AI stack.</em></h2>
+    <div class="stack-grid reveal">
+      <div class="stack-col">
+        <div class="stack-caption">Current stack</div>
+        <div class="stack-row dim">Application</div>
+        <div class="stack-row dim">Agent framework</div>
+        <div class="stack-row dim">LLM</div>
+        <div class="stack-row dim">Vector DB / RAG</div>
+        <div class="stack-row dim">Database</div>
+      </div>
+      <div class="stack-arrow">&rarr;</div>
+      <div class="stack-col">
+        <div class="stack-caption">With MnemeBrain</div>
+        <div class="stack-row">Application</div>
+        <div class="stack-row">Agent framework</div>
+        <div class="stack-row">LLM</div>
+        <div class="stack-row highlight">Belief layer &larr; MnemeBrain</div>
+        <div class="stack-row">Vector DB / RAG</div>
+        <div class="stack-row">Database</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BELIEF STRUCT -->
+<section class="belief-sec" id="beliefs">
+  <div class="wrap">
+    <div class="label reveal">What MnemeBrain stores</div>
+    <h2 class="reveal">Not text chunks.<br/><em>Structured beliefs.</em></h2>
+    <div class="belief-layout reveal">
+      <div class="belief-text">
+        <p>Each belief tracks its supporting and attacking evidence, computes a truth state using Belnap's four-valued logic, and maintains a confidence score that decays over time.</p>
+        <p>When evidence conflicts, the system doesn't silently pick a winner. It enters a <strong>BOTH</strong> state &mdash; explicitly representing the contradiction for the agent to reason about.</p>
+        <div class="belnap-grid">
+          <div class="belnap-cell"><span class="state">TRUE</span><span class="desc">supported</span></div>
+          <div class="belnap-cell"><span class="state">FALSE</span><span class="desc">refuted</span></div>
+          <div class="belnap-cell active"><span class="state">BOTH</span><span class="desc">conflicting</span></div>
+          <div class="belnap-cell"><span class="state">NEITHER</span><span class="desc">no evidence</span></div>
+        </div>
+      </div>
+      <div class="belief-block">
+        <div class="claim">"user is vegetarian"</div>
+        <div class="sep"></div>
+        <span class="k">supporting_evidence:</span><br>
+        &nbsp;&nbsp;<span class="ev">"user said they avoid meat"</span><br>
+        <div class="sep"></div>
+        <span class="k">attacking_evidence:</span><br>
+        &nbsp;&nbsp;<span class="ev">"user ate steak last night"</span><br>
+        <div class="sep"></div>
+        <span class="k">truth_state: </span><span class="v">BOTH</span><br>
+        <span class="k">confidence:&nbsp; </span><span class="v">0.52</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section class="results-sec" id="results">
+  <div class="wrap">
+    <div class="label reveal">Benchmark results</div>
+    <h2 class="reveal">The gap is not <em>small.</em></h2>
+    <div class="results-sub reveal">
+      Belief Maintenance Benchmark (BMB) &mdash; 48 tasks &middot; 8 categories &middot; ~100 checks &middot; zero LLM calls &middot; fully deterministic
+    </div>
+
+    <div class="bar-chart reveal" id="bar-chart">
+      <div class="bar-row">
+        <div class="bar-name top">mnemebrain</div>
+        <div class="bar-track"><div class="bar-fill f100"></div></div>
+        <div class="bar-pct top">100%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">structured_memory</div>
+        <div class="bar-track"><div class="bar-fill f36"></div></div>
+        <div class="bar-pct">36%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">mem0 (real API)</div>
+        <div class="bar-track"><div class="bar-fill f29"></div></div>
+        <div class="bar-pct">29%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">openai_rag (real API)</div>
+        <div class="bar-track"><div class="bar-fill f0"></div></div>
+        <div class="bar-pct">0%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">rag_baseline</div>
+        <div class="bar-track"><div class="bar-fill f0"></div></div>
+        <div class="bar-pct">0%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">langchain_buffer</div>
+        <div class="bar-track"><div class="bar-fill f0"></div></div>
+        <div class="bar-pct">0%</div>
+      </div>
+    </div>
+
+    <div class="results-callout reveal">
+      Every retrieval-based system scores <strong>0% on contradiction detection</strong>.
+      Not because they implemented it badly. Because their architecture cannot represent contradictions.
+    </div>
+
+    <div class="results-meta reveal">
+      Benchmark run: 2026-03-07. Real sentence-transformers embeddings (all-MiniLM-L6-v2).<br>
+      Mem0 tested with real cloud API, graph memory enabled. OpenAI RAG with real text-embedding-3-small.<br>
+      Full report: <a href="https://github.com/mnemebrain/mnemebrain-benchmark/blob/main/BMB_REPORT.md" style="color: rgba(200,245,66,0.5);">BMB_REPORT.md</a>
+    </div>
+  </div>
+</section>
+
+<!-- QUICKSTART -->
+<section class="qs-sec" id="quickstart">
+  <div class="wrap">
+    <div class="label reveal">Try it yourself</div>
+    <h2 class="reveal">Reproduce in <em>60 seconds.</em></h2>
+    <div class="qs-block reveal">
+      <span class="c"># Install</span><br>
+      <span class="cmd">pip install</span> <span class="flag">mnemebrain-benchmark</span><br>
+      <br>
+      <span class="c"># Run the full benchmark (all adapters)</span><br>
+      <span class="cmd">mnemebrain-bmb</span><br>
+      <br>
+      <span class="c"># Single adapter</span><br>
+      <span class="cmd">mnemebrain-bmb</span> <span class="flag">--adapter mnemebrain</span><br>
+      <span class="cmd">mnemebrain-bmb</span> <span class="flag">--adapter mem0</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c"># requires MEM0_API_KEY</span><br>
+      <br>
+      <span class="c"># Single category</span><br>
+      <span class="cmd">mnemebrain-bmb</span> <span class="flag">--category contradiction</span><br>
+      <br>
+      <span class="c"># Task-level evaluations (downstream correctness)</span><br>
+      <span class="cmd">mnemebrain-task-eval</span>
+    </div>
+    <p class="qs-note reveal">
+      No LLM calls. Deterministic results. All logic computed by the belief engine.
+    </p>
+  </div>
+</section>
+
+<!-- API EXAMPLE -->
+<section class="api-sec" id="api">
+  <div class="wrap">
+    <div class="label reveal">Example</div>
+    <h2 class="reveal">Contradiction detection<br/>in <em>four lines.</em></h2>
+    <div class="api-layout reveal">
+      <div class="api-text">
+        <p>Store two conflicting beliefs. Query the result. The system detects the contradiction and returns <strong>BOTH</strong> instead of silently picking a winner.</p>
+        <p>Call <code>explain()</code> to get the full evidence chain &mdash; which evidence supports, which attacks, and why the truth state changed.</p>
+        <p>This is a structural trace, not generated prose. The audit trail is the architecture.</p>
+      </div>
+      <div class="api-code">
+        <span class="kw">from</span> <span class="var">mnemebrain</span> <span class="kw">import</span> <span class="var">Brain</span><br>
+        <br>
+        <span class="var">brain</span> = <span class="var">Brain</span>()<br>
+        <br>
+        <span class="var">brain</span>.<span class="fn">store</span>(<span class="str">"user is vegetarian"</span>)<br>
+        <span class="var">brain</span>.<span class="fn">store</span>(<span class="str">"user ate steak last night"</span>)<br>
+        <br>
+        <span class="var">belief</span> = <span class="var">brain</span>.<span class="fn">query</span>(<span class="str">"user diet"</span>)<br>
+        <div class="sep"></div>
+        <span class="cm"># Output:</span><br>
+        <span class="var">belief.truth_state</span>&nbsp;&nbsp;<span class="cm">#</span> <span class="out">BOTH</span><br>
+        <span class="var">belief.confidence</span>&nbsp;&nbsp;&nbsp;<span class="cm">#</span> <span class="out">0.52</span><br>
+        <div class="sep"></div>
+        <span class="var">trace</span> = <span class="var">brain</span>.<span class="fn">explain</span>(<span class="var">belief</span>)<br>
+        <span class="var">trace.supporting</span>&nbsp;&nbsp;&nbsp;<span class="cm"># 1 item</span><br>
+        <span class="var">trace.attacking</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># 1 item</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="arch-sec" id="architecture">
+  <div class="wrap">
+    <div class="label reveal">Architecture</div>
+    <h2 class="reveal">Evidence in,<br/><em>beliefs out.</em></h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start;" class="reveal">
+      <div>
+        <div class="arch-flow">
+          <div class="arch-node">Evidence</div>
+          <div class="arch-node">Belief Node</div>
+          <div class="arch-node active">TruthState (Belnap)</div>
+          <div class="arch-node">Confidence + Decay</div>
+          <div class="arch-node">Agent API</div>
+        </div>
+      </div>
+      <div>
+        <ul class="arch-props">
+          <li>Explicit evidence provenance</li>
+          <li>Contradiction tracking (Belnap four-valued logic)</li>
+          <li>AGM-style belief revision</li>
+          <li>Temporal decay with type-specific half-lives</li>
+          <li>Copy-on-write sandbox for counterfactual reasoning</li>
+          <li>Episodic-to-semantic consolidation</li>
+          <li>HippoRAG multi-hop graph retrieval</li>
+          <li>ANN-first pattern separation</li>
+        </ul>
+        <p style="margin-top: 1.5rem; font-size: 0.88rem; line-height: 1.7; color: var(--muted);">
+          8 categories in BMB. Each tests a different architectural capability. Systems that lack the capability score 0% on that category &mdash; no amount of prompt engineering can fix a missing abstraction.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ADAPTERS -->
+<section class="adapt-sec" id="adapters">
+  <div class="wrap">
+    <div class="label reveal">Open benchmark</div>
+    <h2 class="reveal">Any memory system<br/>can <em>run BMB.</em></h2>
+
+    <div class="adapt-code reveal">
+      <span class="kw">class</span> <span class="cls">MemorySystem</span>:<br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">def</span> <span class="fn">store</span>(<span class="param">self, claim, evidence</span>):<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">...</span><br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">def</span> <span class="fn">query</span>(<span class="param">self, claim</span>):<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">...</span><br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">def</span> <span class="fn">explain</span>(<span class="param">self, belief_id</span>):<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">...</span>
+    </div>
+
+    <div class="adapt-wanted reveal">
+      <strong>Adapters welcome for:</strong>
+      <div class="adapt-list">
+        <span class="adapt-chip">MemGPT</span>
+        <span class="adapt-chip">Zep</span>
+        <span class="adapt-chip">Graphiti</span>
+        <span class="adapt-chip">LlamaIndex</span>
+        <span class="adapt-chip">CrewAI</span>
+        <span class="adapt-chip">Weaviate</span>
+        <span class="adapt-chip">ChromaDB</span>
+        <span class="adapt-chip">your system</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec">
+  <div class="wrap">
+    <h2 class="reveal">Run the benchmark.<br/>See for <em>yourself.</em></h2>
+    <p class="cta-sub reveal">Open-source. Deterministic. No LLM calls. Reproduce every result.</p>
+    <div class="cta-btns reveal">
+      <a href="https://github.com/mnemebrain/mnemebrain-benchmark" class="btn-pulse" target="_blank" rel="noopener noreferrer">Star on GitHub</a>
+      <a href="#quickstart" class="btn-line" style="border-color: var(--border);">Quickstart</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">mneme<span class="b">brain</span></div>
+  <div>Belief memory infrastructure for AI agents. &copy; 2026</div>
+  <div>
+    <a href="https://github.com/mnemebrain/mnemebrain-benchmark">GitHub</a> &middot;
+    <a href="https://github.com/mnemebrain/mnemebrain-benchmark/blob/main/BMB_REPORT.md">BMB Report</a> &middot;
+    <a href="https://github.com/mnemebrain/mnemebrain-benchmark/blob/main/CONTRIBUTING.md">Contributing</a>
+  </div>
+</footer>
+
+<script>
+// Reveal on scroll
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('on'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Animate bar chart when visible
+const chartObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.bar-fill').forEach((bar, i) => {
+        setTimeout(() => bar.classList.add('animated'), i * 120);
+      });
+      chartObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+const chart = document.getElementById('bar-chart');
+if (chart) chartObs.observe(chart);
+</script>
+
+</body>
+</html>
