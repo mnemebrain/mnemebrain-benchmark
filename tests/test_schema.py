@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 from mnemebrain_benchmark.scenarios.schema import (
+    VALID_ACTION_TYPES,
+    VALID_CATEGORIES,
     Action,
     Expectation,
     Scenario,
-    VALID_ACTION_TYPES,
-    VALID_CATEGORIES,
 )
 
 

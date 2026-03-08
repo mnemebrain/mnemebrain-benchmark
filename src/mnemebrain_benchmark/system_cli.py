@@ -7,8 +7,8 @@ import sys
 
 from mnemebrain_benchmark.interface import MemorySystem
 from mnemebrain_benchmark.scenarios.loader import load_scenarios
+from mnemebrain_benchmark.system_report import export_json, format_scorecard
 from mnemebrain_benchmark.system_runner import SystemBenchmarkRunner
-from mnemebrain_benchmark.system_report import format_scorecard, export_json
 
 
 def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
@@ -16,9 +16,10 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
 
     if adapter_filter is None or adapter_filter == "naive_baseline":
         try:
-            from mnemebrain_benchmark.adapters.naive_baseline import NaiveBaseline
-            from sentence_transformers import SentenceTransformer
             import numpy as np
+            from sentence_transformers import SentenceTransformer
+
+            from mnemebrain_benchmark.adapters.naive_baseline import NaiveBaseline
 
             class _STProvider:
                 def __init__(self) -> None:
@@ -34,7 +35,10 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
             adapters.append(NaiveBaseline(_STProvider()))
         except ImportError:
             if adapter_filter == "naive_baseline":
-                print("naive_baseline requires sentence-transformers: pip install mnemebrain-benchmark[embeddings]")
+                print(
+                    "naive_baseline requires sentence-transformers:"
+                    " pip install mnemebrain-benchmark[embeddings]"
+                )
                 sys.exit(1)
 
     if adapter_filter is None or adapter_filter == "mnemebrain":
@@ -44,7 +48,10 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
             adapters.append(MnemeBrainAdapter(base_url=base_url))
         except ImportError:
             if adapter_filter == "mnemebrain":
-                print("mnemebrain adapter requires the SDK: pip install mnemebrain-benchmark[mnemebrain]")
+                print(
+                    "mnemebrain adapter requires the SDK: "
+                    "pip install mnemebrain-benchmark[mnemebrain]"
+                )
                 sys.exit(1)
 
     return adapters
@@ -54,7 +61,10 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
         description="MnemeBrain System Benchmark"
     )
-    parser.add_argument("--adapter", type=str, default=None, choices=["mnemebrain", "naive_baseline"])
+    parser.add_argument(
+        "--adapter", type=str, default=None,
+        choices=["mnemebrain", "naive_baseline"],
+    )
     parser.add_argument(
         "--category", type=str, default=None,
         choices=["contradiction", "retraction", "decay", "dedup", "extraction", "lifecycle"],

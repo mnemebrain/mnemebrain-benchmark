@@ -1,8 +1,6 @@
 """Tests for mnemebrain_benchmark.system_runner -- SystemBenchmarkRunner."""
 from __future__ import annotations
 
-from unittest.mock import MagicMock
-
 from mnemebrain_benchmark.interface import (
     AttackResult,
     Capability,
@@ -181,7 +179,11 @@ class TestRunScenario:
             actions=[
                 Action(label="s1", type="store", claim="test", evidence=[{}]),
                 Action(label="sf1", type="sandbox_fork", scenario_label="test"),
-                Action(label="sa1", type="sandbox_assume", sandbox_label="sf1", belief_label="s1", truth_state_override="false"),
+                Action(
+                    label="sa1", type="sandbox_assume",
+                    sandbox_label="sf1", belief_label="s1",
+                    truth_state_override="false",
+                ),
                 Action(label="sr1", type="sandbox_resolve", sandbox_label="sf1", belief_label="s1"),
                 Action(label="sd1", type="sandbox_discard", sandbox_label="sf1"),
             ],

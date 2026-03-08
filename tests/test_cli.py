@@ -1,14 +1,11 @@
 """Tests for CLI modules (bmb_cli, system_cli, __main__)."""
 from __future__ import annotations
 
-import json
-import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
 from mnemebrain_benchmark.scoring import CheckResult, ScenarioScore
-
 
 # -- bmb_cli --
 

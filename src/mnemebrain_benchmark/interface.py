@@ -3,10 +3,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 
-class Capability(str, Enum):
+class Capability(StrEnum):
     STORE = "store"
     QUERY = "query"
     RETRACT = "retract"
@@ -139,7 +139,10 @@ class MemorySystem(ABC):
     def sandbox_discard(self, sandbox_id: str) -> None:
         raise NotImplementedError
 
-    def add_attack(self, attacker_id: str, target_id: str, attack_type: str, weight: float) -> AttackResult:
+    def add_attack(
+        self, attacker_id: str, target_id: str,
+        attack_type: str, weight: float,
+    ) -> AttackResult:
         raise NotImplementedError
 
     @abstractmethod

@@ -16,7 +16,10 @@ def mock_mnemebrain_sdk():
     fake_mod = ModuleType("mnemebrain")
 
     class FakeEvidenceInput:
-        def __init__(self, source_ref="", content="", polarity="supports", weight=0.7, reliability=0.8):
+        def __init__(
+            self, source_ref="", content="",
+            polarity="supports", weight=0.7, reliability=0.8,
+        ):
             self.source_ref = source_ref
             self.content = content
             self.polarity = polarity
@@ -158,7 +161,10 @@ class TestMnemeBrainAdapter:
 
     def test_store(self):
         adapter = _get_adapter()
-        result = adapter.store("test", [{"source_ref": "src", "content": "ev", "polarity": "supports"}])
+        result = adapter.store(
+            "test",
+            [{"source_ref": "src", "content": "ev", "polarity": "supports"}],
+        )
         assert result.belief_id == "b-1#1"
         assert result.truth_state == "true"
 

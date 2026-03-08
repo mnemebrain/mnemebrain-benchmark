@@ -14,12 +14,10 @@ from mnemebrain_benchmark.interface import (
 from mnemebrain_benchmark.scenarios.schema import Expectation
 from mnemebrain_benchmark.scoring import (
     CheckResult,
-    CategoryScore,
     ScenarioScore,
     aggregate_by_category,
     evaluate_expectations,
 )
-
 
 # -- ScenarioScore --
 
