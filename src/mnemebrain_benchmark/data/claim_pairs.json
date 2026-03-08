@@ -1,0 +1,602 @@
+[
+  {
+    "id": "ep-01",
+    "claim_a": "The user prefers Python",
+    "claim_b": "The user's preferred language is Python",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-02",
+    "claim_a": "The user likes dark mode",
+    "claim_b": "The user prefers dark mode for their IDE",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-03",
+    "claim_a": "The user works at Google",
+    "claim_b": "The user is employed by Google",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-04",
+    "claim_a": "The user has a dog named Max",
+    "claim_b": "The user owns a dog called Max",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-05",
+    "claim_a": "The user lives in New York",
+    "claim_b": "The user resides in New York City",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-06",
+    "claim_a": "The user is a software engineer",
+    "claim_b": "The user works as a software developer",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-07",
+    "claim_a": "The user prefers tabs over spaces",
+    "claim_b": "The user uses tabs for indentation instead of spaces",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-08",
+    "claim_a": "The user is allergic to peanuts",
+    "claim_b": "The user has a peanut allergy",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-09",
+    "claim_a": "The user wants to learn Rust",
+    "claim_b": "The user is interested in learning the Rust programming language",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-10",
+    "claim_a": "The user graduated from MIT",
+    "claim_b": "The user got their degree from MIT",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-11",
+    "claim_a": "The user enjoys hiking on weekends",
+    "claim_b": "The user likes to go hiking during the weekend",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-12",
+    "claim_a": "The user speaks Spanish fluently",
+    "claim_b": "The user is fluent in Spanish",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-13",
+    "claim_a": "The user prefers morning meetings",
+    "claim_b": "The user likes to schedule meetings in the morning",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-14",
+    "claim_a": "The user has two children",
+    "claim_b": "The user is a parent of two kids",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ep-15",
+    "claim_a": "The user uses VS Code as their editor",
+    "claim_b": "The user's code editor of choice is Visual Studio Code",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "sd-01",
+    "claim_a": "The user thinks TypeScript is better than JavaScript for large projects",
+    "claim_b": "For big codebases, the user believes TypeScript is superior to plain JavaScript",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-02",
+    "claim_a": "The user finds async/await easier to reason about than callbacks",
+    "claim_b": "The user prefers async/await over callback-based patterns for readability",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-03",
+    "claim_a": "The user's team follows trunk-based development",
+    "claim_b": "The user's engineering team uses a trunk-based branching strategy",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-04",
+    "claim_a": "The user believes microservices add unnecessary complexity for small teams",
+    "claim_b": "The user thinks a monolith is better than microservices when the team is small",
+    "label": "same",
+    "category": "inference",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-05",
+    "claim_a": "The user usually deploys on Fridays without issues",
+    "claim_b": "Friday deployments have generally gone smoothly for the user",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-06",
+    "claim_a": "The user is skeptical about AI replacing developers",
+    "claim_b": "The user doubts that artificial intelligence will fully replace software engineers",
+    "label": "same",
+    "category": "inference",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-07",
+    "claim_a": "The user tends to over-engineer solutions",
+    "claim_b": "The user has a habit of building more complex solutions than needed",
+    "label": "same",
+    "category": "inference",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-08",
+    "claim_a": "The user's project deadline is next quarter",
+    "claim_b": "The user needs to finish their project by the end of next quarter",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-09",
+    "claim_a": "The user relies heavily on integration tests over unit tests",
+    "claim_b": "The user prioritizes integration testing above unit testing",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-10",
+    "claim_a": "The user will likely switch to a management role within a year",
+    "claim_b": "The user is probably transitioning into engineering management soon",
+    "label": "same",
+    "category": "prediction",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-11",
+    "claim_a": "The user values code readability over clever optimizations",
+    "claim_b": "The user prioritizes writing clear, readable code rather than optimizing for performance",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-12",
+    "claim_a": "The user's application has a memory leak in production",
+    "claim_b": "There is a memory leak in the user's production deployment",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-13",
+    "claim_a": "The user learns best by building projects from scratch",
+    "claim_b": "Hands-on project-based learning works best for the user",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-14",
+    "claim_a": "The user's company is migrating from AWS to GCP",
+    "claim_b": "The user's organization is moving their cloud infrastructure from Amazon Web Services to Google Cloud Platform",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-15",
+    "claim_a": "The user avoids ORMs and writes raw SQL",
+    "claim_b": "The user prefers writing SQL directly instead of using an ORM layer",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-16",
+    "claim_a": "The user struggles with distributed systems design",
+    "claim_b": "Designing distributed systems is challenging for the user",
+    "label": "same",
+    "category": "inference",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-17",
+    "claim_a": "The user prefers functional programming paradigms",
+    "claim_b": "The user gravitates toward a functional style of programming",
+    "label": "same",
+    "category": "preference",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-18",
+    "claim_a": "The user's startup is running low on runway",
+    "claim_b": "The user's company is almost out of funding",
+    "label": "same",
+    "category": "fact",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-19",
+    "claim_a": "The user believes TDD slows down initial development but pays off long-term",
+    "claim_b": "The user thinks test-driven development is slower upfront but beneficial over time",
+    "label": "same",
+    "category": "inference",
+    "difficulty": "medium"
+  },
+  {
+    "id": "sd-20",
+    "claim_a": "The user is burned out from on-call rotations",
+    "claim_b": "Frequent on-call duties have left the user feeling exhausted",
+    "label": "same",
+    "category": "inference",
+    "difficulty": "medium"
+  },
+  {
+    "id": "neg-01",
+    "claim_a": "The user prefers dark mode",
+    "claim_b": "The user does not prefer dark mode",
+    "label": "different",
+    "category": "preference",
+    "difficulty": "hard"
+  },
+  {
+    "id": "neg-02",
+    "claim_a": "The user likes working remotely",
+    "claim_b": "The user dislikes working remotely",
+    "label": "different",
+    "category": "preference",
+    "difficulty": "hard"
+  },
+  {
+    "id": "neg-03",
+    "claim_a": "The user has completed the migration",
+    "claim_b": "The user has not completed the migration",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "hard"
+  },
+  {
+    "id": "neg-04",
+    "claim_a": "The user is comfortable with public speaking",
+    "claim_b": "The user is uncomfortable with public speaking",
+    "label": "different",
+    "category": "inference",
+    "difficulty": "hard"
+  },
+  {
+    "id": "neg-05",
+    "claim_a": "The user trusts automated testing",
+    "claim_b": "The user does not trust automated testing",
+    "label": "different",
+    "category": "preference",
+    "difficulty": "hard"
+  },
+  {
+    "id": "neg-06",
+    "claim_a": "The user can handle the workload",
+    "claim_b": "The user cannot handle the workload",
+    "label": "different",
+    "category": "inference",
+    "difficulty": "hard"
+  },
+  {
+    "id": "neg-07",
+    "claim_a": "The user is happy with their current role",
+    "claim_b": "The user is unhappy with their current role",
+    "label": "different",
+    "category": "inference",
+    "difficulty": "hard"
+  },
+  {
+    "id": "neg-08",
+    "claim_a": "The user recommends using Docker in production",
+    "claim_b": "The user advises against using Docker in production",
+    "label": "different",
+    "category": "preference",
+    "difficulty": "hard"
+  },
+  {
+    "id": "neg-09",
+    "claim_a": "The user believes the project will succeed",
+    "claim_b": "The user believes the project will fail",
+    "label": "different",
+    "category": "prediction",
+    "difficulty": "hard"
+  },
+  {
+    "id": "neg-10",
+    "claim_a": "The user wants to stay at their current company",
+    "claim_b": "The user wants to leave their current company",
+    "label": "different",
+    "category": "preference",
+    "difficulty": "hard"
+  },
+  {
+    "id": "es-01",
+    "claim_a": "The user works at Google",
+    "claim_b": "The user works at Microsoft",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "hard"
+  },
+  {
+    "id": "es-02",
+    "claim_a": "The user has a dog named Max",
+    "claim_b": "The user has a cat named Max",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "hard"
+  },
+  {
+    "id": "es-03",
+    "claim_a": "The user lives in New York",
+    "claim_b": "The user lives in San Francisco",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "hard"
+  },
+  {
+    "id": "es-04",
+    "claim_a": "The user graduated from MIT",
+    "claim_b": "The user graduated from Stanford",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "hard"
+  },
+  {
+    "id": "es-05",
+    "claim_a": "The user prefers Python over JavaScript",
+    "claim_b": "The user prefers JavaScript over Python",
+    "label": "different",
+    "category": "preference",
+    "difficulty": "hard"
+  },
+  {
+    "id": "es-06",
+    "claim_a": "The user's team uses React",
+    "claim_b": "The user's team uses Vue",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "hard"
+  },
+  {
+    "id": "es-07",
+    "claim_a": "The user's project is written in Go",
+    "claim_b": "The user's project is written in Rust",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "hard"
+  },
+  {
+    "id": "es-08",
+    "claim_a": "The user reports to Sarah",
+    "claim_b": "The user reports to Michael",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "hard"
+  },
+  {
+    "id": "es-09",
+    "claim_a": "The user's application runs on PostgreSQL",
+    "claim_b": "The user's application runs on MongoDB",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "hard"
+  },
+  {
+    "id": "es-10",
+    "claim_a": "The user joined the company in 2020",
+    "claim_b": "The user joined the company in 2023",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "hard"
+  },
+  {
+    "id": "ur-01",
+    "claim_a": "The user prefers Python",
+    "claim_b": "The user enjoys hiking on weekends",
+    "label": "different",
+    "category": "preference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-02",
+    "claim_a": "The user works at Google",
+    "claim_b": "The user is allergic to peanuts",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-03",
+    "claim_a": "The user likes dark mode",
+    "claim_b": "The user graduated from MIT",
+    "label": "different",
+    "category": "preference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-04",
+    "claim_a": "The user has two children",
+    "claim_b": "The user prefers TypeScript",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-05",
+    "claim_a": "The user is learning Rust",
+    "claim_b": "The user's startup is running low on runway",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-06",
+    "claim_a": "The user speaks Spanish fluently",
+    "claim_b": "The user prefers morning meetings",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-07",
+    "claim_a": "The user uses VS Code",
+    "claim_b": "The user has a memory leak in production",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-08",
+    "claim_a": "The user avoids ORMs",
+    "claim_b": "The user has two children",
+    "label": "different",
+    "category": "preference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-09",
+    "claim_a": "The user is burned out from on-call",
+    "claim_b": "The user lives in New York",
+    "label": "different",
+    "category": "inference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-10",
+    "claim_a": "The user believes TDD pays off long-term",
+    "claim_b": "The user has a dog named Max",
+    "label": "different",
+    "category": "inference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-11",
+    "claim_a": "The user prefers functional programming",
+    "claim_b": "The user's company is migrating to GCP",
+    "label": "different",
+    "category": "preference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-12",
+    "claim_a": "The user follows trunk-based development",
+    "claim_b": "The user is skeptical about AI replacing developers",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-13",
+    "claim_a": "The user tends to over-engineer solutions",
+    "claim_b": "The user enjoys cooking Italian food",
+    "label": "different",
+    "category": "inference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-14",
+    "claim_a": "The user deploys on Fridays",
+    "claim_b": "The user is comfortable with public speaking",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-15",
+    "claim_a": "The user values code readability",
+    "claim_b": "The user joined the company in 2020",
+    "label": "different",
+    "category": "preference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-16",
+    "claim_a": "The user's project deadline is next quarter",
+    "claim_b": "The user prefers tabs over spaces",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-17",
+    "claim_a": "The user is a software engineer",
+    "claim_b": "The user will likely switch to management",
+    "label": "different",
+    "category": "fact",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-18",
+    "claim_a": "The user struggles with distributed systems",
+    "claim_b": "The user speaks Spanish fluently",
+    "label": "different",
+    "category": "inference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-19",
+    "claim_a": "The user relies on integration tests",
+    "claim_b": "The user enjoys hiking on weekends",
+    "label": "different",
+    "category": "preference",
+    "difficulty": "easy"
+  },
+  {
+    "id": "ur-20",
+    "claim_a": "The user learns best by building projects",
+    "claim_b": "The user reports to Sarah",
+    "label": "different",
+    "category": "preference",
+    "difficulty": "easy"
+  }
+]

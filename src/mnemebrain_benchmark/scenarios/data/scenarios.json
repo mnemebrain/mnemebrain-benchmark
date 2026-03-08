@@ -1,0 +1,1069 @@
+[
+  {
+    "name": "vegetarian_contradiction",
+    "description": "Stores a belief that the user is vegetarian, then stores contradicting evidence that they eat meat.",
+    "category": "contradiction",
+    "requires": ["store", "contradiction"],
+    "actions": [
+      {
+        "label": "store_veg",
+        "type": "store",
+        "claim": "user is vegetarian",
+        "evidence": [
+          {
+            "content": "User said they don't eat meat",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "conversation_2024_01"
+          }
+        ]
+      },
+      {
+        "label": "store_meat",
+        "type": "store",
+        "claim": "user is vegetarian",
+        "evidence": [
+          {
+            "content": "User ordered a chicken burger at lunch",
+            "polarity": "attacks",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "observation_2024_02"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_meat",
+        "contradiction_detected": true,
+        "truth_state": "both"
+      }
+    ]
+  },
+  {
+    "name": "location_contradiction",
+    "description": "User believed to live in Amsterdam, then evidence surfaces they moved to Berlin.",
+    "category": "contradiction",
+    "requires": ["store", "contradiction"],
+    "actions": [
+      {
+        "label": "store_amsterdam",
+        "type": "store",
+        "claim": "user lives in Amsterdam",
+        "evidence": [
+          {
+            "content": "User's profile shows Amsterdam as home city",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.85,
+            "source_ref": "profile_2024_01"
+          }
+        ]
+      },
+      {
+        "label": "store_berlin",
+        "type": "store",
+        "claim": "user lives in Amsterdam",
+        "evidence": [
+          {
+            "content": "User mentioned moving to Berlin last month in conversation",
+            "polarity": "attacks",
+            "weight": 0.95,
+            "reliability": 0.9,
+            "source_ref": "conversation_2024_03"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_berlin",
+        "contradiction_detected": true,
+        "truth_state": "both"
+      }
+    ]
+  },
+  {
+    "name": "subtle_contradiction",
+    "description": "User prefers morning meetings, but later evidence suggests they never schedule before noon.",
+    "category": "contradiction",
+    "requires": ["store", "contradiction"],
+    "actions": [
+      {
+        "label": "store_morning",
+        "type": "store",
+        "claim": "user prefers morning meetings",
+        "evidence": [
+          {
+            "content": "User said they are most productive in the morning",
+            "polarity": "supports",
+            "weight": 0.8,
+            "reliability": 0.8,
+            "source_ref": "survey_2024_01"
+          }
+        ]
+      },
+      {
+        "label": "store_no_morning",
+        "type": "store",
+        "claim": "user prefers morning meetings",
+        "evidence": [
+          {
+            "content": "User's calendar shows no meetings scheduled before noon in the past 3 months",
+            "polarity": "attacks",
+            "weight": 0.85,
+            "reliability": 0.95,
+            "source_ref": "calendar_analysis_2024"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_no_morning",
+        "contradiction_detected": true,
+        "truth_state": "both"
+      }
+    ]
+  },
+  {
+    "name": "resolved_contradiction",
+    "description": "A contradiction arises, then one side is retracted, leaving a single truth state.",
+    "category": "contradiction",
+    "requires": ["store", "contradiction", "retract"],
+    "actions": [
+      {
+        "label": "store_yes",
+        "type": "store",
+        "claim": "user owns a car",
+        "evidence": [
+          {
+            "content": "User mentioned driving to work",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "conversation_2024_04"
+          }
+        ]
+      },
+      {
+        "label": "store_no",
+        "type": "store",
+        "claim": "user owns a car",
+        "evidence": [
+          {
+            "content": "User said they rely solely on public transport",
+            "polarity": "attacks",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "conversation_2024_05"
+          }
+        ]
+      },
+      {
+        "label": "retract_no",
+        "type": "retract",
+        "target_label": "store_no"
+      },
+      {
+        "label": "query_car",
+        "type": "query",
+        "claim": "user owns a car"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_no",
+        "contradiction_detected": true
+      },
+      {
+        "action_label": "query_car",
+        "truth_state": "true"
+      }
+    ]
+  },
+  {
+    "name": "simple_retraction",
+    "description": "A belief is stored and then fully retracted.",
+    "category": "retraction",
+    "requires": ["store", "retract"],
+    "actions": [
+      {
+        "label": "store_belief",
+        "type": "store",
+        "claim": "user prefers dark mode UI",
+        "evidence": [
+          {
+            "content": "User toggled dark mode on in settings",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.98,
+            "source_ref": "settings_event_2024"
+          }
+        ]
+      },
+      {
+        "label": "retract_belief",
+        "type": "retract",
+        "target_label": "store_belief"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "retract_belief",
+        "affected_beliefs": 1
+      }
+    ]
+  },
+  {
+    "name": "partial_retraction",
+    "description": "Three pieces of supporting evidence are stored; one is retracted. Belief should remain TRUE.",
+    "category": "retraction",
+    "requires": ["store", "retract", "query"],
+    "actions": [
+      {
+        "label": "store_e1",
+        "type": "store",
+        "claim": "user is an early adopter",
+        "evidence": [
+          {
+            "content": "User signed up on launch day",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "signup_log"
+          }
+        ]
+      },
+      {
+        "label": "store_e2",
+        "type": "store",
+        "claim": "user is an early adopter",
+        "evidence": [
+          {
+            "content": "User bought the first-generation device",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "purchase_history"
+          }
+        ]
+      },
+      {
+        "label": "store_e3",
+        "type": "store",
+        "claim": "user is an early adopter",
+        "evidence": [
+          {
+            "content": "User beta-tested three products",
+            "polarity": "supports",
+            "weight": 0.8,
+            "reliability": 0.85,
+            "source_ref": "beta_records"
+          }
+        ]
+      },
+      {
+        "label": "retract_e3",
+        "type": "retract",
+        "target_label": "store_e3"
+      },
+      {
+        "label": "query_adopter",
+        "type": "query",
+        "claim": "user is an early adopter"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "retract_e3",
+        "affected_beliefs": 1
+      },
+      {
+        "action_label": "query_adopter",
+        "truth_state": "true"
+      }
+    ]
+  },
+  {
+    "name": "cascade_retraction",
+    "description": "Retracting a foundational evidence item cascades to affect downstream beliefs.",
+    "category": "retraction",
+    "requires": ["store", "retract"],
+    "actions": [
+      {
+        "label": "store_foundation",
+        "type": "store",
+        "claim": "user is a software engineer",
+        "evidence": [
+          {
+            "content": "User's LinkedIn title is Software Engineer",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.98,
+            "source_ref": "linkedin_2024"
+          }
+        ]
+      },
+      {
+        "label": "retract_foundation",
+        "type": "retract",
+        "target_label": "store_foundation"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "retract_foundation",
+        "affected_beliefs": 1
+      }
+    ]
+  },
+  {
+    "name": "prediction_expires",
+    "description": "A prediction is stored; after 7 days it should decay to 'neither'.",
+    "category": "decay",
+    "requires": ["store", "decay", "query"],
+    "actions": [
+      {
+        "label": "store_prediction",
+        "type": "store",
+        "belief_type": "prediction",
+        "claim": "user will renew subscription next month",
+        "evidence": [
+          {
+            "content": "User has renewed every year for the past 3 years",
+            "polarity": "supports",
+            "weight": 0.8,
+            "reliability": 0.85,
+            "source_ref": "billing_history",
+            "belief_type": "prediction"
+          }
+        ]
+      },
+      {
+        "label": "wait",
+        "type": "wait_days",
+        "wait_days": 7
+      },
+      {
+        "label": "query_prediction",
+        "type": "query",
+        "claim": "user will renew subscription next month"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_prediction",
+        "truth_state": "neither"
+      }
+    ]
+  },
+  {
+    "name": "fact_persists",
+    "description": "A hard fact remains true after 90 days of elapsed time.",
+    "category": "decay",
+    "requires": ["store", "decay", "query"],
+    "actions": [
+      {
+        "label": "store_fact",
+        "type": "store",
+        "belief_type": "fact",
+        "claim": "user was born in 1990",
+        "evidence": [
+          {
+            "content": "User's verified government ID shows birth year 1990",
+            "polarity": "supports",
+            "weight": 1.0,
+            "reliability": 1.0,
+            "source_ref": "id_verification",
+            "belief_type": "fact"
+          }
+        ]
+      },
+      {
+        "label": "wait",
+        "type": "wait_days",
+        "wait_days": 90
+      },
+      {
+        "label": "query_fact",
+        "type": "query",
+        "claim": "user was born in 1990"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_fact",
+        "truth_state": "true"
+      }
+    ]
+  },
+  {
+    "name": "preference_drifts",
+    "description": "A preference stored 180 days ago should have lower confidence than at storage time.",
+    "category": "decay",
+    "requires": ["store", "decay", "query"],
+    "actions": [
+      {
+        "label": "store_preference",
+        "type": "store",
+        "belief_type": "preference",
+        "claim": "user prefers email communication over phone calls",
+        "evidence": [
+          {
+            "content": "User explicitly stated preference for email in onboarding",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "onboarding_2023",
+            "belief_type": "preference"
+          }
+        ]
+      },
+      {
+        "label": "wait",
+        "type": "wait_days",
+        "wait_days": 180
+      },
+      {
+        "label": "query_preference",
+        "type": "query",
+        "claim": "user prefers email communication over phone calls"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_preference",
+        "confidence_below": 0.85
+      }
+    ]
+  },
+  {
+    "name": "exact_dedup",
+    "description": "The same claim is stored twice with identical text; the second store should be merged.",
+    "category": "dedup",
+    "requires": ["store"],
+    "actions": [
+      {
+        "label": "store_first",
+        "type": "store",
+        "claim": "user speaks Spanish fluently",
+        "evidence": [
+          {
+            "content": "User completed advanced Spanish course",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "course_completion"
+          }
+        ]
+      },
+      {
+        "label": "store_second",
+        "type": "store",
+        "claim": "user speaks Spanish fluently",
+        "evidence": [
+          {
+            "content": "User completed advanced Spanish course",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "course_completion"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_second",
+        "merged": true
+      }
+    ]
+  },
+  {
+    "name": "paraphrase_merge",
+    "description": "Two paraphrases of the same preference claim should be detected as duplicates and merged.",
+    "category": "dedup",
+    "requires": ["store"],
+    "actions": [
+      {
+        "label": "store_likes",
+        "type": "store",
+        "claim": "user likes Python programming",
+        "evidence": [
+          {
+            "content": "User said Python is their favourite language",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "conversation_2024_06"
+          }
+        ]
+      },
+      {
+        "label": "store_prefers",
+        "type": "store",
+        "claim": "user prefers Python as a programming language",
+        "evidence": [
+          {
+            "content": "User chose Python for a personal project",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.85,
+            "source_ref": "project_log_2024"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_prefers",
+        "merged": true
+      }
+    ]
+  },
+  {
+    "name": "similar_but_distinct",
+    "description": "Two claims that are topically similar but semantically distinct should NOT be merged.",
+    "category": "dedup",
+    "requires": ["store"],
+    "actions": [
+      {
+        "label": "store_works",
+        "type": "store",
+        "claim": "user works at Google",
+        "evidence": [
+          {
+            "content": "User's email domain is @google.com",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.98,
+            "source_ref": "email_domain_check"
+          }
+        ]
+      },
+      {
+        "label": "store_interviewed",
+        "type": "store",
+        "claim": "user interviewed at Google",
+        "evidence": [
+          {
+            "content": "User mentioned attending a Google interview last year",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.8,
+            "source_ref": "conversation_2024_07"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_interviewed",
+        "merged": false
+      }
+    ]
+  },
+  {
+    "name": "scoped_beliefs",
+    "description": "Context-scoped beliefs about the same subject should not be merged across different scopes.",
+    "category": "dedup",
+    "requires": ["store"],
+    "actions": [
+      {
+        "label": "store_work_coffee",
+        "type": "store",
+        "claim": "user drinks coffee at work",
+        "evidence": [
+          {
+            "content": "User always grabs a coffee when arriving at the office",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "office_observation"
+          }
+        ]
+      },
+      {
+        "label": "store_home_tea",
+        "type": "store",
+        "claim": "user drinks tea at home",
+        "evidence": [
+          {
+            "content": "User mentioned only making tea at home on weekends",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.85,
+            "source_ref": "conversation_2024_08"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_home_tea",
+        "merged": false
+      }
+    ]
+  },
+  {
+    "name": "fact_extraction",
+    "description": "Multiple discrete facts are stored across turns; all should be retrievable by query.",
+    "category": "extraction",
+    "requires": ["store", "query"],
+    "actions": [
+      {
+        "label": "store_city",
+        "type": "store",
+        "claim": "user grew up in Toronto",
+        "evidence": [
+          {
+            "content": "User mentioned their hometown is Toronto",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "conversation_2024_09"
+          }
+        ]
+      },
+      {
+        "label": "store_sport",
+        "type": "store",
+        "claim": "user plays ice hockey recreationally",
+        "evidence": [
+          {
+            "content": "User mentioned joining a hockey league",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.85,
+            "source_ref": "conversation_2024_10"
+          }
+        ]
+      },
+      {
+        "label": "store_diet",
+        "type": "store",
+        "claim": "user follows a gluten-free diet",
+        "evidence": [
+          {
+            "content": "User asked for gluten-free options at a restaurant",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "restaurant_request_2024"
+          }
+        ]
+      },
+      {
+        "label": "query_city",
+        "type": "query",
+        "claim": "user grew up in Toronto"
+      },
+      {
+        "label": "query_sport",
+        "type": "query",
+        "claim": "user plays ice hockey recreationally"
+      },
+      {
+        "label": "query_diet",
+        "type": "query",
+        "claim": "user follows a gluten-free diet"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_city",
+        "query_returns_claim": true
+      },
+      {
+        "action_label": "query_sport",
+        "query_returns_claim": true
+      },
+      {
+        "action_label": "query_diet",
+        "query_returns_claim": true
+      }
+    ]
+  },
+  {
+    "name": "preference_drift",
+    "description": "Two different preferences about content consumption are stored and both should be queryable.",
+    "category": "extraction",
+    "requires": ["store", "query"],
+    "actions": [
+      {
+        "label": "store_pref_video",
+        "type": "store",
+        "claim": "user prefers video tutorials over written documentation",
+        "evidence": [
+          {
+            "content": "User said they learn better from videos",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "learning_survey_2024"
+          }
+        ]
+      },
+      {
+        "label": "store_pref_short",
+        "type": "store",
+        "claim": "user prefers short-form content under 10 minutes",
+        "evidence": [
+          {
+            "content": "User's watch history shows average video length under 8 minutes",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "watch_history_2024"
+          }
+        ]
+      },
+      {
+        "label": "query_video",
+        "type": "query",
+        "claim": "user prefers video tutorials over written documentation"
+      },
+      {
+        "label": "query_short",
+        "type": "query",
+        "claim": "user prefers short-form content under 10 minutes"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_video",
+        "query_returns_claim": true
+      },
+      {
+        "action_label": "query_short",
+        "query_returns_claim": true
+      }
+    ]
+  },
+  {
+    "name": "multi_turn_inference",
+    "description": "Multiple evidence items are accumulated across turns; the resulting belief should be TRUE with confidence above 0.5.",
+    "category": "extraction",
+    "requires": ["store", "query"],
+    "actions": [
+      {
+        "label": "store_ev1",
+        "type": "store",
+        "claim": "user is proficient in machine learning",
+        "evidence": [
+          {
+            "content": "User completed a Kaggle competition with top-10 finish",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "kaggle_profile"
+          }
+        ]
+      },
+      {
+        "label": "store_ev2",
+        "type": "store",
+        "claim": "user is proficient in machine learning",
+        "evidence": [
+          {
+            "content": "User published two ML papers on arXiv",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.95,
+            "source_ref": "arxiv_2024"
+          }
+        ]
+      },
+      {
+        "label": "store_ev3",
+        "type": "store",
+        "claim": "user is proficient in machine learning",
+        "evidence": [
+          {
+            "content": "User trains neural networks as part of day job",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "job_description_2024"
+          }
+        ]
+      },
+      {
+        "label": "query_ml",
+        "type": "query",
+        "claim": "user is proficient in machine learning"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_ml",
+        "truth_state": "true",
+        "confidence_above": 0.5
+      }
+    ]
+  },
+  {
+    "name": "noisy_conversation",
+    "description": "A real belief is embedded within noisy conversational context; it should still be stored and retrievable.",
+    "category": "extraction",
+    "requires": ["store", "query"],
+    "actions": [
+      {
+        "label": "store_noisy",
+        "type": "store",
+        "claim": "user has a dog named Max",
+        "evidence": [
+          {
+            "content": "In a conversation about weekend plans the user mentioned walking their dog Max in the park",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.85,
+            "source_ref": "conversation_2024_11"
+          }
+        ]
+      },
+      {
+        "label": "query_dog",
+        "type": "query",
+        "claim": "user has a dog named Max"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_dog",
+        "query_returns_claim": true
+      }
+    ]
+  },
+  {
+    "name": "believe_explain_revise",
+    "description": "A belief is stored, explained, then attacked; the explanation after attack should reflect BOTH truth state.",
+    "category": "lifecycle",
+    "requires": ["store", "explain", "contradiction"],
+    "actions": [
+      {
+        "label": "store_initial",
+        "type": "store",
+        "claim": "user is an introvert",
+        "evidence": [
+          {
+            "content": "User scored high on introversion in personality assessment",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "mbti_assessment_2024"
+          }
+        ]
+      },
+      {
+        "label": "explain_initial",
+        "type": "explain",
+        "claim": "user is an introvert"
+      },
+      {
+        "label": "store_attack",
+        "type": "store",
+        "claim": "user is an introvert",
+        "evidence": [
+          {
+            "content": "User is known to be highly social and often initiates group activities",
+            "polarity": "attacks",
+            "weight": 0.8,
+            "reliability": 0.85,
+            "source_ref": "peer_feedback_2024"
+          }
+        ]
+      },
+      {
+        "label": "explain_after",
+        "type": "explain",
+        "claim": "user is an introvert"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "explain_initial",
+        "explanation_has_evidence": true
+      },
+      {
+        "action_label": "store_attack",
+        "truth_state": "both"
+      },
+      {
+        "action_label": "explain_after",
+        "explanation_has_evidence": true
+      }
+    ]
+  },
+  {
+    "name": "retract_and_rebuild",
+    "description": "A belief is stored, retracted, then re-added with new evidence. It should be TRUE again.",
+    "category": "lifecycle",
+    "requires": ["store", "retract", "query"],
+    "actions": [
+      {
+        "label": "store_initial",
+        "type": "store",
+        "claim": "user has a premium subscription",
+        "evidence": [
+          {
+            "content": "User upgraded to premium in January",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.98,
+            "source_ref": "billing_jan_2024"
+          }
+        ]
+      },
+      {
+        "label": "retract_initial",
+        "type": "retract",
+        "target_label": "store_initial"
+      },
+      {
+        "label": "store_renewed",
+        "type": "store",
+        "claim": "user has a premium subscription",
+        "evidence": [
+          {
+            "content": "User renewed premium subscription in June",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.98,
+            "source_ref": "billing_jun_2024"
+          }
+        ]
+      },
+      {
+        "label": "query_premium",
+        "type": "query",
+        "claim": "user has a premium subscription"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "retract_initial",
+        "affected_beliefs": 1
+      },
+      {
+        "action_label": "query_premium",
+        "truth_state": "true"
+      }
+    ]
+  },
+  {
+    "name": "confidence_ordering",
+    "description": "Three beliefs with progressively weaker evidence should produce decreasing confidence values.",
+    "category": "lifecycle",
+    "requires": ["store", "query"],
+    "actions": [
+      {
+        "label": "store_high",
+        "type": "store",
+        "claim": "user is highly skilled at public speaking",
+        "evidence": [
+          {
+            "content": "User has delivered keynote speeches at three international conferences",
+            "polarity": "supports",
+            "weight": 0.98,
+            "reliability": 0.98,
+            "source_ref": "conference_records"
+          }
+        ]
+      },
+      {
+        "label": "store_medium",
+        "type": "store",
+        "claim": "user is moderately skilled at public speaking",
+        "evidence": [
+          {
+            "content": "User has presented at internal team meetings occasionally",
+            "polarity": "supports",
+            "weight": 0.6,
+            "reliability": 0.6,
+            "source_ref": "team_meetings_log"
+          }
+        ]
+      },
+      {
+        "label": "store_low",
+        "type": "store",
+        "claim": "user is a novice at public speaking",
+        "evidence": [
+          {
+            "content": "User mentioned feeling nervous before their first presentation",
+            "polarity": "supports",
+            "weight": 0.3,
+            "reliability": 0.4,
+            "source_ref": "self_report_2024"
+          }
+        ]
+      },
+      {
+        "label": "query_high",
+        "type": "query",
+        "claim": "user is highly skilled at public speaking"
+      },
+      {
+        "label": "query_low",
+        "type": "query",
+        "claim": "user is a novice at public speaking"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_high",
+        "confidence_above": 0.5
+      },
+      {
+        "action_label": "query_low",
+        "confidence_below": 0.5
+      }
+    ]
+  },
+  {
+    "name": "multi_agent_provenance",
+    "description": "Two agents store the same claim independently; the system should merge them into one belief.",
+    "category": "lifecycle",
+    "requires": ["store"],
+    "actions": [
+      {
+        "label": "store_agent_a",
+        "type": "store",
+        "claim": "user is interested in renewable energy",
+        "evidence": [
+          {
+            "content": "Agent A observed user reading multiple articles on solar power",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.85,
+            "source_ref": "agent_a_observation_2024"
+          }
+        ]
+      },
+      {
+        "label": "store_agent_b",
+        "type": "store",
+        "claim": "user is interested in renewable energy",
+        "evidence": [
+          {
+            "content": "Agent B noted user subscribed to a wind energy newsletter",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.85,
+            "source_ref": "agent_b_observation_2024"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_agent_b",
+        "merged": true
+      }
+    ]
+  }
+]
