@@ -299,6 +299,43 @@ nav {
   line-height: 1.75; color: rgba(244,241,235,0.55);
 }
 .results-callout strong { color: var(--pulse); font-weight: 400; }
+
+/* ---- WHY MATRIX (inside results-sec, dark bg) ---- */
+.why-matrix { margin-top: 3rem; }
+.why-matrix-title {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(244,241,235,0.3); margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.why-matrix-title::after {
+  content: ''; flex: 1; height: 1px; background: rgba(244,241,235,0.06);
+}
+.why-table {
+  width: 100%; border-collapse: collapse;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+}
+.why-table th {
+  text-align: center; padding: 0.5rem 0.4rem;
+  border-bottom: 1px solid rgba(244,241,235,0.08);
+  font-weight: 500; font-size: 0.52rem;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: rgba(244,241,235,0.3); white-space: nowrap;
+}
+.why-table th:first-child { text-align: left; min-width: 140px; }
+.why-table td {
+  padding: 0.45rem 0.4rem; text-align: center;
+  border-bottom: 1px solid rgba(244,241,235,0.03);
+}
+.why-table td:first-child {
+  text-align: left; color: rgba(244,241,235,0.5); font-weight: 400;
+}
+.why-table tr:last-child td { border-bottom: none; }
+.why-yes { color: var(--pulse); }
+.why-no { color: rgba(244,241,235,0.12); }
+.why-table tr.why-highlight td { color: var(--paper); }
+.why-table tr.why-highlight td:first-child { color: var(--pulse); font-weight: 500; }
+
 .results-meta {
   margin-top: 2rem; font-family: 'IBM Plex Mono', monospace;
   font-size: 0.58rem; color: rgba(244,241,235,0.2); line-height: 1.7;
@@ -656,6 +693,84 @@ footer a:hover { color: rgba(244,241,235,0.6); }
     <div class="results-callout reveal">
       Every retrieval-based system scores <strong>0% on contradiction detection</strong>.
       Not because they implemented it badly. Because their architecture cannot represent contradictions.
+    </div>
+
+    <div class="why-matrix reveal">
+      <div class="why-matrix-title">Why the scores differ</div>
+      <div style="overflow-x:auto;">
+      <table class="why-table">
+        <thead>
+          <tr>
+            <th>System</th>
+            <th>Score</th>
+            <th>Contra&shy;diction</th>
+            <th>Revision</th>
+            <th>Evidence</th>
+            <th>Decay</th>
+            <th>Explain</th>
+            <th>Sandbox</th>
+            <th>Consoli&shy;dation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="why-highlight">
+            <td>mnemebrain</td>
+            <td><span class="why-yes">100%</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-yes">&check;</span></td>
+          </tr>
+          <tr>
+            <td>mnemebrain_lite</td>
+            <td><span class="why-yes">93%</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+          </tr>
+          <tr>
+            <td>mem0 (real API)</td>
+            <td>29%</td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+          </tr>
+          <tr>
+            <td>structured_memory</td>
+            <td>36%</td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-yes">&check;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+          </tr>
+          <tr>
+            <td>rag / openai / langchain</td>
+            <td><span style="color:rgba(255,64,64,0.6)">0%</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+            <td><span class="why-no">&mdash;</span></td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
     </div>
 
     <div class="results-meta reveal">
