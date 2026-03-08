@@ -31,8 +31,10 @@ def _create_provider(provider_type: str, model_name: str) -> EmbeddingProvider:
     if provider_type == "sentence_transformers":
         try:
             from sentence_transformers import SentenceTransformer
-        except ImportError:
-            raise ImportError("sentence-transformers required: pip install mnemebrain-benchmark[embeddings]")
+        except ImportError as exc:
+            raise ImportError(
+                "sentence-transformers required: pip install mnemebrain-benchmark[embeddings]"
+            ) from exc
 
         class _STProvider:
             def __init__(self, model: str) -> None:
@@ -50,11 +52,11 @@ def _create_provider(provider_type: str, model_name: str) -> EmbeddingProvider:
 
         return _STProvider(model_name)
 
-    elif provider_type == "openai":
+    if provider_type == "openai":
         try:
             from openai import OpenAI
-        except ImportError:
-            raise ImportError("openai required: pip install mnemebrain-benchmark[openai]")
+        except ImportError as exc:
+            raise ImportError("openai required: pip install mnemebrain-benchmark[openai]") from exc
 
         import os
         key = os.environ.get("OPENAI_API_KEY")
@@ -79,8 +81,7 @@ def _create_provider(provider_type: str, model_name: str) -> EmbeddingProvider:
 
         return _OpenAIProvider(model_name)
 
-    else:
-        raise ValueError(f"Unknown provider type: {provider_type}")
+    raise ValueError(f"Unknown provider type: {provider_type}")
 
 
 def _print_metrics(name: str, metrics: BenchmarkMetrics) -> None:

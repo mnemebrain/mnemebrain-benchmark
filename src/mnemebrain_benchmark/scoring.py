@@ -1,13 +1,12 @@
 """Scoring engine for the system benchmark."""
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from mnemebrain_benchmark.interface import (
     ConsolidateResult,
     ExplainResult,
     MemoryTierResult,
-    QueryResult,
     RetractResult,
     ReviseResult,
     SandboxResult,
