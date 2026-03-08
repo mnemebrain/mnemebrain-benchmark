@@ -34,7 +34,7 @@ class BenchmarkDataset:
         """Load and validate dataset from JSON file."""
         if path is not None:
             path = Path(path)
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 raw = json.load(f)
         else:
             ref = importlib.resources.files("mnemebrain_benchmark") / "data" / "claim_pairs.json"
@@ -67,7 +67,7 @@ class BenchmarkDataset:
                     f"expected one of {VALID_DIFFICULTIES}"
                 )
 
-            pairs.append(ClaimPair(**{k: entry[k] for k in ClaimPair.__dataclass_fields__}))
+            pairs.append(ClaimPair(**{k: entry[k] for k in vars(ClaimPair)["__dataclass_fields__"]}))
 
         return cls(pairs)
 

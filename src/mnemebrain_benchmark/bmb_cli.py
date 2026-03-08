@@ -45,8 +45,10 @@ def _get_embedder():
     """Lazily create a SentenceTransformer embedding provider."""
     try:
         from sentence_transformers import SentenceTransformer
-    except ImportError:
-        raise ImportError("sentence-transformers required: pip install mnemebrain-benchmark[embeddings]")
+    except ImportError as exc:
+        raise ImportError(
+            "sentence-transformers required: pip install mnemebrain-benchmark[embeddings]"
+        ) from exc
 
     import numpy as np
 
@@ -152,8 +154,8 @@ def _print_bmb_chart(results: dict[str, list]) -> None:
         if scored:
             avg = sum(c.score for c in scored) / len(scored)
             pct = int(avg * 100)
-            bar = "\u2588" * (pct // 5)
-            print(f"  {system_name:<20} {bar} {pct}%")
+            filled = "\u2588" * (pct // 5)
+            print(f"  {system_name:<20} {filled} {pct}%")
         else:
             print(f"  {system_name:<20} N/A")
 
