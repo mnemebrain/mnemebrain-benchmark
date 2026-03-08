@@ -191,17 +191,25 @@ mnemebrain-task-eval --adapter your_system
 
 ## Capability Matrix
 
-For reference, here are the current adapters and their capabilities:
+This matrix shows exactly which capabilities each adapter declares. The benchmark uses this to determine which scenarios each system attempts — scenarios requiring a capability marked `--` are skipped.
 
-| Adapter | Capabilities | Type |
-|---------|-------------|------|
-| `mnemebrain` | All 12 | SDK |
-| `structured_memory` | store, query, retract, explain, revise, contradiction | Local |
-| `mem0` | store, query, retract, explain, revise | Cloud API |
-| `naive_baseline` | store, query | Local |
-| `rag_baseline` | store, query | Local |
-| `openai_rag` | store, query | Cloud API |
-| `langchain_buffer` | store, query | Local |
+| Capability | rag_baseline | langchain_buffer | naive_baseline | openai_rag | mem0 | structured_memory | mnemebrain_lite | mnemebrain |
+|------------|:------------:|:----------------:|:--------------:|:----------:|:----:|:-----------------:|:---------------:|:----------:|
+| store | Y | Y | Y | Y | Y | Y | Y | Y |
+| query | Y | Y | Y | Y | Y | Y | Y | Y |
+| retract | -- | -- | -- | -- | Y | Y | Y | Y |
+| explain | -- | -- | -- | -- | Y | Y | Y | Y |
+| revise | -- | -- | -- | -- | Y | Y | Y | Y |
+| contradiction | -- | -- | -- | -- | -- | Y | Y | Y |
+| decay | -- | -- | -- | -- | -- | -- | Y | Y |
+| sandbox | -- | -- | -- | -- | -- | -- | -- | Y |
+| attack | -- | -- | -- | -- | -- | -- | -- | Y |
+| consolidation | -- | -- | -- | -- | -- | -- | -- | Y |
+| hipporag | -- | -- | -- | -- | -- | -- | -- | Y |
+| pattern_separation | -- | -- | -- | -- | -- | -- | -- | Y |
+| **BMB tasks attempted** | **5** | **5** | **5** | **5** | **18** | **18** | **24** | **48** |
+
+`Y` = declared, `--` = not supported (scenarios requiring this are skipped)
 
 ## Tips
 

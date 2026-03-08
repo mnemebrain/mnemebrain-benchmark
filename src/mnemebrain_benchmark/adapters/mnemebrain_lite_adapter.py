@@ -134,7 +134,7 @@ class MnemeBrainLiteAdapter(MemorySystem):
         # mnemebrain-lite's retract needs an actual evidence UUID.
         # Try as belief_id first: find all evidence and retract them.
         uid = UUID(belief_id)
-        belief = self._memory._store.get(uid)
+        belief = self._memory._store.get(uid)  # pylint: disable=protected-access
         if belief is not None:
             count = 0
             for ev in belief.evidence:
@@ -214,11 +214,11 @@ class MnemeBrainLiteAdapter(MemorySystem):
                 ev.timestamp = ev.timestamp - delta
             belief.truth_state = compute_truth_state(belief.evidence, belief.belief_type)
             belief.confidence = compute_confidence(belief.evidence, belief.belief_type)
-            self._memory._store.upsert(belief, embedding=emb)
+            self._memory._store.upsert(belief, embedding=emb)  # pylint: disable=protected-access
 
     def _get_stored_embedding(self, belief_id: str) -> list[float] | None:
         """Retrieve the embedding for a belief from the store."""
-        result = self._memory._store._conn.execute(
+        result = self._memory._store._conn.execute(  # pylint: disable=protected-access
             "MATCH (b:Belief {id: $id}) RETURN b.embedding",
             parameters={"id": belief_id},
         )

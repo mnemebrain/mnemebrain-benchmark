@@ -135,6 +135,24 @@ OpenAI providers require `OPENAI_API_KEY`.
 | `OPENAI_API_KEY` | openai_rag adapter, OpenAI embedding providers | OpenAI API authentication |
 | `MNEMEBRAIN_URL` | mnemebrain adapter | MnemeBrain backend server URL (default: `http://localhost:8000`) |
 
+## Determinism and Reproducibility
+
+BMB scenarios are **deterministic by design**. There are no random seeds, sampling, or LLM calls in the benchmark loop. Scenarios define fixed action sequences and fixed expectations — the same adapter code on the same input always produces the same checks.
+
+Sources of variation between runs:
+
+| Source | Affects | Magnitude |
+|--------|---------|-----------|
+| Embedding model version | Similarity-based checks (dedup, query retrieval) | Small — thresholds are calibrated with margin |
+| Floating-point platform differences | Confidence scores near thresholds | Rare — only affects edge-case scenarios |
+| Cloud API changes (mem0, openai_rag) | Any check for those adapters | Possible — external APIs may change behaviour |
+| Local adapters (baselines, lite) | Nothing | Fully deterministic across runs |
+
+For academic reproducibility:
+- Pin `sentence-transformers` and model versions in your environment
+- Record `pip freeze` output alongside benchmark results
+- Use `--output results/run.json` to capture full per-check results for comparison
+
 ## Verifying Results
 
 After running benchmarks, compare your output against the published results in [LEADERBOARD.md](../leaderboard/LEADERBOARD.md). Minor variations in embedding-dependent scores (structured_memory, mem0) are expected due to model version differences. Capability-gated scores (contradiction detection, sandbox reasoning) should be deterministic.
