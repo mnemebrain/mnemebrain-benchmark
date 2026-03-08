@@ -50,7 +50,7 @@ class MnemeBrainLiteAdapter(MemorySystem):
     def __init__(self, embedder: BenchmarkEmbeddingProvider) -> None:
         self._embedder = embedder
         self._db_dir: str | None = None
-        self._memory: BeliefMemory | None = None
+        self._memory: BeliefMemory = None  # set in _init_memory
         self._time_offset_days: int = 0
         self._init_memory()
 

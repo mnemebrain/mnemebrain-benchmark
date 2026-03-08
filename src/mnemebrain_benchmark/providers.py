@@ -29,7 +29,7 @@ class SentenceTransformerProvider:
 
     def embed(self, text: str) -> list[float]:
         """Embed text into a vector."""
-        return self._model.encode(text).tolist()
+        return list(self._model.encode(text).tolist())
 
     def similarity(self, a: list[float], b: list[float]) -> float:
         """Compute cosine similarity between two embedding vectors."""

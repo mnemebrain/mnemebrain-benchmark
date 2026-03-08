@@ -50,7 +50,8 @@ def _extract_truth_state(result: object) -> str | None:
     if isinstance(result, (StoreResult, ReviseResult, ExplainResult)):
         return result.truth_state
     if isinstance(result, list) and result:
-        return result[0].truth_state
+        first = result[0]
+        return first.truth_state if hasattr(first, "truth_state") else None
     return None
 
 
@@ -59,7 +60,8 @@ def _extract_confidence(result: object) -> float | None:
     if isinstance(result, (StoreResult, ReviseResult, ExplainResult)):
         return result.confidence
     if isinstance(result, list) and result:
-        return result[0].confidence
+        first = result[0]
+        return first.confidence if hasattr(first, "confidence") else None
     return None
 
 

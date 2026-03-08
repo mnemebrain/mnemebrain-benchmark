@@ -21,7 +21,7 @@ def _get_belief_id(action_results: dict[str, object], label: str) -> str | None:
     """Look up a prior result by label and return its belief_id, if any."""
     result = action_results.get(label or "")
     if result is not None and hasattr(result, "belief_id"):
-        return result.belief_id  # type: ignore[union-attr]
+        return result.belief_id  # type: ignore[no-any-return]
     return None
 
 
@@ -29,7 +29,7 @@ def _get_sandbox_id(action_results: dict[str, object], label: str) -> str | None
     """Look up a prior result by label and return its sandbox_id, if any."""
     result = action_results.get(label or "")
     if result is not None and hasattr(result, "sandbox_id"):
-        return result.sandbox_id  # type: ignore[union-attr]
+        return result.sandbox_id  # type: ignore[no-any-return]
     return None
 
 

@@ -36,7 +36,6 @@ All notable changes to mnemebrain-benchmark will be documented in this file.
 ### Docs
 
 - Updated README with architecture overview and fixed embedding benchmark command path
-- Added gitleaks secret scanning workflow (`.github/workflows/gitleaks.yml`)
 - Expanded CONTRIBUTING.md with development setup and PR guidelines
 - Removed BMB_REPORT.md (superseded by JSON reports)
 

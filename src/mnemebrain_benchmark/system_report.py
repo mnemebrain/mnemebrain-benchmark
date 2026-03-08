@@ -49,7 +49,7 @@ def format_scorecard(results: dict[str, list[ScenarioScore]]) -> str:
             if cat_score is None or cat_score.skipped:
                 cell = "N/A"
             else:
-                cell = f"{cat_score.score * 100:.1f}%"
+                cell = f"{cat_score.score * 100:.1f}%" if cat_score.score is not None else "N/A"
             row += f"{cell:<{col_width}}"
         lines.append(row)
 
@@ -60,7 +60,7 @@ def format_scorecard(results: dict[str, list[ScenarioScore]]) -> str:
         cats = system_cats.get(name, {})
         scored = [c for c in cats.values() if not c.skipped and c.score is not None]
         if scored:
-            avg = sum(c.score for c in scored) / len(scored)
+            avg = sum(c.score or 0.0 for c in scored) / len(scored)
             cell = f"{avg * 100:.1f}%"
         else:
             cell = "N/A"
