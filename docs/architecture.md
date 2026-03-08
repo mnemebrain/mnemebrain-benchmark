@@ -97,7 +97,7 @@ Evaluates embedding providers on claim deduplication accuracy and latency. Tests
 
 ### 3. Belief Maintenance Benchmark (BMB)
 
-Flagship evaluation. 48 tasks across 8 categories testing belief dynamics. See [BMB_REPORT.md](../BMB_REPORT.md) for full results.
+Flagship evaluation. 48 tasks across 8 categories testing belief dynamics. See [BMB_REPORT.md](../leaderboard/reports/BMB_REPORT.md) for full results.
 
 ### 4. Task-Level Evaluations
 
@@ -116,3 +116,37 @@ Flagship evaluation. 48 tasks across 8 categories testing belief dynamics. See [
 | `langchain_buffer` | store, query | Local (append-only text) |
 
 See [adding-adapters.md](adding-adapters.md) for how to implement a new adapter.
+
+## Adapter Lifecycle
+
+Every benchmark run follows this sequence per adapter, per scenario:
+
+```
+1. Capability check
+   └─ scenario.requires ⊆ adapter.capabilities()?
+      ├─ no  → ScenarioScore(skipped=True), skip to next scenario
+      └─ yes → continue
+
+2. Reset
+   └─ adapter.reset() — clear all state from previous scenario
+
+3. Action execution
+   └─ for each action in scenario.actions:
+        handler = ACTION_HANDLERS[action.type]
+        handler(adapter, action, results_dict)
+
+4. Expectation evaluation
+   └─ scoring.evaluate_expectations(scenario.expectations, results_dict)
+      └─ produces list[CheckResult] (binary pass/fail each)
+
+5. Score
+   └─ ScenarioScore(checks=checks, skipped=False)
+      └─ score = passed / total
+```
+
+The runner collects `ScenarioScore` objects across all scenarios, then aggregates by category (mean of non-skipped scenario scores) and overall (mean of all non-skipped scenario scores).
+
+Key invariants:
+- `reset()` is called before every scenario — adapters must not carry state between scenarios
+- Actions execute sequentially — later actions can reference results from earlier actions via `action.target_label`
+- Skipped scenarios produce no checks and do not affect the score denominator

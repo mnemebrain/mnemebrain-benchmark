@@ -62,6 +62,52 @@ overall_score = mean(scenario.score() for scenario in all_scenarios if not scena
 
 This is a flat mean across all non-skipped scenarios, not a mean of category scores. Since each category has 6 scenarios and categories are either fully attempted or fully skipped for a given adapter, the two approaches are equivalent in practice.
 
+## Worked Example: Full Transparency Breakdown
+
+### rag_baseline (2 capabilities: store, query)
+
+```
+Total BMB scenarios:   48
+Skipped (missing caps): 43  (require retract/explain/contradiction/decay/sandbox/etc.)
+Attempted:              5   (only scenarios requiring just store + query)
+
+Checks from attempted scenarios: 12
+Passed:   0   (baselines return truth_state=None, contradiction_detected=False)
+Failed:  12   (expectations require belief states the baseline doesn't compute)
+
+Score: 0 / 12 = 0%
+```
+
+### mnemebrain_lite (7 capabilities)
+
+```
+Total BMB scenarios:   48
+Skipped (missing caps): 24  (require sandbox/attack/consolidation/hipporag/pattern_separation)
+Attempted:             24   (contradiction, belief_revision, evidence_tracking, temporal)
+
+Checks from attempted scenarios: ~50
+Passed:  ~47
+Failed:   ~3  (edge cases in temporal decay thresholds and dedup similarity)
+
+Score: ~47 / ~50 = 93%
+```
+
+### mnemebrain (12 capabilities)
+
+```
+Total BMB scenarios:   48
+Skipped:                0
+Attempted:             48
+
+Checks from attempted scenarios: ~100
+Passed:  ~100
+Failed:    0
+
+Score: ~100 / ~100 = 100%
+```
+
+The key insight: rag_baseline's 0% and mnemebrain's 100% are computed over **different denominators**. The rag_baseline is not "failing 48 tasks" — it attempts 5 and fails the belief-state checks within those 5.
+
 ## Score Interpretation Guide
 
 | Score Range | Interpretation |
