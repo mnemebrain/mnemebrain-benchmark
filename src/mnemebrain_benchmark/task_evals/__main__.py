@@ -30,7 +30,7 @@ def _build_adapters(adapter_filter: str | None = None):
             except ImportError:
                 print("sentence-transformers required: pip install mnemebrain-benchmark[embeddings]")
                 sys.exit(1)
-            from mnemebrain_benchmark.protocols import EmbeddingProvider
+
 
             class STProvider:
                 def __init__(self):

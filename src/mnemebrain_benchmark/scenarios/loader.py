@@ -43,7 +43,7 @@ def load_scenarios(path: Path | str | None = None) -> list[Scenario]:
     """
     if path is not None:
         path = Path(path)
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             raw = json.load(f)
     else:
         ref = importlib.resources.files("mnemebrain_benchmark.scenarios") / "data" / "scenarios.json"
@@ -51,8 +51,8 @@ def load_scenarios(path: Path | str | None = None) -> list[Scenario]:
 
     scenarios: list[Scenario] = []
     for entry in raw:
-        actions = [Action(**{k: v for k, v in a.items()}) for a in entry.get("actions", [])]
-        expectations = [Expectation(**{k: v for k, v in e.items()}) for e in entry.get("expectations", [])]
+        actions = [Action(**dict(a.items())) for a in entry.get("actions", [])]
+        expectations = [Expectation(**dict(e.items())) for e in entry.get("expectations", [])]
         scenario = Scenario(
             name=entry["name"],
             description=entry["description"],
@@ -77,8 +77,8 @@ def load_bmb_scenarios(path: Path | str | None = None) -> list[Scenario]:
 
     scenarios: list[Scenario] = []
     for entry in raw:
-        actions = [Action(**{k: v for k, v in a.items()}) for a in entry.get("actions", [])]
-        expectations = [Expectation(**{k: v for k, v in e.items()}) for e in entry.get("expectations", [])]
+        actions = [Action(**dict(a.items())) for a in entry.get("actions", [])]
+        expectations = [Expectation(**dict(e.items())) for e in entry.get("expectations", [])]
         scenario = Scenario(
             name=entry["name"],
             description=entry["description"],

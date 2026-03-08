@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from dataclasses import asdict
 from pathlib import Path
 
@@ -88,14 +87,14 @@ def _print_metrics(name: str, metrics: BenchmarkMetrics) -> None:
     print(f"\n{'=' * 60}")
     print(f"  {name}")
     print(f"{'=' * 60}")
-    print(f"  Classification (threshold-based):")
+    print("  Classification (threshold-based):")
     print(f"    Precision: {metrics.precision:.3f}  Recall: {metrics.recall:.3f}  F1: {metrics.f1:.3f}")
     print(f"    Accuracy:  {metrics.accuracy:.3f}  (TP={metrics.tp} FP={metrics.fp} TN={metrics.tn} FN={metrics.fn})")
-    print(f"  Similarity distribution:")
+    print("  Similarity distribution:")
     print(f"    Same pairs:      mean={metrics.mean_sim_same:.4f}  std={metrics.std_sim_same:.4f}")
     print(f"    Different pairs: mean={metrics.mean_sim_different:.4f}  std={metrics.std_sim_different:.4f}")
     print(f"    Separation gap:  {metrics.separation_gap:.4f}")
-    print(f"  Latency:")
+    print("  Latency:")
     print(f"    Mean: {metrics.mean_embed_ms:.1f}ms  P95: {metrics.p95_embed_ms:.1f}ms  P99: {metrics.p99_embed_ms:.1f}ms")
     print(f"    Throughput: {metrics.throughput_pairs_per_sec:.1f} pairs/sec")
     print()
@@ -116,7 +115,7 @@ def _serialize_report(report: dict) -> dict:
 def save_report(report: dict, path: Path | str) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(_serialize_report(report), f, indent=2)
     print(f"Report saved to {path}")
 
