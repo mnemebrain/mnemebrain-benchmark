@@ -1,7 +1,7 @@
 """Scenario data structures for the system benchmark."""
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 VALID_ACTION_TYPES = {
     "store", "retract", "query", "explain", "wait_days",

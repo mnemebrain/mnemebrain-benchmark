@@ -16,7 +16,7 @@ _DATA_PATH = Path(__file__).parent / "data" / "preference_scenarios.json"
 def load_preference_scenarios(path: Path | None = None) -> list[TaskScenario]:
     """Load preference tracking scenarios from JSON."""
     data_path = path or _DATA_PATH
-    with open(data_path) as f:
+    with open(data_path, encoding="utf-8") as f:
         raw = json.load(f)
 
     scenarios: list[TaskScenario] = []

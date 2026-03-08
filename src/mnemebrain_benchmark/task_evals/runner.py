@@ -1,7 +1,7 @@
 """Runner for task-level evaluations."""
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from mnemebrain_benchmark.interface import MemorySystem
 from mnemebrain_benchmark.task_evals.base import (
