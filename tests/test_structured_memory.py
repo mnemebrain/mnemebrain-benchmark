@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.adapters.structured_memory."""
+
 from __future__ import annotations
 
 from helpers import HighSimEmbedder, LowSimEmbedder
@@ -15,8 +16,11 @@ class TestStructuredMemoryBaseline:
     def test_capabilities(self):
         adapter = StructuredMemoryBaseline(HighSimEmbedder())
         expected = {
-            Capability.STORE, Capability.QUERY, Capability.RETRACT,
-            Capability.EXPLAIN, Capability.REVISE,
+            Capability.STORE,
+            Capability.QUERY,
+            Capability.RETRACT,
+            Capability.EXPLAIN,
+            Capability.REVISE,
         }
         assert adapter.capabilities() == expected
 

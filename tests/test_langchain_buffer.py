@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.adapters.langchain_buffer."""
+
 from __future__ import annotations
 
 from mnemebrain_benchmark.adapters.langchain_buffer import LangChainBufferBaseline

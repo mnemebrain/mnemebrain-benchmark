@@ -1,17 +1,39 @@
 """Scenario data structures for the system benchmark."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 
 VALID_ACTION_TYPES = {
-    "store", "retract", "query", "explain", "wait_days",
-    "revise", "sandbox_fork", "sandbox_assume", "sandbox_resolve", "sandbox_discard",
-    "add_attack", "consolidate", "query_multihop", "get_memory_tier",
+    "store",
+    "retract",
+    "query",
+    "explain",
+    "wait_days",
+    "revise",
+    "sandbox_fork",
+    "sandbox_assume",
+    "sandbox_resolve",
+    "sandbox_discard",
+    "add_attack",
+    "consolidate",
+    "query_multihop",
+    "get_memory_tier",
 }
 VALID_CATEGORIES = {
-    "contradiction", "retraction", "decay", "dedup", "extraction", "lifecycle",
-    "belief_revision", "evidence_tracking", "temporal", "counterfactual",
-    "consolidation", "multihop_retrieval", "pattern_separation",
+    "contradiction",
+    "retraction",
+    "decay",
+    "dedup",
+    "extraction",
+    "lifecycle",
+    "belief_revision",
+    "evidence_tracking",
+    "temporal",
+    "counterfactual",
+    "consolidation",
+    "multihop_retrieval",
+    "pattern_separation",
 }
 
 

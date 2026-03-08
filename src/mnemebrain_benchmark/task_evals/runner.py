@@ -1,6 +1,8 @@
 """Runner for task-level evaluations."""
+
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass
 
 from mnemebrain_benchmark.interface import MemorySystem
@@ -90,18 +92,19 @@ class TaskEvalRunner:
                 try:
                     system_scores.append(self.run_scenario(system, scenario))
                 except Exception as exc:
-                    import sys as _sys
                     print(
                         f"  warning: {system.name()}/{scenario.name}: {exc}",
-                        file=_sys.stderr,
+                        file=sys.stderr,
                     )
-                    system_scores.append(ScenarioTaskScore(
-                        scenario_name=scenario.name,
-                        category=scenario.category,
-                        correct=0,
-                        total=len(scenario.questions),
-                        details=[],
-                    ))
+                    system_scores.append(
+                        ScenarioTaskScore(
+                            scenario_name=scenario.name,
+                            category=scenario.category,
+                            correct=0,
+                            total=len(scenario.questions),
+                            details=[],
+                        )
+                    )
             scores[system.name()] = system_scores
         return TaskEvalReport(eval_name="task_eval", scores=scores)
 

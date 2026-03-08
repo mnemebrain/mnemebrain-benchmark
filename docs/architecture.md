@@ -54,7 +54,7 @@ Every adapter implements this abstract base class. It defines 12 capabilities:
 |------------|--------|-------------|
 | `STORE` | `store(claim, evidence)` | Ingest a belief with evidence |
 | `QUERY` | `query(claim)` | Retrieve beliefs by similarity |
-| `RETRACT` | `retract(evidence_id)` | Invalidate evidence, recompute state |
+| `RETRACT` | `retract(belief_id)` | Invalidate belief, recompute state |
 | `EXPLAIN` | `explain(claim)` | Return justification chain |
 | `CONTRADICTION` | (via store) | Detect BOTH state via Belnap logic |
 | `DECAY` | `set_time_offset_days(days)` | Time-based confidence decay |

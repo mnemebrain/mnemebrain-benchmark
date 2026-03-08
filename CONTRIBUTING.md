@@ -139,25 +139,87 @@ uv sync --extra dev
 
 # Running Tests
 
+## Quick test run
+
 ``` bash
-# Full test suite with coverage
-uv run pytest --cov=mnemebrain_benchmark --cov-report=term-missing
-
-# Quick test run
 uv run pytest -q
+```
 
-# Lint and type check
+## Lint
+
+``` bash
+# Check for lint errors
 uv run ruff check src/ tests/
+
+# Auto-fix lint errors
+uv run ruff check --fix src/ tests/
+
+# Format code
+uv run ruff format src/ tests/
+
+# Check formatting without modifying files
+uv run ruff format --check src/ tests/
+```
+
+Ruff is configured in `pyproject.toml` with `line-length = 100` and rule
+sets `E`, `F`, `I`, `UP`, `B` (targeting Python 3.12+).
+
+## Type check
+
+``` bash
 uv run mypy src/mnemebrain_benchmark/
 ```
 
-Run the benchmark locally:
+Mypy is configured in `pyproject.toml`. Key settings: `warn_return_any`,
+`warn_unused_configs`, `warn_unused_ignores` are enabled;
+`disallow_untyped_defs` is off (type hints are required on public APIs but
+not enforced everywhere).
+
+## Coverage
+
+``` bash
+# Run tests with coverage report
+uv run pytest --cov=mnemebrain_benchmark --cov-report=term-missing
+
+# Generate an HTML coverage report
+uv run pytest --cov=mnemebrain_benchmark --cov-report=html
+# then open htmlcov/index.html
+```
+
+The project enforces an **80% coverage minimum**. New code should include
+tests that maintain or improve coverage.
+
+## Secret scanning
+
+``` bash
+# Scan working tree for leaked secrets/passwords/API keys
+gitleaks detect --source . --no-git
+
+# Scan full git history
+gitleaks detect --source .
+```
+
+Install gitleaks: `brew install gitleaks` (macOS) or see
+[gitleaks.io](https://gitleaks.io). The repo includes a `.gitleaks.toml`
+that excludes `.venv`, `node_modules`, and lock files.
+
+## Run all checks
+
+``` bash
+uv run ruff check src/ tests/ \
+  && uv run ruff format --check src/ tests/ \
+  && uv run mypy src/mnemebrain_benchmark/ \
+  && uv run pytest --cov=mnemebrain_benchmark --cov-report=term-missing \
+  && gitleaks detect --source . --no-git
+```
+
+All checks must pass before submitting a pull request.
+
+## Run the benchmark locally
 
 ``` bash
 uv run mnemebrain-bmb
 ```
-
-All checks must pass before submitting a pull request. CI enforces lint, type check, tests, and 80% coverage minimum.
 
 ------------------------------------------------------------------------
 

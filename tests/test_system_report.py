@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.system_report."""
+
 from __future__ import annotations
 
 import json
@@ -31,24 +32,19 @@ class TestFormatScorecard:
         assert "Overall" in output
 
     def test_includes_percentages(self):
-        results = {
-            "sys": [ScenarioScore("s1", "cat", [CheckResult("c", True, 1, 1)], False)]
-        }
+        results = {"sys": [ScenarioScore("s1", "cat", [CheckResult("c", True, 1, 1)], False)]}
         output = format_scorecard(results)
         assert "100.0%" in output
 
     def test_skipped_shows_na(self):
-        results = {
-            "sys": [ScenarioScore("s1", "cat", [], True)]
-        }
+        results = {"sys": [ScenarioScore("s1", "cat", [], True)]}
         output = format_scorecard(results)
         assert "N/A" in output
 
-    def test_empty_results_raises(self):
-        """Empty results triggers a max() edge case in format_scorecard."""
-        import pytest
-        with pytest.raises(TypeError):
-            format_scorecard({})
+    def test_empty_results_returns_message(self):
+        """Empty results returns a graceful no-results message."""
+        output = format_scorecard({})
+        assert output == "No results"
 
 
 class TestExportJson:

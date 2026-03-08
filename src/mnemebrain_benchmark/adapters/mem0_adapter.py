@@ -2,8 +2,10 @@
 
 Requires MEM0_API_KEY environment variable and mem0ai package.
 """
+
 from __future__ import annotations
 
+import logging
 import os
 import time
 from uuid import uuid4
@@ -20,19 +22,22 @@ from mnemebrain_benchmark.interface import (
     StoreResult,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class Mem0Adapter(MemorySystem):
     """Real Mem0 API adapter for the BMB benchmark."""
 
-    def __init__(self, api_key: str | None = None) -> None:
+    def __init__(self, api_key: str | None = None, store_delay: float = 1.5) -> None:
         key = api_key or os.environ.get("MEM0_API_KEY")
         if not key:
             raise ValueError("MEM0_API_KEY required")
         self._client = MemoryClient(api_key=key)
+        self._store_delay = store_delay
         try:
             self._client.project.update(enable_graph=True)
         except Exception:
-            pass
+            logger.warning("Failed to enable graph mode", exc_info=True)
         self._user_id = f"bmb_{uuid4().hex[:12]}"
         self._store_to_memory: dict[str, str] = {}
 
@@ -59,7 +64,7 @@ class Mem0Adapter(MemorySystem):
             user_id=self._user_id,
         )
 
-        time.sleep(1.5)
+        time.sleep(self._store_delay)
 
         memory_id = None
         if isinstance(result, dict) and "results" in result:
@@ -102,23 +107,25 @@ class Mem0Adapter(MemorySystem):
                 memory_id = item.get("id", "")
                 score = item.get("score", 0)
                 if score >= 0.3:
-                    results_list.append(QueryResult(
-                        belief_id=str(memory_id),
-                        claim=memory_text,
-                        confidence=0.7,
-                        truth_state="true",
-                    ))
+                    results_list.append(
+                        QueryResult(
+                            belief_id=str(memory_id),
+                            claim=memory_text,
+                            confidence=0.7,
+                            truth_state="true",
+                        )
+                    )
 
         return results_list
 
-    def retract(self, evidence_id: str) -> RetractResult:
-        memory_id = self._store_to_memory.get(evidence_id)
+    def retract(self, belief_id: str) -> RetractResult:
+        memory_id = self._store_to_memory.get(belief_id)
         if memory_id:
             try:
                 self._client.delete(memory_id=memory_id)
                 return RetractResult(affected_beliefs=1, truth_states_changed=1)
             except Exception:
-                pass
+                logger.warning("Failed to delete memory %s", memory_id, exc_info=True)
         return RetractResult(affected_beliefs=0, truth_states_changed=0)
 
     def explain(self, claim: str) -> ExplainResult:
@@ -160,6 +167,7 @@ class Mem0Adapter(MemorySystem):
             try:
                 self._client.update(memory_id=memory_id, data=content)
             except Exception:
+                logger.warning("Failed to update memory, falling back to add", exc_info=True)
                 self._client.add(
                     messages=[{"role": "user", "content": content}],
                     user_id=self._user_id,
@@ -176,6 +184,6 @@ class Mem0Adapter(MemorySystem):
         try:
             self._client.delete_all(user_id=self._user_id)
         except Exception:
-            pass
+            logger.warning("Failed to delete all memories", exc_info=True)
         self._store_to_memory.clear()
         self._user_id = f"bmb_{uuid4().hex[:12]}"

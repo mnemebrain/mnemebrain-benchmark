@@ -87,7 +87,7 @@ Override these to unlock more benchmark scenarios:
 
 | Method | Capability | Unlocks |
 |--------|------------|---------|
-| `retract(evidence_id)` | `RETRACT` | Retraction scenarios |
+| `retract(belief_id)` | `RETRACT` | Retraction scenarios |
 | `explain(claim)` | `EXPLAIN` | Evidence tracking scenarios |
 | `set_time_offset_days(days)` | `DECAY` | Temporal decay scenarios |
 | `revise(belief_id, evidence)` | `REVISE` | Belief revision scenarios |

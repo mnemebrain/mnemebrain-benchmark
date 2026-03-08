@@ -7,6 +7,7 @@ Usage:
     mnemebrain-bmb --adapter mnemebrain
     python -m mnemebrain_benchmark.bmb_cli
 """
+
 from __future__ import annotations
 
 import argparse
@@ -14,6 +15,8 @@ import os
 import sys
 
 from mnemebrain_benchmark.interface import MemorySystem
+from mnemebrain_benchmark.protocols import EmbeddingProvider
+from mnemebrain_benchmark.providers import SentenceTransformerProvider
 from mnemebrain_benchmark.scenarios.loader import load_bmb_scenarios
 from mnemebrain_benchmark.system_report import export_json, format_scorecard
 from mnemebrain_benchmark.system_runner import SystemBenchmarkRunner
@@ -32,6 +35,7 @@ BMB_CATEGORIES = [
 
 ALL_ADAPTERS = [
     "mnemebrain",
+    "mnemebrain_lite",
     "naive_baseline",
     "langchain_buffer",
     "rag_baseline",
@@ -41,37 +45,16 @@ ALL_ADAPTERS = [
 ]
 
 
-def _get_embedder():
+def _get_embedder() -> EmbeddingProvider:
     """Lazily create a SentenceTransformer embedding provider."""
-    try:
-        from sentence_transformers import SentenceTransformer
-    except ImportError as exc:
-        raise ImportError(
-            "sentence-transformers required: pip install mnemebrain-benchmark[embeddings]"
-        ) from exc
-
-    import numpy as np
-
-    class _STProvider:
-        def __init__(self) -> None:
-            self._model = SentenceTransformer("all-MiniLM-L6-v2")
-
-        def embed(self, text: str) -> list[float]:
-            return self._model.encode(text).tolist()
-
-        def similarity(self, a: list[float], b: list[float]) -> float:
-            a_arr, b_arr = np.array(a), np.array(b)
-            dot = np.dot(a_arr, b_arr)
-            norm = np.linalg.norm(a_arr) * np.linalg.norm(b_arr)
-            return float(dot / norm) if norm > 0 else 0.0
-
-    return _STProvider()
+    return SentenceTransformerProvider()
 
 
 def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
     adapters: list[MemorySystem] = []
 
     embedder = None
+
     def _lazy_embedder():
         nonlocal embedder
         if embedder is None:
@@ -81,6 +64,7 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
     if adapter_filter is None or adapter_filter == "mnemebrain":
         try:
             from mnemebrain_benchmark.adapters.mnemebrain_adapter import MnemeBrainAdapter
+
             base_url = os.environ.get("MNEMEBRAIN_URL", "http://localhost:8000")
             adapters.append(MnemeBrainAdapter(base_url=base_url))
         except ImportError:
@@ -91,9 +75,22 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
                 )
                 sys.exit(1)
 
+    if adapter_filter is None or adapter_filter == "mnemebrain_lite":
+        try:
+            from mnemebrain_benchmark.adapters.mnemebrain_lite_adapter import (
+                MnemeBrainLiteAdapter,
+            )
+
+            adapters.append(MnemeBrainLiteAdapter(_lazy_embedder()))
+        except ImportError:
+            if adapter_filter == "mnemebrain_lite":
+                print("mnemebrain_lite adapter requires: pip install mnemebrain-lite[embeddings]")
+                sys.exit(1)
+
     if adapter_filter is None or adapter_filter == "naive_baseline":
         try:
             from mnemebrain_benchmark.adapters.naive_baseline import NaiveBaseline
+
             adapters.append(NaiveBaseline(_lazy_embedder()))
         except ImportError:
             if adapter_filter == "naive_baseline":
@@ -105,11 +102,13 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
 
     if adapter_filter is None or adapter_filter == "langchain_buffer":
         from mnemebrain_benchmark.adapters.langchain_buffer import LangChainBufferBaseline
+
         adapters.append(LangChainBufferBaseline())
 
     if adapter_filter is None or adapter_filter == "rag_baseline":
         try:
             from mnemebrain_benchmark.adapters.rag_baseline import RAGBaseline
+
             adapters.append(RAGBaseline(_lazy_embedder()))
         except ImportError:
             if adapter_filter == "rag_baseline":
@@ -122,6 +121,7 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
     if adapter_filter is None or adapter_filter == "structured_memory":
         try:
             from mnemebrain_benchmark.adapters.structured_memory import StructuredMemoryBaseline
+
             adapters.append(StructuredMemoryBaseline(_lazy_embedder()))
         except ImportError:
             if adapter_filter == "structured_memory":
@@ -134,6 +134,7 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
     if adapter_filter is None or adapter_filter == "mem0":
         try:
             from mnemebrain_benchmark.adapters.mem0_adapter import Mem0Adapter
+
             adapters.append(Mem0Adapter())
         except (ImportError, ValueError) as e:
             if adapter_filter == "mem0":
@@ -143,6 +144,7 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
     if adapter_filter is None or adapter_filter == "openai_rag":
         try:
             from mnemebrain_benchmark.adapters.openai_rag_adapter import OpenAIRAGAdapter
+
             adapters.append(OpenAIRAGAdapter())
         except (ImportError, ValueError) as e:
             if adapter_filter == "openai_rag":
@@ -211,9 +213,7 @@ def run_bmb(
 
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(
-        description="MnemeBrain Belief Maintenance Benchmark (BMB)"
-    )
+    parser = argparse.ArgumentParser(description="MnemeBrain Belief Maintenance Benchmark (BMB)")
     parser.add_argument("--adapter", type=str, default=None, choices=ALL_ADAPTERS)
     parser.add_argument("--category", type=str, default=None, choices=BMB_CATEGORIES)
     parser.add_argument("--scenario", type=str, default=None)

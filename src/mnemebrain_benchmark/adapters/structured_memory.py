@@ -1,4 +1,5 @@
 """Structured memory baseline (Mem0-style) adapter."""
+
 from __future__ import annotations
 
 from uuid import uuid4
@@ -67,14 +68,16 @@ class StructuredMemoryBaseline(MemorySystem):
 
         slot_id = str(uuid4())
         confidence = min(0.5 + 0.1 * len(evidence), 0.95)
-        self._slots.append({
-            "id": slot_id,
-            "claim": claim,
-            "embedding": embedding,
-            "evidence_count": len(evidence),
-            "confidence": confidence,
-            "deleted": False,
-        })
+        self._slots.append(
+            {
+                "id": slot_id,
+                "claim": claim,
+                "embedding": embedding,
+                "evidence_count": len(evidence),
+                "confidence": confidence,
+                "deleted": False,
+            }
+        )
         return StoreResult(
             belief_id=slot_id,
             merged=False,
@@ -93,17 +96,19 @@ class StructuredMemoryBaseline(MemorySystem):
                 continue
             sim = self._embedder.similarity(embedding, slot["embedding"])
             if sim >= 0.5:
-                results.append(QueryResult(
-                    belief_id=slot["id"],
-                    claim=slot["claim"],
-                    confidence=slot["confidence"],
-                    truth_state="true",
-                ))
+                results.append(
+                    QueryResult(
+                        belief_id=slot["id"],
+                        claim=slot["claim"],
+                        confidence=slot["confidence"],
+                        truth_state="true",
+                    )
+                )
         return results
 
-    def retract(self, evidence_id: str) -> RetractResult:
+    def retract(self, belief_id: str) -> RetractResult:
         for slot in self._slots:
-            if slot["id"] == evidence_id:
+            if slot["id"] == belief_id:
                 slot["deleted"] = True
                 return RetractResult(affected_beliefs=1, truth_states_changed=1)
         return RetractResult(affected_beliefs=0, truth_states_changed=0)

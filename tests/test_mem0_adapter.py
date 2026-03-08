@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.adapters.mem0_adapter (mocked)."""
+
 from __future__ import annotations
 
 import sys
@@ -47,6 +48,7 @@ def mock_mem0():
 # Import after mocking
 def _get_adapter_class():
     from mnemebrain_benchmark.adapters.mem0_adapter import Mem0Adapter
+
     return Mem0Adapter
 
 
@@ -65,6 +67,7 @@ class TestMem0Adapter:
 
     def test_capabilities(self, mock_mem0, monkeypatch):
         from mnemebrain_benchmark.interface import Capability
+
         Mem0Adapter = _get_adapter_class()
         adapter = Mem0Adapter(api_key="test-key")
         caps = adapter.capabilities()
@@ -102,9 +105,9 @@ class TestMem0Adapter:
     def test_query_filters_low_score(self, mock_mem0):
         Mem0Adapter = _get_adapter_class()
         adapter = Mem0Adapter(api_key="test-key")
-        adapter._client.search = MagicMock(return_value={
-            "results": [{"id": "m1", "memory": "low", "score": 0.1}]
-        })
+        adapter._client.search = MagicMock(
+            return_value={"results": [{"id": "m1", "memory": "low", "score": 0.1}]}
+        )
         results = adapter.query("test")
         assert len(results) == 0
 

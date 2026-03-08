@@ -1,4 +1,5 @@
 """Naive baseline memory system -- flat vector store, no belief logic."""
+
 from __future__ import annotations
 
 from uuid import uuid4
@@ -56,12 +57,14 @@ class NaiveBaseline(MemorySystem):
         for b in self._beliefs:
             sim = self._embedder.similarity(embedding, b["embedding"])
             if sim >= 0.5:
-                results.append(QueryResult(
-                    belief_id=b["id"],
-                    claim=b["claim"],
-                    confidence=None,
-                    truth_state=None,
-                ))
+                results.append(
+                    QueryResult(
+                        belief_id=b["id"],
+                        claim=b["claim"],
+                        confidence=None,
+                        truth_state=None,
+                    )
+                )
         return results
 
     def reset(self) -> None:

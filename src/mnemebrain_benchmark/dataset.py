@@ -1,6 +1,8 @@
 """Dataset loading and validation for the embedding benchmark."""
+
 from __future__ import annotations
 
+import dataclasses
 import importlib.resources
 import json
 from dataclasses import dataclass
@@ -67,7 +69,7 @@ class BenchmarkDataset:
                     f"expected one of {VALID_DIFFICULTIES}"
                 )
 
-            fields = vars(ClaimPair)["__dataclass_fields__"]
+            fields = {f.name for f in dataclasses.fields(ClaimPair)}
             pairs.append(ClaimPair(**{k: entry[k] for k in fields}))
 
         return cls(pairs)

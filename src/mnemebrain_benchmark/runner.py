@@ -1,4 +1,5 @@
 """Benchmark orchestrator and reporting."""
+
 from __future__ import annotations
 
 import argparse
@@ -14,6 +15,7 @@ from mnemebrain_benchmark.metrics import (
     evaluate_pair,
 )
 from mnemebrain_benchmark.protocols import EmbeddingProvider
+from mnemebrain_benchmark.providers import SentenceTransformerProvider, cosine_similarity
 
 # Provider registry: (provider_type, model_name)
 PROVIDER_CONFIGS: list[tuple[str, str]] = [
@@ -28,28 +30,7 @@ PROVIDER_CONFIGS: list[tuple[str, str]] = [
 def _create_provider(provider_type: str, model_name: str) -> EmbeddingProvider:
     """Instantiate a provider by type and model name."""
     if provider_type == "sentence_transformers":
-        try:
-            from sentence_transformers import SentenceTransformer
-        except ImportError as exc:
-            raise ImportError(
-                "sentence-transformers required: pip install mnemebrain-benchmark[embeddings]"
-            ) from exc
-
-        class _STProvider:
-            def __init__(self, model: str) -> None:
-                self._model = SentenceTransformer(model)
-
-            def embed(self, text: str) -> list[float]:
-                return self._model.encode(text).tolist()
-
-            def similarity(self, a: list[float], b: list[float]) -> float:
-                import numpy as np
-                a_arr, b_arr = np.array(a), np.array(b)
-                dot = np.dot(a_arr, b_arr)
-                norm = np.linalg.norm(a_arr) * np.linalg.norm(b_arr)
-                return float(dot / norm) if norm > 0 else 0.0
-
-        return _STProvider(model_name)
+        return SentenceTransformerProvider(model_name)
 
     if provider_type == "openai":
         try:
@@ -58,6 +39,7 @@ def _create_provider(provider_type: str, model_name: str) -> EmbeddingProvider:
             raise ImportError("openai required: pip install mnemebrain-benchmark[openai]") from exc
 
         import os
+
         key = os.environ.get("OPENAI_API_KEY")
         if not key:
             raise ValueError("OPENAI_API_KEY required")
@@ -72,11 +54,7 @@ def _create_provider(provider_type: str, model_name: str) -> EmbeddingProvider:
                 return resp.data[0].embedding
 
             def similarity(self, a: list[float], b: list[float]) -> float:
-                import numpy as np
-                a_arr, b_arr = np.array(a), np.array(b)
-                dot = np.dot(a_arr, b_arr)
-                norm = np.linalg.norm(a_arr) * np.linalg.norm(b_arr)
-                return float(dot / norm) if norm > 0 else 0.0
+                return cosine_similarity(a, b)
 
         return _OpenAIProvider(model_name)
 
@@ -99,10 +77,7 @@ def _print_metrics(name: str, metrics: BenchmarkMetrics) -> None:
         f" TN={metrics.tn} FN={metrics.fn})"
     )
     print("  Similarity distribution:")
-    print(
-        f"    Same pairs:      mean={metrics.mean_sim_same:.4f}"
-        f"  std={metrics.std_sim_same:.4f}"
-    )
+    print(f"    Same pairs:      mean={metrics.mean_sim_same:.4f}  std={metrics.std_sim_same:.4f}")
     print(
         f"    Different pairs: mean={metrics.mean_sim_different:.4f}"
         f"  std={metrics.std_sim_different:.4f}"
@@ -127,6 +102,7 @@ def _serialize_report(report: dict) -> dict:
         if isinstance(obj, float):
             return round(obj, 6)
         return obj
+
     return _convert(report)
 
 
@@ -196,19 +172,21 @@ def run_benchmark(
 
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(
-        description="MnemeBrain Embedding Provider Benchmark"
-    )
+    parser = argparse.ArgumentParser(description="MnemeBrain Embedding Provider Benchmark")
     parser.add_argument("--threshold", type=float, default=0.92)
     parser.add_argument("--dataset", type=str, default=None)
     parser.add_argument("--output", type=str, default="benchmark_report.json")
     parser.add_argument(
-        "--provider", type=str, default=None,
+        "--provider",
+        type=str,
+        default=None,
         choices=["sentence_transformers", "openai"],
     )
     parser.add_argument("--model", type=str, default=None)
     parser.add_argument(
-        "--category", type=str, default=None,
+        "--category",
+        type=str,
+        default=None,
         choices=["fact", "preference", "inference", "prediction"],
     )
     parser.add_argument("--difficulty", type=str, default=None, choices=["easy", "medium", "hard"])

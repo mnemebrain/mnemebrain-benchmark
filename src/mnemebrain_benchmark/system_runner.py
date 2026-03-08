@@ -1,13 +1,208 @@
 """System benchmark runner -- executes scenarios against memory system adapters."""
+
 from __future__ import annotations
 
+import sys
+from typing import TYPE_CHECKING
+
 from mnemebrain_benchmark.interface import MemorySystem
-from mnemebrain_benchmark.scenarios.schema import Scenario
+from mnemebrain_benchmark.scenarios.schema import Action, Scenario
 from mnemebrain_benchmark.scoring import (
     CheckResult,
     ScenarioScore,
     evaluate_expectations,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+
+def _get_belief_id(action_results: dict[str, object], label: str) -> str | None:
+    """Look up a prior result by label and return its belief_id, if any."""
+    result = action_results.get(label or "")
+    if result is not None and hasattr(result, "belief_id"):
+        return result.belief_id  # type: ignore[union-attr]
+    return None
+
+
+def _get_sandbox_id(action_results: dict[str, object], label: str) -> str | None:
+    """Look up a prior result by label and return its sandbox_id, if any."""
+    result = action_results.get(label or "")
+    if result is not None and hasattr(result, "sandbox_id"):
+        return result.sandbox_id  # type: ignore[union-attr]
+    return None
+
+
+def _handle_store(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    action_results[action.label] = system.store(
+        claim=action.claim or "",
+        evidence=action.evidence or [],
+    )
+
+
+def _handle_query(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    action_results[action.label] = system.query(claim=action.claim or "")
+
+
+def _handle_retract(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    bid = _get_belief_id(action_results, action.target_label or "")
+    if bid is not None:
+        action_results[action.label] = system.retract(bid)
+
+
+def _handle_explain(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    action_results[action.label] = system.explain(claim=action.claim or "")
+
+
+def _handle_wait_days(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    if action.wait_days:
+        try:
+            system.set_time_offset_days(action.wait_days)
+        except NotImplementedError:
+            pass
+
+
+def _handle_revise(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    bid = _get_belief_id(action_results, action.target_label or "")
+    if bid is not None:
+        action_results[action.label] = system.revise(
+            belief_id=bid,
+            evidence=action.evidence or [],
+        )
+
+
+def _handle_sandbox_fork(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    action_results[action.label] = system.sandbox_fork(
+        scenario_label=action.scenario_label or "",
+    )
+
+
+def _handle_sandbox_assume(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    sid = _get_sandbox_id(action_results, action.sandbox_label or "")
+    bid = _get_belief_id(action_results, action.belief_label or "")
+    if sid is not None and bid is not None:
+        action_results[action.label] = system.sandbox_assume(
+            sandbox_id=sid,
+            belief_id=bid,
+            truth_state=action.truth_state_override or "false",
+        )
+
+
+def _handle_sandbox_resolve(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    sid = _get_sandbox_id(action_results, action.sandbox_label or "")
+    bid = _get_belief_id(action_results, action.belief_label or "")
+    if sid is not None and bid is not None:
+        action_results[action.label] = system.sandbox_resolve(
+            sandbox_id=sid,
+            belief_id=bid,
+        )
+
+
+def _handle_sandbox_discard(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    sid = _get_sandbox_id(action_results, action.sandbox_label or "")
+    if sid is not None:
+        system.sandbox_discard(sandbox_id=sid)
+        action_results[action.label] = action_results.get(action.sandbox_label or "")
+
+
+def _handle_add_attack(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    attacker_bid = _get_belief_id(action_results, action.belief_label or "")
+    target_bid = _get_belief_id(action_results, action.target_label or "")
+    if attacker_bid is not None and target_bid is not None:
+        action_results[action.label] = system.add_attack(
+            attacker_id=attacker_bid,
+            target_id=target_bid,
+            attack_type="undermining",
+            weight=0.5,
+        )
+
+
+def _handle_consolidate(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    action_results[action.label] = system.consolidate()
+
+
+def _handle_query_multihop(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    action_results[action.label] = system.query_multihop(query=action.claim or "")
+
+
+def _handle_get_memory_tier(
+    system: MemorySystem,
+    action: Action,
+    action_results: dict[str, object],
+) -> None:
+    bid = _get_belief_id(action_results, action.belief_ref_label or "")
+    if bid is not None:
+        action_results[action.label] = system.get_memory_tier(belief_id=bid)
+
+
+_ACTION_HANDLERS: dict[str, Callable[[MemorySystem, Action, dict[str, object]], None]] = {
+    "store": _handle_store,
+    "query": _handle_query,
+    "retract": _handle_retract,
+    "explain": _handle_explain,
+    "wait_days": _handle_wait_days,
+    "revise": _handle_revise,
+    "sandbox_fork": _handle_sandbox_fork,
+    "sandbox_assume": _handle_sandbox_assume,
+    "sandbox_resolve": _handle_sandbox_resolve,
+    "sandbox_discard": _handle_sandbox_discard,
+    "add_attack": _handle_add_attack,
+    "consolidate": _handle_consolidate,
+    "query_multihop": _handle_query_multihop,
+    "get_memory_tier": _handle_get_memory_tier,
+}
 
 
 class SystemBenchmarkRunner:
@@ -29,102 +224,9 @@ class SystemBenchmarkRunner:
         action_results: dict[str, object] = {}
 
         for action in scenario.actions:
-            if action.type == "store":
-                result = system.store(claim=action.claim or "", evidence=action.evidence or [])
-                action_results[action.label] = result
-            elif action.type == "query":
-                result = system.query(claim=action.claim or "")
-                action_results[action.label] = result
-            elif action.type == "retract":
-                target_result = action_results.get(action.target_label or "")
-                if target_result is not None and hasattr(target_result, "belief_id"):
-                    result = system.retract(target_result.belief_id)  # type: ignore[union-attr]
-                    action_results[action.label] = result
-            elif action.type == "explain":
-                result = system.explain(claim=action.claim or "")
-                action_results[action.label] = result
-            elif action.type == "wait_days":
-                if action.wait_days:
-                    try:
-                        system.set_time_offset_days(action.wait_days)
-                    except NotImplementedError:
-                        pass
-            elif action.type == "revise":
-                target_result = action_results.get(action.target_label or "")
-                if target_result is not None and hasattr(target_result, "belief_id"):
-                    result = system.revise(
-                        belief_id=target_result.belief_id,
-                        evidence=action.evidence or [],
-                    )
-                    action_results[action.label] = result
-            elif action.type == "sandbox_fork":
-                result = system.sandbox_fork(
-                    scenario_label=action.scenario_label or "",
-                )
-                action_results[action.label] = result
-            elif action.type == "sandbox_assume":
-                sandbox_result = action_results.get(action.sandbox_label or "")
-                belief_result = action_results.get(action.belief_label or "")
-                if (
-                    sandbox_result is not None
-                    and hasattr(sandbox_result, "sandbox_id")
-                    and belief_result is not None
-                    and hasattr(belief_result, "belief_id")
-                ):
-                    result = system.sandbox_assume(
-                        sandbox_id=sandbox_result.sandbox_id,
-                        belief_id=belief_result.belief_id,
-                        truth_state=action.truth_state_override or "false",
-                    )
-                    action_results[action.label] = result
-            elif action.type == "sandbox_resolve":
-                sandbox_result = action_results.get(action.sandbox_label or "")
-                belief_result = action_results.get(action.belief_label or "")
-                if (
-                    sandbox_result is not None
-                    and hasattr(sandbox_result, "sandbox_id")
-                    and belief_result is not None
-                    and hasattr(belief_result, "belief_id")
-                ):
-                    result = system.sandbox_resolve(
-                        sandbox_id=sandbox_result.sandbox_id,
-                        belief_id=belief_result.belief_id,
-                    )
-                    action_results[action.label] = result
-            elif action.type == "sandbox_discard":
-                sandbox_result = action_results.get(action.sandbox_label or "")
-                if sandbox_result is not None and hasattr(sandbox_result, "sandbox_id"):
-                    system.sandbox_discard(sandbox_id=sandbox_result.sandbox_id)
-                    action_results[action.label] = sandbox_result
-            elif action.type == "add_attack":
-                attacker_result = action_results.get(action.belief_label or "")
-                target_result = action_results.get(action.target_label or "")
-                if (
-                    attacker_result is not None
-                    and hasattr(attacker_result, "belief_id")
-                    and target_result is not None
-                    and hasattr(target_result, "belief_id")
-                ):
-                    result = system.add_attack(
-                        attacker_id=attacker_result.belief_id,
-                        target_id=target_result.belief_id,
-                        attack_type="undermining",
-                        weight=0.5,
-                    )
-                    action_results[action.label] = result
-            elif action.type == "consolidate":
-                result = system.consolidate()
-                action_results[action.label] = result
-            elif action.type == "query_multihop":
-                result = system.query_multihop(query=action.claim or "")
-                action_results[action.label] = result
-            elif action.type == "get_memory_tier":
-                target_result = action_results.get(action.belief_ref_label or "")
-                if target_result is not None and hasattr(target_result, "belief_id"):
-                    result = system.get_memory_tier(
-                        belief_id=target_result.belief_id,
-                    )
-                    action_results[action.label] = result
+            handler = _ACTION_HANDLERS.get(action.type)
+            if handler is not None:
+                handler(system, action, action_results)
 
         checks = evaluate_expectations(scenario.expectations, action_results)
         return ScenarioScore(
@@ -147,21 +249,24 @@ class SystemBenchmarkRunner:
                 try:
                     scores.append(self.run_scenario(system, scenario))
                 except Exception as exc:
-                    import sys
                     print(
                         f"  Warning: {system.name()}/{scenario.name}: {exc}",
                         file=sys.stderr,
                     )
-                    scores.append(ScenarioScore(
-                        scenario_name=scenario.name,
-                        category=scenario.category,
-                        checks=[CheckResult(
-                            name="runtime_error",
-                            passed=False,
-                            expected="no error",
-                            actual=str(exc),
-                        )],
-                        skipped=False,
-                    ))
+                    scores.append(
+                        ScenarioScore(
+                            scenario_name=scenario.name,
+                            category=scenario.category,
+                            checks=[
+                                CheckResult(
+                                    name="runtime_error",
+                                    passed=False,
+                                    expected="no error",
+                                    actual=str(exc),
+                                )
+                            ],
+                            skipped=False,
+                        )
+                    )
             results[system.name()] = scores
         return results

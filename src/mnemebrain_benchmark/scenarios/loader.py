@@ -1,4 +1,5 @@
 """Load and validate scenarios from JSON."""
+
 from __future__ import annotations
 
 import importlib.resources
@@ -36,6 +37,25 @@ def validate_scenario(scenario: Scenario) -> None:
             )
 
 
+def _parse_scenarios(raw: list[dict]) -> list[Scenario]:
+    """Parse and validate a list of raw scenario dicts into Scenario objects."""
+    scenarios: list[Scenario] = []
+    for entry in raw:
+        actions = [Action(**dict(a.items())) for a in entry.get("actions", [])]
+        expectations = [Expectation(**dict(e.items())) for e in entry.get("expectations", [])]
+        scenario = Scenario(
+            name=entry["name"],
+            description=entry["description"],
+            category=entry["category"],
+            requires=entry.get("requires", []),
+            actions=actions,
+            expectations=expectations,
+        )
+        validate_scenario(scenario)
+        scenarios.append(scenario)
+    return scenarios
+
+
 def load_scenarios(path: Path | str | None = None) -> list[Scenario]:
     """Load and validate scenarios from a JSON file.
 
@@ -47,27 +67,11 @@ def load_scenarios(path: Path | str | None = None) -> list[Scenario]:
             raw = json.load(f)
     else:
         ref = (
-            importlib.resources.files("mnemebrain_benchmark.scenarios")
-            / "data" / "scenarios.json"
+            importlib.resources.files("mnemebrain_benchmark.scenarios") / "data" / "scenarios.json"
         )
         raw = json.loads(ref.read_text(encoding="utf-8"))
 
-    scenarios: list[Scenario] = []
-    for entry in raw:
-        actions = [Action(**dict(a.items())) for a in entry.get("actions", [])]
-        expectations = [Expectation(**dict(e.items())) for e in entry.get("expectations", [])]
-        scenario = Scenario(
-            name=entry["name"],
-            description=entry["description"],
-            category=entry["category"],
-            requires=entry.get("requires", []),
-            actions=actions,
-            expectations=expectations,
-        )
-        validate_scenario(scenario)
-        scenarios.append(scenario)
-
-    return scenarios
+    return _parse_scenarios(raw)
 
 
 def load_bmb_scenarios(path: Path | str | None = None) -> list[Scenario]:
@@ -76,24 +80,7 @@ def load_bmb_scenarios(path: Path | str | None = None) -> list[Scenario]:
         return load_scenarios(path)
 
     ref = (
-        importlib.resources.files("mnemebrain_benchmark.scenarios")
-        / "data" / "bmb_scenarios.json"
+        importlib.resources.files("mnemebrain_benchmark.scenarios") / "data" / "bmb_scenarios.json"
     )
     raw = json.loads(ref.read_text(encoding="utf-8"))
-
-    scenarios: list[Scenario] = []
-    for entry in raw:
-        actions = [Action(**dict(a.items())) for a in entry.get("actions", [])]
-        expectations = [Expectation(**dict(e.items())) for e in entry.get("expectations", [])]
-        scenario = Scenario(
-            name=entry["name"],
-            description=entry["description"],
-            category=entry["category"],
-            requires=entry.get("requires", []),
-            actions=actions,
-            expectations=expectations,
-        )
-        validate_scenario(scenario)
-        scenarios.append(scenario)
-
-    return scenarios
+    return _parse_scenarios(raw)

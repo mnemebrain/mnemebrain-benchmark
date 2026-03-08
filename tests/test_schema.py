@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.scenarios.schema."""
+
 from __future__ import annotations
 
 from mnemebrain_benchmark.scenarios.schema import (
@@ -13,17 +14,38 @@ from mnemebrain_benchmark.scenarios.schema import (
 class TestValidSets:
     def test_all_action_types(self):
         expected = {
-            "store", "retract", "query", "explain", "wait_days",
-            "revise", "sandbox_fork", "sandbox_assume", "sandbox_resolve", "sandbox_discard",
-            "add_attack", "consolidate", "query_multihop", "get_memory_tier",
+            "store",
+            "retract",
+            "query",
+            "explain",
+            "wait_days",
+            "revise",
+            "sandbox_fork",
+            "sandbox_assume",
+            "sandbox_resolve",
+            "sandbox_discard",
+            "add_attack",
+            "consolidate",
+            "query_multihop",
+            "get_memory_tier",
         }
         assert VALID_ACTION_TYPES == expected
 
     def test_all_categories(self):
         expected = {
-            "contradiction", "retraction", "decay", "dedup", "extraction", "lifecycle",
-            "belief_revision", "evidence_tracking", "temporal", "counterfactual",
-            "consolidation", "multihop_retrieval", "pattern_separation",
+            "contradiction",
+            "retraction",
+            "decay",
+            "dedup",
+            "extraction",
+            "lifecycle",
+            "belief_revision",
+            "evidence_tracking",
+            "temporal",
+            "counterfactual",
+            "consolidation",
+            "multihop_retrieval",
+            "pattern_separation",
         }
         assert VALID_CATEGORIES == expected
 
@@ -38,10 +60,18 @@ class TestAction:
 
     def test_all_fields(self):
         a = Action(
-            label="s1", type="store", claim="x", evidence=[{"a": 1}],
-            belief_type="fact", target_label="t", wait_days=5,
-            belief_label="bl", sandbox_label="sb", scenario_label="sc",
-            truth_state_override="false", belief_ref_label="br",
+            label="s1",
+            type="store",
+            claim="x",
+            evidence=[{"a": 1}],
+            belief_type="fact",
+            target_label="t",
+            wait_days=5,
+            belief_label="bl",
+            sandbox_label="sb",
+            scenario_label="sc",
+            truth_state_override="false",
+            belief_ref_label="br",
         )
         assert a.belief_ref_label == "br"
 

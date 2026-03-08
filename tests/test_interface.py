@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.interface -- dataclasses, enums, and ABC."""
+
 from __future__ import annotations
 
 import pytest
@@ -19,12 +20,22 @@ from mnemebrain_benchmark.interface import (
 
 # -- Capability enum --
 
+
 class TestCapability:
     def test_all_values(self):
         expected = {
-            "store", "query", "retract", "explain", "contradiction",
-            "decay", "revise", "sandbox", "attack", "consolidation",
-            "hipporag", "pattern_separation",
+            "store",
+            "query",
+            "retract",
+            "explain",
+            "contradiction",
+            "decay",
+            "revise",
+            "sandbox",
+            "attack",
+            "consolidation",
+            "hipporag",
+            "pattern_separation",
         }
         assert {c.value for c in Capability} == expected
 
@@ -40,20 +51,28 @@ class TestCapability:
 
 # -- Dataclasses --
 
+
 class TestStoreResult:
     def test_defaults(self):
         r = StoreResult(
-            belief_id="b1", merged=False,
+            belief_id="b1",
+            merged=False,
             contradiction_detected=False,
-            truth_state="true", confidence=0.9,
+            truth_state="true",
+            confidence=0.9,
         )
         assert r.was_separated is False
         assert r.memory_tier == "episodic"
 
     def test_all_fields(self):
         r = StoreResult(
-            belief_id="b1", merged=True, contradiction_detected=True,
-            truth_state="hedged", confidence=0.5, was_separated=True, memory_tier="semantic",
+            belief_id="b1",
+            merged=True,
+            contradiction_detected=True,
+            truth_state="hedged",
+            confidence=0.5,
+            was_separated=True,
+            memory_tier="semantic",
         )
         assert r.belief_id == "b1"
         assert r.merged is True
@@ -78,9 +97,12 @@ class TestRetractResult:
 class TestExplainResult:
     def test_defaults(self):
         r = ExplainResult(
-            claim="x", has_evidence=True,
-            supporting_count=1, attacking_count=0,
-            truth_state="true", confidence=0.9,
+            claim="x",
+            has_evidence=True,
+            supporting_count=1,
+            attacking_count=0,
+            truth_state="true",
+            confidence=0.9,
         )
         assert r.expired_count == 0
 
@@ -117,6 +139,7 @@ class TestMemoryTierResult:
 
 # -- MemorySystem ABC --
 
+
 class TestMemorySystemABC:
     def test_cannot_instantiate(self):
         with pytest.raises(TypeError):
@@ -126,10 +149,16 @@ class TestMemorySystemABC:
         """All optional methods should raise NotImplementedError by default."""
 
         class MinimalSystem(MemorySystem):
-            def name(self): return "minimal"
-            def capabilities(self): return set()
+            def name(self):
+                return "minimal"
+
+            def capabilities(self):
+                return set()
+
             def store(self, claim, evidence): ...
-            def query(self, claim): return []
+            def query(self, claim):
+                return []
+
             def reset(self): ...
 
         sys = MinimalSystem()

@@ -1,4 +1,5 @@
 """Metric computation for the embedding benchmark."""
+
 from __future__ import annotations
 
 import time
@@ -118,12 +119,22 @@ def compute_metrics(
     throughput = (len(results) / (total_wall_ms / 1000)) if total_wall_ms > 0 else 0.0
 
     return BenchmarkMetrics(
-        tp=tp, fp=fp, tn=tn, fn=fn,
-        precision=precision, recall=recall, f1=f1, accuracy=accuracy,
-        mean_sim_same=mean_sim_same, std_sim_same=std_sim_same,
-        mean_sim_different=mean_sim_different, std_sim_different=std_sim_different,
+        tp=tp,
+        fp=fp,
+        tn=tn,
+        fn=fn,
+        precision=precision,
+        recall=recall,
+        f1=f1,
+        accuracy=accuracy,
+        mean_sim_same=mean_sim_same,
+        std_sim_same=std_sim_same,
+        mean_sim_different=mean_sim_different,
+        std_sim_different=std_sim_different,
         separation_gap=separation_gap,
-        mean_embed_ms=mean_embed_ms, p95_embed_ms=p95_embed_ms, p99_embed_ms=p99_embed_ms,
+        mean_embed_ms=mean_embed_ms,
+        p95_embed_ms=p95_embed_ms,
+        p99_embed_ms=p99_embed_ms,
         throughput_pairs_per_sec=throughput,
         pair_results=results,
     )

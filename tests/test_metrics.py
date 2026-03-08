@@ -1,4 +1,5 @@
 """Tests for mnemebrain_benchmark.metrics."""
+
 from __future__ import annotations
 
 from mnemebrain_benchmark.dataset import ClaimPair
@@ -29,8 +30,11 @@ class TestEvaluatePair:
 
     def test_predicted_different(self):
         class LowSim:
-            def embed(self, text): return [1.0]
-            def similarity(self, a, b): return 0.3
+            def embed(self, text):
+                return [1.0]
+
+            def similarity(self, a, b):
+                return 0.3
 
         pair = ClaimPair("p1", "a", "b", "different", "fact", "easy")
         result = evaluate_pair(LowSim(), pair, threshold=0.9)
@@ -61,10 +65,10 @@ class TestComputeMetrics:
 
     def test_mixed_classification(self):
         results = [
-            PairResult("p1", 0.95, True, True, 1.0, 1.0),   # TP
+            PairResult("p1", 0.95, True, True, 1.0, 1.0),  # TP
             PairResult("p2", 0.95, True, False, 1.0, 1.0),  # FP
-            PairResult("p3", 0.3, False, False, 1.0, 1.0),   # TN
-            PairResult("p4", 0.3, False, True, 1.0, 1.0),    # FN
+            PairResult("p3", 0.3, False, False, 1.0, 1.0),  # TN
+            PairResult("p4", 0.3, False, True, 1.0, 1.0),  # FN
         ]
         m = compute_metrics(results)
         assert m.tp == 1

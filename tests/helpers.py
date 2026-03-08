@@ -1,4 +1,5 @@
 """Shared test helpers for mnemebrain_benchmark tests."""
+
 from __future__ import annotations
 
 import math
