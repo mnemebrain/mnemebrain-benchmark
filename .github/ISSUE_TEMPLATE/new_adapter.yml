@@ -1,0 +1,61 @@
+name: New Adapter Proposal
+description: Propose a new memory system adapter for the benchmark
+labels: ["adapter", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Propose adding a new memory system adapter to the benchmark suite.
+        See [docs/adding-adapters.md](../../docs/adding-adapters.md) for the implementation guide.
+
+  - type: input
+    id: system_name
+    attributes:
+      label: Memory system name
+      placeholder: "e.g. chromadb, weaviate, pinecone"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: capabilities
+    attributes:
+      label: Capabilities
+      description: Which capabilities does this system support?
+      options:
+        - label: "store"
+        - label: "query"
+        - label: "retract"
+        - label: "explain"
+        - label: "contradiction"
+        - label: "decay"
+        - label: "revise"
+        - label: "sandbox"
+        - label: "attack"
+        - label: "consolidation"
+        - label: "hipporag"
+        - label: "pattern_separation"
+
+  - type: dropdown
+    id: dependency_type
+    attributes:
+      label: Dependency type
+      options:
+        - Local only (no API key needed)
+        - Cloud API (requires API key)
+        - Hybrid
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Brief description of the system and why it's a useful benchmark target.
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation_notes
+    attributes:
+      label: Implementation notes
+      description: Any relevant details about the adapter implementation.
