@@ -281,12 +281,14 @@ nav {
   width: 0; transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .bar-fill.f100 { background: var(--pulse); }
+.bar-fill.f93 { background: rgba(200,245,66,0.55); }
 .bar-fill.f36 { background: rgba(244,241,235,0.18); }
 .bar-fill.f29 { background: rgba(244,241,235,0.12); }
 .bar-fill.f0 { background: rgba(255,64,64,0.25); width: 2px !important; }
 .bar-pct { color: rgba(244,241,235,0.4); font-size: 0.65rem; }
 .bar-pct.top { color: var(--pulse); font-weight: 500; }
 .bar-fill.animated.f100 { width: 100%; }
+.bar-fill.animated.f93 { width: 93%; }
 .bar-fill.animated.f36 { width: 36%; }
 .bar-fill.animated.f29 { width: 29%; }
 .results-callout {
@@ -588,9 +590,14 @@ footer a:hover { color: rgba(244,241,235,0.6); }
 
     <div class="bar-chart reveal" id="bar-chart">
       <div class="bar-row">
-        <div class="bar-name top">mnemebrain</div>
+        <div class="bar-name top">mnemebrain (full)</div>
         <div class="bar-track"><div class="bar-fill f100"></div></div>
         <div class="bar-pct top">100%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name top">mnemebrain_lite</div>
+        <div class="bar-track"><div class="bar-fill f93"></div></div>
+        <div class="bar-pct top">93%</div>
       </div>
       <div class="bar-row">
         <div class="bar-name">structured_memory</div>
@@ -603,12 +610,17 @@ footer a:hover { color: rgba(244,241,235,0.6); }
         <div class="bar-pct">29%</div>
       </div>
       <div class="bar-row">
-        <div class="bar-name">openai_rag (real API)</div>
+        <div class="bar-name">naive_baseline</div>
         <div class="bar-track"><div class="bar-fill f0"></div></div>
         <div class="bar-pct">0%</div>
       </div>
       <div class="bar-row">
         <div class="bar-name">rag_baseline</div>
+        <div class="bar-track"><div class="bar-fill f0"></div></div>
+        <div class="bar-pct">0%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">openai_rag (real)</div>
         <div class="bar-track"><div class="bar-fill f0"></div></div>
         <div class="bar-pct">0%</div>
       </div>
