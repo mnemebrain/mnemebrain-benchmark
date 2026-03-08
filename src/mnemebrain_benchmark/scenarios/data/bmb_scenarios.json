@@ -1,0 +1,2640 @@
+[
+  {
+    "name": "bmb_vegetarian_contradiction",
+    "description": "User claims vegetarian, then mentions eating steak. System must detect BOTH state, not overwrite.",
+    "category": "contradiction",
+    "requires": [
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_veg",
+        "type": "store",
+        "claim": "user is vegetarian",
+        "evidence": [
+          {
+            "content": "User stated: I'm vegetarian",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "user_statement_t1"
+          }
+        ]
+      },
+      {
+        "label": "store_steak",
+        "type": "store",
+        "claim": "user is vegetarian",
+        "evidence": [
+          {
+            "content": "User stated: I ate steak yesterday",
+            "polarity": "attacks",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "user_statement_t2"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_steak",
+        "contradiction_detected": true,
+        "truth_state": "both"
+      },
+      {
+        "action_label": "store_steak",
+        "confidence_below": 0.7
+      }
+    ]
+  },
+  {
+    "name": "bmb_remote_work_preference",
+    "description": "User prefers remote work, then moves to office job. System must revise with evidence chain.",
+    "category": "contradiction",
+    "requires": [
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_remote",
+        "type": "store",
+        "claim": "user prefers remote work",
+        "belief_type": "preference",
+        "evidence": [
+          {
+            "content": "User said they prefer working from home",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "conversation_t1",
+            "belief_type": "preference"
+          }
+        ]
+      },
+      {
+        "label": "store_office",
+        "type": "store",
+        "claim": "user prefers remote work",
+        "evidence": [
+          {
+            "content": "User moved to a full-time office job",
+            "polarity": "attacks",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "observation_t2",
+            "belief_type": "preference"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_office",
+        "contradiction_detected": true,
+        "truth_state": "both"
+      }
+    ]
+  },
+  {
+    "name": "bmb_allergic_contradiction",
+    "description": "User says allergic to peanuts, then orders pad thai with peanuts.",
+    "category": "contradiction",
+    "requires": [
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_allergy",
+        "type": "store",
+        "claim": "user is allergic to peanuts",
+        "evidence": [
+          {
+            "content": "User warned restaurant about peanut allergy",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.95,
+            "source_ref": "restaurant_t1"
+          }
+        ]
+      },
+      {
+        "label": "store_peanuts",
+        "type": "store",
+        "claim": "user is allergic to peanuts",
+        "evidence": [
+          {
+            "content": "User ordered pad thai with peanuts at a different restaurant",
+            "polarity": "attacks",
+            "weight": 0.8,
+            "reliability": 0.85,
+            "source_ref": "restaurant_t2"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_peanuts",
+        "contradiction_detected": true,
+        "truth_state": "both"
+      }
+    ]
+  },
+  {
+    "name": "bmb_morning_evening_person",
+    "description": "User says morning person but calendar shows late-night activity.",
+    "category": "contradiction",
+    "requires": [
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_morning",
+        "type": "store",
+        "claim": "user is a morning person",
+        "evidence": [
+          {
+            "content": "User self-reported as a morning person in survey",
+            "polarity": "supports",
+            "weight": 0.8,
+            "reliability": 0.85,
+            "source_ref": "survey_t1"
+          }
+        ]
+      },
+      {
+        "label": "store_night",
+        "type": "store",
+        "claim": "user is a morning person",
+        "evidence": [
+          {
+            "content": "Usage analytics show 80% of activity between 10pm-2am",
+            "polarity": "attacks",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "analytics_t2"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_night",
+        "contradiction_detected": true,
+        "truth_state": "both"
+      }
+    ]
+  },
+  {
+    "name": "bmb_budget_contradiction",
+    "description": "User says budget-conscious, then makes luxury purchase.",
+    "category": "contradiction",
+    "requires": [
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_budget",
+        "type": "store",
+        "claim": "user is budget-conscious",
+        "evidence": [
+          {
+            "content": "User uses multiple coupon apps and compares prices",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "app_usage_t1"
+          }
+        ]
+      },
+      {
+        "label": "store_luxury",
+        "type": "store",
+        "claim": "user is budget-conscious",
+        "evidence": [
+          {
+            "content": "User purchased a luxury watch for $5000",
+            "polarity": "attacks",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "purchase_t2"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_luxury",
+        "contradiction_detected": true,
+        "truth_state": "both"
+      }
+    ]
+  },
+  {
+    "name": "bmb_contradiction_resolved_by_retraction",
+    "description": "Contradiction arises, then one side is retracted. System should return to single truth state.",
+    "category": "contradiction",
+    "requires": [
+      "query",
+      "retract",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_dogs",
+        "type": "store",
+        "claim": "user prefers dogs over cats",
+        "evidence": [
+          {
+            "content": "User said they love dogs",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "convo_t1"
+          }
+        ]
+      },
+      {
+        "label": "store_cats",
+        "type": "store",
+        "claim": "user prefers dogs over cats",
+        "evidence": [
+          {
+            "content": "User adopted two cats",
+            "polarity": "attacks",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "observation_t2"
+          }
+        ]
+      },
+      {
+        "label": "retract_cats",
+        "type": "retract",
+        "target_label": "store_cats"
+      },
+      {
+        "label": "query_dogs",
+        "type": "query",
+        "claim": "user prefers dogs over cats"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_cats",
+        "contradiction_detected": true
+      },
+      {
+        "action_label": "query_dogs",
+        "truth_state": "true"
+      }
+    ]
+  },
+  {
+    "name": "bmb_traffic_revision_chain",
+    "description": "Two conflicting traffic reports, then a third confirms one side. Tests AGM revision.",
+    "category": "belief_revision",
+    "requires": [
+      "revise",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_moderate",
+        "type": "store",
+        "claim": "traffic is heavy on highway 101",
+        "evidence": [
+          {
+            "content": "API report: traffic moderate on highway 101",
+            "polarity": "attacks",
+            "weight": 0.7,
+            "reliability": 0.8,
+            "source_ref": "traffic_api_t1"
+          }
+        ]
+      },
+      {
+        "label": "store_heavy",
+        "type": "store",
+        "claim": "traffic is heavy on highway 101",
+        "evidence": [
+          {
+            "content": "User report: traffic is very heavy, took 2 hours",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "user_report_t2"
+          }
+        ]
+      },
+      {
+        "label": "revise_confirm",
+        "type": "revise",
+        "target_label": "store_heavy",
+        "evidence": [
+          {
+            "content": "Updated API confirms heavy traffic on highway 101",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "traffic_api_t3"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_heavy",
+        "truth_state": "both"
+      },
+      {
+        "action_label": "revise_confirm",
+        "truth_state": "both",
+        "confidence_above": 0.5
+      }
+    ]
+  },
+  {
+    "name": "bmb_medical_revision",
+    "description": "Initial diagnosis revised with new test results. Tests incremental revision.",
+    "category": "belief_revision",
+    "requires": [
+      "revise",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_diagnosis",
+        "type": "store",
+        "claim": "patient has condition X",
+        "evidence": [
+          {
+            "content": "Initial blood test suggests condition X",
+            "polarity": "supports",
+            "weight": 0.7,
+            "reliability": 0.75,
+            "source_ref": "blood_test_t1"
+          }
+        ]
+      },
+      {
+        "label": "revise_with_scan",
+        "type": "revise",
+        "target_label": "store_diagnosis",
+        "evidence": [
+          {
+            "content": "MRI scan confirms condition X markers",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.98,
+            "source_ref": "mri_scan_t2"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "revise_with_scan",
+        "truth_state": "true",
+        "confidence_above": 0.6
+      }
+    ]
+  },
+  {
+    "name": "bmb_stock_revision",
+    "description": "Belief about stock price revised with contradicting data, then confirmed.",
+    "category": "belief_revision",
+    "requires": [
+      "revise",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_bullish",
+        "type": "store",
+        "claim": "ACME stock will rise",
+        "belief_type": "prediction",
+        "evidence": [
+          {
+            "content": "Analyst report: ACME fundamentals strong",
+            "polarity": "supports",
+            "weight": 0.8,
+            "reliability": 0.85,
+            "source_ref": "analyst_t1",
+            "belief_type": "prediction"
+          }
+        ]
+      },
+      {
+        "label": "store_bearish",
+        "type": "store",
+        "claim": "ACME stock will rise",
+        "evidence": [
+          {
+            "content": "Market crash: sector-wide sell-off",
+            "polarity": "attacks",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "market_t2",
+            "belief_type": "prediction"
+          }
+        ]
+      },
+      {
+        "label": "revise_recovery",
+        "type": "revise",
+        "target_label": "store_bullish",
+        "evidence": [
+          {
+            "content": "ACME beats earnings estimates by 30%, stock rebounds",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.95,
+            "source_ref": "earnings_t3"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_bearish",
+        "truth_state": "both"
+      },
+      {
+        "action_label": "revise_recovery",
+        "truth_state": "both"
+      }
+    ]
+  },
+  {
+    "name": "bmb_policy_revision_recency",
+    "description": "Older evidence superseded by newer evidence on the same topic.",
+    "category": "belief_revision",
+    "requires": [
+      "revise",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_old",
+        "type": "store",
+        "claim": "company policy allows remote work on Fridays",
+        "evidence": [
+          {
+            "content": "2023 employee handbook states remote Fridays allowed",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "handbook_2023"
+          }
+        ]
+      },
+      {
+        "label": "revise_new",
+        "type": "revise",
+        "target_label": "store_old",
+        "evidence": [
+          {
+            "content": "2024 policy update: remote Fridays discontinued",
+            "polarity": "attacks",
+            "weight": 0.95,
+            "reliability": 0.98,
+            "source_ref": "policy_update_2024"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "revise_new",
+        "truth_state": "both"
+      }
+    ]
+  },
+  {
+    "name": "bmb_revision_strengthening",
+    "description": "Multiple supporting evidence items strengthen a belief progressively.",
+    "category": "belief_revision",
+    "requires": [
+      "revise",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_initial",
+        "type": "store",
+        "claim": "user is a senior software engineer",
+        "evidence": [
+          {
+            "content": "User mentioned 8 years of coding experience",
+            "polarity": "supports",
+            "weight": 0.6,
+            "reliability": 0.7,
+            "source_ref": "convo_t1"
+          }
+        ]
+      },
+      {
+        "label": "revise_e2",
+        "type": "revise",
+        "target_label": "store_initial",
+        "evidence": [
+          {
+            "content": "LinkedIn shows Staff Engineer title at FAANG",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "linkedin_t2"
+          }
+        ]
+      },
+      {
+        "label": "revise_e3",
+        "type": "revise",
+        "target_label": "store_initial",
+        "evidence": [
+          {
+            "content": "Published 3 tech talks at major conferences",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "conferences_t3"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "revise_e3",
+        "truth_state": "true",
+        "confidence_above": 0.6
+      }
+    ]
+  },
+  {
+    "name": "bmb_revision_weakening",
+    "description": "Attacking evidence weakens a belief but does not flip it until third piece.",
+    "category": "belief_revision",
+    "requires": [
+      "revise",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_reliable",
+        "type": "store",
+        "claim": "service X has 99.9% uptime",
+        "evidence": [
+          {
+            "content": "SLA dashboard shows 99.95% uptime last quarter",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.98,
+            "source_ref": "sla_t1"
+          }
+        ]
+      },
+      {
+        "label": "revise_incident",
+        "type": "revise",
+        "target_label": "store_reliable",
+        "evidence": [
+          {
+            "content": "Major outage lasting 4 hours reported",
+            "polarity": "attacks",
+            "weight": 0.8,
+            "reliability": 0.9,
+            "source_ref": "incident_t2"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "revise_incident",
+        "truth_state": "both"
+      }
+    ]
+  },
+  {
+    "name": "bmb_explain_employment_change",
+    "description": "User employment changes; explain() must return evidence chain with timestamps.",
+    "category": "evidence_tracking",
+    "requires": [
+      "explain",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_google",
+        "type": "store",
+        "claim": "Alice works at Google",
+        "evidence": [
+          {
+            "content": "Alice mentioned working at Google",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "conversation_2024_01"
+          }
+        ]
+      },
+      {
+        "label": "store_anthropic",
+        "type": "store",
+        "claim": "Alice works at Google",
+        "evidence": [
+          {
+            "content": "Alice announced she moved to Anthropic",
+            "polarity": "attacks",
+            "weight": 0.95,
+            "reliability": 0.95,
+            "source_ref": "announcement_2024_06"
+          }
+        ]
+      },
+      {
+        "label": "explain_alice",
+        "type": "explain",
+        "claim": "Alice works at Google"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_anthropic",
+        "truth_state": "both"
+      },
+      {
+        "action_label": "explain_alice",
+        "explanation_has_evidence": true,
+        "explanation_supporting_count_gte": 1,
+        "explanation_attacking_count_gte": 1
+      }
+    ]
+  },
+  {
+    "name": "bmb_explain_retracted_evidence",
+    "description": "Evidence is retracted; explain() must show expired evidence separately.",
+    "category": "evidence_tracking",
+    "requires": [
+      "explain",
+      "retract",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_city_old",
+        "type": "store",
+        "claim": "user lives in New York",
+        "evidence": [
+          {
+            "content": "User address on file shows NYC",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "address_t1"
+          }
+        ]
+      },
+      {
+        "label": "store_city_new",
+        "type": "store",
+        "claim": "user lives in New York",
+        "evidence": [
+          {
+            "content": "Coworker confirmed user lives in NYC area",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.85,
+            "source_ref": "coworker_t2"
+          }
+        ]
+      },
+      {
+        "label": "retract_old",
+        "type": "retract",
+        "target_label": "store_city_old"
+      },
+      {
+        "label": "explain_city",
+        "type": "explain",
+        "claim": "user lives in New York"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "explain_city",
+        "explanation_has_evidence": true,
+        "explanation_expired_count_gte": 1
+      }
+    ]
+  },
+  {
+    "name": "bmb_explain_multi_source",
+    "description": "Multiple sources support a belief; explain() must enumerate all.",
+    "category": "evidence_tracking",
+    "requires": [
+      "explain",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_e1",
+        "type": "store",
+        "claim": "user is proficient in Python",
+        "evidence": [
+          {
+            "content": "User completed advanced Python certification",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "cert_2024"
+          }
+        ]
+      },
+      {
+        "label": "store_e2",
+        "type": "store",
+        "claim": "user is proficient in Python",
+        "evidence": [
+          {
+            "content": "User has 50+ Python repos on GitHub",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "github_2024"
+          }
+        ]
+      },
+      {
+        "label": "store_e3",
+        "type": "store",
+        "claim": "user is proficient in Python",
+        "evidence": [
+          {
+            "content": "User teaches Python at a bootcamp",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "teaching_2024"
+          }
+        ]
+      },
+      {
+        "label": "explain_python",
+        "type": "explain",
+        "claim": "user is proficient in Python"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "explain_python",
+        "explanation_has_evidence": true,
+        "explanation_supporting_count_gte": 3
+      }
+    ]
+  },
+  {
+    "name": "bmb_explain_attack_chain",
+    "description": "Explain a belief with both supporting and attacking evidence.",
+    "category": "evidence_tracking",
+    "requires": [
+      "explain",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_support",
+        "type": "store",
+        "claim": "product X is reliable",
+        "evidence": [
+          {
+            "content": "Product X has 4.8 star rating from 10000 reviews",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "reviews_t1"
+          },
+          {
+            "content": "Product X has 99.5% satisfaction rate",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.85,
+            "source_ref": "survey_t1"
+          }
+        ]
+      },
+      {
+        "label": "store_attack",
+        "type": "store",
+        "claim": "product X is reliable",
+        "evidence": [
+          {
+            "content": "Recent batch recall due to defect affecting 5% of units",
+            "polarity": "attacks",
+            "weight": 0.8,
+            "reliability": 0.95,
+            "source_ref": "recall_notice_t2"
+          }
+        ]
+      },
+      {
+        "label": "explain_product",
+        "type": "explain",
+        "claim": "product X is reliable"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "explain_product",
+        "explanation_has_evidence": true,
+        "explanation_supporting_count_gte": 2,
+        "explanation_attacking_count_gte": 1
+      }
+    ]
+  },
+  {
+    "name": "bmb_explain_no_hallucination",
+    "description": "Query a belief that was never stored; explain must return no evidence, not hallucinate.",
+    "category": "evidence_tracking",
+    "requires": [
+      "explain"
+    ],
+    "actions": [
+      {
+        "label": "explain_nonexistent",
+        "type": "explain",
+        "claim": "user has been to Mars"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "explain_nonexistent",
+        "explanation_has_evidence": false
+      }
+    ]
+  },
+  {
+    "name": "bmb_explain_confidence_matches_evidence",
+    "description": "Confidence should reflect evidence weight; strong support = high confidence.",
+    "category": "evidence_tracking",
+    "requires": [
+      "explain",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_strong",
+        "type": "store",
+        "claim": "user speaks French fluently",
+        "evidence": [
+          {
+            "content": "User holds DALF C2 French certification",
+            "polarity": "supports",
+            "weight": 0.98,
+            "reliability": 0.99,
+            "source_ref": "cert_t1"
+          },
+          {
+            "content": "User conducted a 2-hour interview in French",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.95,
+            "source_ref": "interview_t1"
+          }
+        ]
+      },
+      {
+        "label": "explain_french",
+        "type": "explain",
+        "claim": "user speaks French fluently"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "explain_french",
+        "explanation_has_evidence": true,
+        "truth_state": "true",
+        "confidence_above": 0.6
+      }
+    ]
+  },
+  {
+    "name": "bmb_prediction_decay_3days",
+    "description": "A prediction's confidence should decay significantly after 3+ days (half-life = 3 days).",
+    "category": "temporal",
+    "requires": [
+      "decay",
+      "query",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_weather",
+        "type": "store",
+        "belief_type": "prediction",
+        "claim": "it will rain tomorrow",
+        "evidence": [
+          {
+            "content": "Weather forecast says rain tomorrow",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "forecast_t1",
+            "belief_type": "prediction"
+          }
+        ]
+      },
+      {
+        "label": "wait",
+        "type": "wait_days",
+        "wait_days": 5
+      },
+      {
+        "label": "query_weather",
+        "type": "query",
+        "claim": "it will rain tomorrow"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_weather",
+        "truth_state": "neither"
+      }
+    ]
+  },
+  {
+    "name": "bmb_fact_no_decay",
+    "description": "A fact (half-life 365 days) should persist after 30 days.",
+    "category": "temporal",
+    "requires": [
+      "decay",
+      "query",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_fact",
+        "type": "store",
+        "belief_type": "fact",
+        "claim": "user's birthday is March 15",
+        "evidence": [
+          {
+            "content": "User verified birthday on government ID",
+            "polarity": "supports",
+            "weight": 1.0,
+            "reliability": 1.0,
+            "source_ref": "id_check",
+            "belief_type": "fact"
+          }
+        ]
+      },
+      {
+        "label": "wait",
+        "type": "wait_days",
+        "wait_days": 30
+      },
+      {
+        "label": "query_birthday",
+        "type": "query",
+        "claim": "user's birthday is March 15"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_birthday",
+        "truth_state": "true"
+      }
+    ]
+  },
+  {
+    "name": "bmb_preference_gradual_decay",
+    "description": "A preference (half-life 90 days) should lose confidence over 180 days.",
+    "category": "temporal",
+    "requires": [
+      "decay",
+      "query",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_pref",
+        "type": "store",
+        "belief_type": "preference",
+        "claim": "user prefers dark mode",
+        "evidence": [
+          {
+            "content": "User toggled dark mode on",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "settings_t1",
+            "belief_type": "preference"
+          }
+        ]
+      },
+      {
+        "label": "wait",
+        "type": "wait_days",
+        "wait_days": 180
+      },
+      {
+        "label": "query_pref",
+        "type": "query",
+        "claim": "user prefers dark mode"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_pref",
+        "confidence_below": 0.7
+      }
+    ]
+  },
+  {
+    "name": "bmb_inference_decay_medium",
+    "description": "An inference (half-life 30 days) should decay after 60 days.",
+    "category": "temporal",
+    "requires": [
+      "decay",
+      "query",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_inference",
+        "type": "store",
+        "belief_type": "inference",
+        "claim": "user is interested in machine learning",
+        "evidence": [
+          {
+            "content": "User read 5 ML articles this week",
+            "polarity": "supports",
+            "weight": 0.8,
+            "reliability": 0.85,
+            "source_ref": "reading_t1",
+            "belief_type": "inference"
+          }
+        ]
+      },
+      {
+        "label": "wait",
+        "type": "wait_days",
+        "wait_days": 60
+      },
+      {
+        "label": "query_ml",
+        "type": "query",
+        "claim": "user is interested in machine learning"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_ml",
+        "confidence_below": 0.6
+      }
+    ]
+  },
+  {
+    "name": "bmb_temporal_fresh_beats_stale",
+    "description": "Fresh evidence on same belief should have higher effective weight than stale evidence.",
+    "category": "temporal",
+    "requires": [
+      "decay",
+      "query",
+      "revise",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_old",
+        "type": "store",
+        "belief_type": "inference",
+        "claim": "user is learning Rust",
+        "evidence": [
+          {
+            "content": "User started a Rust tutorial",
+            "polarity": "supports",
+            "weight": 0.7,
+            "reliability": 0.8,
+            "source_ref": "tutorial_t1",
+            "belief_type": "inference"
+          }
+        ]
+      },
+      {
+        "label": "wait",
+        "type": "wait_days",
+        "wait_days": 90
+      },
+      {
+        "label": "revise_fresh",
+        "type": "revise",
+        "target_label": "store_old",
+        "evidence": [
+          {
+            "content": "User published a Rust crate on crates.io",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "crates_io_t2"
+          }
+        ]
+      },
+      {
+        "label": "query_rust",
+        "type": "query",
+        "claim": "user is learning Rust"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_rust",
+        "truth_state": "true",
+        "confidence_above": 0.4
+      }
+    ]
+  },
+  {
+    "name": "bmb_prediction_with_time_validity",
+    "description": "A prediction with explicit time_validity should expire when that time passes.",
+    "category": "temporal",
+    "requires": [
+      "decay",
+      "query",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_pred",
+        "type": "store",
+        "belief_type": "prediction",
+        "claim": "user will attend the conference next week",
+        "evidence": [
+          {
+            "content": "User confirmed attendance for next week's conference",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "rsvp_t1",
+            "belief_type": "prediction"
+          }
+        ]
+      },
+      {
+        "label": "wait",
+        "type": "wait_days",
+        "wait_days": 14
+      },
+      {
+        "label": "query_conference",
+        "type": "query",
+        "claim": "user will attend the conference next week"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_conference",
+        "truth_state": "neither"
+      }
+    ]
+  },
+  {
+    "name": "bmb_sandbox_server_overload",
+    "description": "Hypothetical: what if server load exceeds capacity? Sandbox simulation without modifying canonical.",
+    "category": "counterfactual",
+    "requires": [
+      "query",
+      "sandbox",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_capacity",
+        "type": "store",
+        "claim": "server capacity is 1000 concurrent users",
+        "evidence": [
+          {
+            "content": "Load test shows max capacity at 1000 users",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.98,
+            "source_ref": "load_test_t1"
+          }
+        ]
+      },
+      {
+        "label": "store_load",
+        "type": "store",
+        "claim": "current server load is 900 users",
+        "evidence": [
+          {
+            "content": "Monitoring dashboard shows 900 active users",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "monitoring_t1"
+          }
+        ]
+      },
+      {
+        "label": "fork",
+        "type": "sandbox_fork",
+        "scenario_label": "overload_scenario"
+      },
+      {
+        "label": "assume_overload",
+        "type": "sandbox_assume",
+        "sandbox_label": "fork",
+        "belief_label": "store_load",
+        "truth_state_override": "false"
+      },
+      {
+        "label": "resolve_load",
+        "type": "sandbox_resolve",
+        "sandbox_label": "fork",
+        "belief_label": "store_load"
+      },
+      {
+        "label": "discard",
+        "type": "sandbox_discard",
+        "sandbox_label": "fork"
+      },
+      {
+        "label": "query_load_after",
+        "type": "query",
+        "claim": "current server load is 900 users"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "resolve_load",
+        "sandbox_resolved_state": "false",
+        "sandbox_canonical_unchanged": true
+      },
+      {
+        "action_label": "query_load_after",
+        "truth_state": "true"
+      }
+    ]
+  },
+  {
+    "name": "bmb_sandbox_pricing_change",
+    "description": "What-if analysis: what if we change pricing? Sandbox explores without affecting canonical beliefs.",
+    "category": "counterfactual",
+    "requires": [
+      "query",
+      "sandbox",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_price",
+        "type": "store",
+        "claim": "product price is $49.99",
+        "evidence": [
+          {
+            "content": "Current price tag shows $49.99",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.99,
+            "source_ref": "price_list_t1"
+          }
+        ]
+      },
+      {
+        "label": "fork_pricing",
+        "type": "sandbox_fork",
+        "scenario_label": "pricing_experiment"
+      },
+      {
+        "label": "assume_new_price",
+        "type": "sandbox_assume",
+        "sandbox_label": "fork_pricing",
+        "belief_label": "store_price",
+        "truth_state_override": "false"
+      },
+      {
+        "label": "resolve_price",
+        "type": "sandbox_resolve",
+        "sandbox_label": "fork_pricing",
+        "belief_label": "store_price"
+      },
+      {
+        "label": "discard_pricing",
+        "type": "sandbox_discard",
+        "sandbox_label": "fork_pricing"
+      },
+      {
+        "label": "query_price_canonical",
+        "type": "query",
+        "claim": "product price is $49.99"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "resolve_price",
+        "sandbox_resolved_state": "false"
+      },
+      {
+        "action_label": "query_price_canonical",
+        "truth_state": "true"
+      }
+    ]
+  },
+  {
+    "name": "bmb_sandbox_diet_change",
+    "description": "What if user changed diet? Sandbox explores hypothetical without modifying real beliefs.",
+    "category": "counterfactual",
+    "requires": [
+      "query",
+      "sandbox",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_vegan",
+        "type": "store",
+        "claim": "user follows a vegan diet",
+        "evidence": [
+          {
+            "content": "User stated they are vegan for 3 years",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "statement_t1"
+          }
+        ]
+      },
+      {
+        "label": "fork_diet",
+        "type": "sandbox_fork",
+        "scenario_label": "diet_change"
+      },
+      {
+        "label": "assume_not_vegan",
+        "type": "sandbox_assume",
+        "sandbox_label": "fork_diet",
+        "belief_label": "store_vegan",
+        "truth_state_override": "false"
+      },
+      {
+        "label": "resolve_diet",
+        "type": "sandbox_resolve",
+        "sandbox_label": "fork_diet",
+        "belief_label": "store_vegan"
+      },
+      {
+        "label": "discard_diet",
+        "type": "sandbox_discard",
+        "sandbox_label": "fork_diet"
+      },
+      {
+        "label": "query_diet_canonical",
+        "type": "query",
+        "claim": "user follows a vegan diet"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "resolve_diet",
+        "sandbox_resolved_state": "false",
+        "sandbox_canonical_unchanged": true
+      },
+      {
+        "action_label": "query_diet_canonical",
+        "truth_state": "true"
+      }
+    ]
+  },
+  {
+    "name": "bmb_sandbox_deployment_risk",
+    "description": "What if deployment fails? Sandbox explores risk without modifying production beliefs.",
+    "category": "counterfactual",
+    "requires": [
+      "query",
+      "sandbox",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_deploy",
+        "type": "store",
+        "claim": "deployment pipeline is healthy",
+        "evidence": [
+          {
+            "content": "All CI/CD checks pass, last 10 deploys successful",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "ci_dashboard_t1"
+          }
+        ]
+      },
+      {
+        "label": "fork_deploy",
+        "type": "sandbox_fork",
+        "scenario_label": "deploy_failure"
+      },
+      {
+        "label": "assume_failure",
+        "type": "sandbox_assume",
+        "sandbox_label": "fork_deploy",
+        "belief_label": "store_deploy",
+        "truth_state_override": "false"
+      },
+      {
+        "label": "resolve_deploy",
+        "type": "sandbox_resolve",
+        "sandbox_label": "fork_deploy",
+        "belief_label": "store_deploy"
+      },
+      {
+        "label": "discard_deploy",
+        "type": "sandbox_discard",
+        "sandbox_label": "fork_deploy"
+      },
+      {
+        "label": "query_deploy_after",
+        "type": "query",
+        "claim": "deployment pipeline is healthy"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "resolve_deploy",
+        "sandbox_resolved_state": "false",
+        "sandbox_canonical_unchanged": true
+      },
+      {
+        "action_label": "query_deploy_after",
+        "truth_state": "true"
+      }
+    ]
+  },
+  {
+    "name": "bmb_sandbox_market_scenario",
+    "description": "Market crash scenario: sandbox explores downside without affecting canonical market beliefs.",
+    "category": "counterfactual",
+    "requires": [
+      "query",
+      "sandbox",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_market",
+        "type": "store",
+        "claim": "market sentiment is bullish",
+        "evidence": [
+          {
+            "content": "VIX at historic lows, S&P at all-time high",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.9,
+            "source_ref": "market_data_t1"
+          }
+        ]
+      },
+      {
+        "label": "fork_crash",
+        "type": "sandbox_fork",
+        "scenario_label": "market_crash"
+      },
+      {
+        "label": "assume_crash",
+        "type": "sandbox_assume",
+        "sandbox_label": "fork_crash",
+        "belief_label": "store_market",
+        "truth_state_override": "false"
+      },
+      {
+        "label": "resolve_market",
+        "type": "sandbox_resolve",
+        "sandbox_label": "fork_crash",
+        "belief_label": "store_market"
+      },
+      {
+        "label": "discard_crash",
+        "type": "sandbox_discard",
+        "sandbox_label": "fork_crash"
+      },
+      {
+        "label": "query_market_canonical",
+        "type": "query",
+        "claim": "market sentiment is bullish"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "resolve_market",
+        "sandbox_resolved_state": "false"
+      },
+      {
+        "action_label": "query_market_canonical",
+        "truth_state": "true"
+      }
+    ]
+  },
+  {
+    "name": "bmb_sandbox_hiring_decision",
+    "description": "What if we hire candidate X? Explore hypothetical with sandbox, then discard.",
+    "category": "counterfactual",
+    "requires": [
+      "query",
+      "sandbox",
+      "store"
+    ],
+    "actions": [
+      {
+        "label": "store_team_size",
+        "type": "store",
+        "claim": "engineering team has 5 members",
+        "evidence": [
+          {
+            "content": "HR records show 5 engineers on the team",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.99,
+            "source_ref": "hr_system_t1"
+          }
+        ]
+      },
+      {
+        "label": "fork_hire",
+        "type": "sandbox_fork",
+        "scenario_label": "hire_candidate_x"
+      },
+      {
+        "label": "assume_hired",
+        "type": "sandbox_assume",
+        "sandbox_label": "fork_hire",
+        "belief_label": "store_team_size",
+        "truth_state_override": "false"
+      },
+      {
+        "label": "resolve_team",
+        "type": "sandbox_resolve",
+        "sandbox_label": "fork_hire",
+        "belief_label": "store_team_size"
+      },
+      {
+        "label": "discard_hire",
+        "type": "sandbox_discard",
+        "sandbox_label": "fork_hire"
+      },
+      {
+        "label": "query_team_canonical",
+        "type": "query",
+        "claim": "engineering team has 5 members"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "resolve_team",
+        "sandbox_resolved_state": "false",
+        "sandbox_canonical_unchanged": true
+      },
+      {
+        "action_label": "query_team_canonical",
+        "truth_state": "true"
+      }
+    ]
+  },
+  {
+    "name": "bmb_consolidation_basic",
+    "description": "3 similar language proficiency claims compress into semantic belief via consolidation",
+    "category": "consolidation",
+    "requires": [
+      "store",
+      "consolidation"
+    ],
+    "actions": [
+      {
+        "label": "store_spanish1",
+        "type": "store",
+        "claim": "user speaks fluent Spanish",
+        "evidence": [
+          {
+            "content": "Language test confirmed fluent Spanish ability",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "language_test"
+          }
+        ]
+      },
+      {
+        "label": "store_spanish2",
+        "type": "store",
+        "claim": "user is proficient in Spanish",
+        "evidence": [
+          {
+            "content": "Teacher noted Spanish proficiency",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.95,
+            "source_ref": "teacher_note"
+          }
+        ]
+      },
+      {
+        "label": "store_spanish3",
+        "type": "store",
+        "claim": "user communicates well in Spanish",
+        "evidence": [
+          {
+            "content": "User demonstrated fluent Spanish communication",
+            "polarity": "supports",
+            "weight": 0.8,
+            "reliability": 0.85,
+            "source_ref": "conversation_record"
+          }
+        ]
+      },
+      {
+        "label": "consolidate_lang",
+        "type": "consolidate"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "consolidate_lang",
+        "semantic_beliefs_created_gte": 1
+      }
+    ]
+  },
+  {
+    "name": "bmb_consolidation_preserves_query",
+    "description": "Semantic belief is retrievable after consolidation",
+    "category": "consolidation",
+    "requires": [
+      "store",
+      "consolidation"
+    ],
+    "actions": [
+      {
+        "label": "store_french1",
+        "type": "store",
+        "claim": "user speaks fluent French",
+        "evidence": [
+          {
+            "content": "Language exam confirmed fluent French",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "exam_record"
+          }
+        ]
+      },
+      {
+        "label": "store_french2",
+        "type": "store",
+        "claim": "user is proficient in French",
+        "evidence": [
+          {
+            "content": "Teacher reported French proficiency",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.88,
+            "source_ref": "teacher_report"
+          }
+        ]
+      },
+      {
+        "label": "store_french3",
+        "type": "store",
+        "claim": "user communicates well in French",
+        "evidence": [
+          {
+            "content": "Colleague noted good French communication skills",
+            "polarity": "supports",
+            "weight": 0.8,
+            "reliability": 0.9,
+            "source_ref": "colleague_note"
+          }
+        ]
+      },
+      {
+        "label": "consolidate_french",
+        "type": "consolidate"
+      },
+      {
+        "label": "query_french",
+        "type": "query",
+        "claim": "French language ability"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_french",
+        "query_returns_claim": true
+      }
+    ]
+  },
+  {
+    "name": "bmb_consolidation_pruning",
+    "description": "Low-confidence episodics pruned post-consolidation",
+    "category": "consolidation",
+    "requires": [
+      "store",
+      "consolidation"
+    ],
+    "actions": [
+      {
+        "label": "store_low1",
+        "type": "store",
+        "claim": "user might like drinking tea",
+        "evidence": [
+          {
+            "content": "Uncertain observation about tea preference",
+            "polarity": "supports",
+            "weight": 0.1,
+            "reliability": 0.2,
+            "source_ref": "weak_obs_1"
+          }
+        ]
+      },
+      {
+        "label": "store_low2",
+        "type": "store",
+        "claim": "user may prefer drinking tea",
+        "evidence": [
+          {
+            "content": "Vague note that user may prefer drinking tea",
+            "polarity": "supports",
+            "weight": 0.1,
+            "reliability": 0.2,
+            "source_ref": "weak_obs_2"
+          }
+        ]
+      },
+      {
+        "label": "store_low3",
+        "type": "store",
+        "claim": "user possibly enjoys tea",
+        "evidence": [
+          {
+            "content": "Weak signal: user possibly enjoys tea",
+            "polarity": "supports",
+            "weight": 0.1,
+            "reliability": 0.2,
+            "source_ref": "weak_obs_3"
+          }
+        ]
+      },
+      {
+        "label": "consolidate_low",
+        "type": "consolidate"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "consolidate_low",
+        "episodics_pruned_gte": 0
+      }
+    ]
+  },
+  {
+    "name": "bmb_consolidation_skips_both",
+    "description": "BOTH-state beliefs excluded from consolidation; normal cluster still processes safely",
+    "category": "consolidation",
+    "requires": [
+      "store",
+      "consolidation"
+    ],
+    "actions": [
+      {
+        "label": "store_veg",
+        "type": "store",
+        "claim": "user is vegetarian",
+        "evidence": [
+          {
+            "content": "User claimed to be vegetarian",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "veg_claim"
+          }
+        ]
+      },
+      {
+        "label": "store_steak",
+        "type": "store",
+        "claim": "user is vegetarian",
+        "evidence": [
+          {
+            "content": "User was seen eating steak",
+            "polarity": "attacks",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "steak_obs"
+          }
+        ]
+      },
+      {
+        "label": "store_runs1",
+        "type": "store",
+        "claim": "user enjoys running outdoors",
+        "evidence": [
+          {
+            "content": "User mentioned jogging in the park",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.85,
+            "source_ref": "exercise_log"
+          }
+        ]
+      },
+      {
+        "label": "store_runs2",
+        "type": "store",
+        "claim": "user likes outdoor running",
+        "evidence": [
+          {
+            "content": "User tracks runs outdoors daily",
+            "polarity": "supports",
+            "weight": 0.88,
+            "reliability": 0.88,
+            "source_ref": "fitness_app"
+          }
+        ]
+      },
+      {
+        "label": "store_runs3",
+        "type": "store",
+        "claim": "user loves running outside",
+        "evidence": [
+          {
+            "content": "User set a goal for running outside every morning",
+            "polarity": "supports",
+            "weight": 0.82,
+            "reliability": 0.9,
+            "source_ref": "goal_tracker"
+          }
+        ]
+      },
+      {
+        "label": "consolidate_both",
+        "type": "consolidate"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "consolidate_both",
+        "semantic_beliefs_created_gte": 0
+      }
+    ]
+  },
+  {
+    "name": "bmb_consolidation_confidence_agg",
+    "description": "Consolidated belief confidence reflects weighted aggregate of source beliefs",
+    "category": "consolidation",
+    "requires": [
+      "store",
+      "consolidation"
+    ],
+    "actions": [
+      {
+        "label": "store_conf1",
+        "type": "store",
+        "claim": "user wakes up early every morning",
+        "evidence": [
+          {
+            "content": "User reported waking up at 5am",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "sleep_study"
+          }
+        ]
+      },
+      {
+        "label": "store_conf2",
+        "type": "store",
+        "claim": "user gets up early each morning",
+        "evidence": [
+          {
+            "content": "Sleep tracker shows consistent 5:30am wake time",
+            "polarity": "supports",
+            "weight": 0.7,
+            "reliability": 0.85,
+            "source_ref": "sleep_tracker"
+          }
+        ]
+      },
+      {
+        "label": "store_conf3",
+        "type": "store",
+        "claim": "user wakes up early every day",
+        "evidence": [
+          {
+            "content": "Calendar shows 5am meetings booked regularly",
+            "polarity": "supports",
+            "weight": 0.8,
+            "reliability": 0.8,
+            "source_ref": "calendar_data"
+          }
+        ]
+      },
+      {
+        "label": "consolidate_conf",
+        "type": "consolidate"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "consolidate_conf",
+        "semantic_beliefs_created_gte": 0
+      }
+    ]
+  },
+  {
+    "name": "bmb_consolidation_no_undersized_cluster",
+    "description": "Clusters below min_cluster_size not consolidated \u2014 only 2 similar beliefs provided",
+    "category": "consolidation",
+    "requires": [
+      "store",
+      "consolidation"
+    ],
+    "actions": [
+      {
+        "label": "store_pair1",
+        "type": "store",
+        "claim": "user prefers window seats on flights",
+        "evidence": [
+          {
+            "content": "User always selects window seat when booking",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "booking_history"
+          }
+        ]
+      },
+      {
+        "label": "store_pair2",
+        "type": "store",
+        "claim": "user likes to sit by the window on planes",
+        "evidence": [
+          {
+            "content": "Flight records show consistent window seat preference",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.88,
+            "source_ref": "flight_records"
+          }
+        ]
+      },
+      {
+        "label": "consolidate_pair",
+        "type": "consolidate"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "consolidate_pair",
+        "semantic_beliefs_created": 0
+      }
+    ]
+  },
+  {
+    "name": "bmb_multihop_dietary_constraint",
+    "description": "Multi-hop retrieval links dietary constraint to restaurant choice via shared source",
+    "category": "multihop_retrieval",
+    "requires": [
+      "store",
+      "hipporag"
+    ],
+    "actions": [
+      {
+        "label": "store_gluten",
+        "type": "store",
+        "claim": "user has gluten intolerance",
+        "evidence": [
+          {
+            "content": "Medical report confirmed gluten intolerance",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.95,
+            "source_ref": "dietary_profile_001"
+          }
+        ]
+      },
+      {
+        "label": "store_restaurant",
+        "type": "store",
+        "claim": "user needs gluten-free restaurant options",
+        "evidence": [
+          {
+            "content": "User requested gluten-free menu when dining out",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "dietary_profile_001"
+          }
+        ]
+      },
+      {
+        "label": "store_avoid",
+        "type": "store",
+        "claim": "user avoids wheat and barley",
+        "evidence": [
+          {
+            "content": "Nutritionist confirmed user must avoid wheat and barley",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.92,
+            "source_ref": "dietary_profile_001"
+          }
+        ]
+      },
+      {
+        "label": "query_gluten_multihop",
+        "type": "query_multihop",
+        "claim": "gluten-free dining"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_gluten_multihop",
+        "multihop_returns_claim": true
+      }
+    ]
+  },
+  {
+    "name": "bmb_multihop_causal_chain",
+    "description": "3-hop causal chain retrieved via graph traversal",
+    "category": "multihop_retrieval",
+    "requires": [
+      "store",
+      "hipporag"
+    ],
+    "actions": [
+      {
+        "label": "store_stress",
+        "type": "store",
+        "claim": "user experiences work-related stress",
+        "evidence": [
+          {
+            "content": "User reported high stress from deadlines",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.88,
+            "source_ref": "health_survey_2024"
+          }
+        ]
+      },
+      {
+        "label": "store_sleep",
+        "type": "store",
+        "claim": "stress causes user to have poor sleep",
+        "evidence": [
+          {
+            "content": "Sleep tracker shows disrupted sleep correlated with work stress",
+            "polarity": "supports",
+            "weight": 0.82,
+            "reliability": 0.85,
+            "source_ref": "health_survey_2024"
+          }
+        ]
+      },
+      {
+        "label": "store_fatigue",
+        "type": "store",
+        "claim": "poor sleep leads to user fatigue during the day",
+        "evidence": [
+          {
+            "content": "User reports daytime fatigue linked to poor sleep quality",
+            "polarity": "supports",
+            "weight": 0.8,
+            "reliability": 0.85,
+            "source_ref": "health_survey_2024"
+          }
+        ]
+      },
+      {
+        "label": "query_causal",
+        "type": "query_multihop",
+        "claim": "user stress health"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_causal",
+        "multihop_returns_claim": true
+      }
+    ]
+  },
+  {
+    "name": "bmb_multihop_direct_query",
+    "description": "Simple direct query succeeds in both standard and multihop modes",
+    "category": "multihop_retrieval",
+    "requires": [
+      "store",
+      "hipporag"
+    ],
+    "actions": [
+      {
+        "label": "store_name",
+        "type": "store",
+        "claim": "user's name is Alice",
+        "evidence": [
+          {
+            "content": "User introduced themselves as Alice",
+            "polarity": "supports",
+            "weight": 0.99,
+            "reliability": 0.99,
+            "source_ref": "intro_session"
+          }
+        ]
+      },
+      {
+        "label": "query_name_direct",
+        "type": "query",
+        "claim": "user name"
+      },
+      {
+        "label": "query_name_multihop",
+        "type": "query_multihop",
+        "claim": "user name"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_name_direct",
+        "query_returns_claim": true
+      },
+      {
+        "action_label": "query_name_multihop",
+        "multihop_returns_claim": true
+      }
+    ]
+  },
+  {
+    "name": "bmb_multihop_cross_domain",
+    "description": "Beliefs across domains linked by shared entity via graph",
+    "category": "multihop_retrieval",
+    "requires": [
+      "store",
+      "hipporag"
+    ],
+    "actions": [
+      {
+        "label": "store_location",
+        "type": "store",
+        "claim": "user lives in San Francisco",
+        "evidence": [
+          {
+            "content": "User's registered address is in San Francisco",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.95,
+            "source_ref": "user_profile_bob"
+          }
+        ]
+      },
+      {
+        "label": "store_job",
+        "type": "store",
+        "claim": "user works at a tech company in the Bay Area",
+        "evidence": [
+          {
+            "content": "LinkedIn profile shows Bay Area tech employment",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "user_profile_bob"
+          }
+        ]
+      },
+      {
+        "label": "store_commute",
+        "type": "store",
+        "claim": "user commutes by bicycle in San Francisco",
+        "evidence": [
+          {
+            "content": "User mentioned cycling to work in the city",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.88,
+            "source_ref": "user_profile_bob"
+          }
+        ]
+      },
+      {
+        "label": "query_sf_multihop",
+        "type": "query_multihop",
+        "claim": "San Francisco lifestyle"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_sf_multihop",
+        "multihop_returns_claim": true
+      }
+    ]
+  },
+  {
+    "name": "bmb_multihop_evidence_provenance",
+    "description": "Retrieval follows evidence dependency edges from shared source",
+    "category": "multihop_retrieval",
+    "requires": [
+      "store",
+      "hipporag"
+    ],
+    "actions": [
+      {
+        "label": "store_finding1",
+        "type": "store",
+        "claim": "user has elevated cholesterol",
+        "evidence": [
+          {
+            "content": "Blood panel from 2024 annual checkup shows elevated LDL",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.97,
+            "source_ref": "annual_checkup_2024"
+          }
+        ]
+      },
+      {
+        "label": "store_finding2",
+        "type": "store",
+        "claim": "user should reduce saturated fat intake",
+        "evidence": [
+          {
+            "content": "Doctor recommended reducing saturated fat based on 2024 checkup results",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.95,
+            "source_ref": "annual_checkup_2024"
+          }
+        ]
+      },
+      {
+        "label": "query_cholesterol",
+        "type": "query_multihop",
+        "claim": "cholesterol health recommendation"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_cholesterol",
+        "multihop_returns_claim": true
+      }
+    ]
+  },
+  {
+    "name": "bmb_multihop_retracted_excluded",
+    "description": "Retracted beliefs excluded from graph traversal; remaining beliefs still retrievable",
+    "category": "multihop_retrieval",
+    "requires": [
+      "store",
+      "hipporag",
+      "retract"
+    ],
+    "actions": [
+      {
+        "label": "store_old_address",
+        "type": "store",
+        "claim": "user lives in New York",
+        "evidence": [
+          {
+            "content": "Old address record shows New York residence",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "address_history"
+          }
+        ]
+      },
+      {
+        "label": "store_new_address",
+        "type": "store",
+        "claim": "user relocated to Austin Texas",
+        "evidence": [
+          {
+            "content": "Relocation confirmed via updated mailing address",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.95,
+            "source_ref": "address_history"
+          }
+        ]
+      },
+      {
+        "label": "retract_old",
+        "type": "retract",
+        "target_label": "store_old_address"
+      },
+      {
+        "label": "query_location",
+        "type": "query_multihop",
+        "claim": "user current location"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_location",
+        "multihop_returns_claim": true
+      }
+    ]
+  },
+  {
+    "name": "bmb_separation_similar_claims",
+    "description": "Very similar claims trigger orthogonalisation to prevent false merging",
+    "category": "pattern_separation",
+    "requires": [
+      "store",
+      "pattern_separation"
+    ],
+    "actions": [
+      {
+        "label": "store_veg_rest",
+        "type": "store",
+        "claim": "user prefers vegetarian restaurants",
+        "evidence": [
+          {
+            "content": "User requested vegetarian options when dining",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "dining_pref_1"
+          }
+        ]
+      },
+      {
+        "label": "store_vegan_rest",
+        "type": "store",
+        "claim": "user prefers vegan restaurants",
+        "evidence": [
+          {
+            "content": "User specifically asked for fully vegan menus",
+            "polarity": "supports",
+            "weight": 0.88,
+            "reliability": 0.88,
+            "source_ref": "dining_pref_2"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_vegan_rest",
+        "was_separated": true
+      }
+    ]
+  },
+  {
+    "name": "bmb_separation_distinct_claims",
+    "description": "Dissimilar claims don't trigger separation",
+    "category": "pattern_separation",
+    "requires": [
+      "store",
+      "pattern_separation"
+    ],
+    "actions": [
+      {
+        "label": "store_hiking",
+        "type": "store",
+        "claim": "user likes hiking in mountains",
+        "evidence": [
+          {
+            "content": "User mentioned weekend mountain hikes",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.85,
+            "source_ref": "hobby_record"
+          }
+        ]
+      },
+      {
+        "label": "store_engineer",
+        "type": "store",
+        "claim": "user works as a software engineer",
+        "evidence": [
+          {
+            "content": "Resume lists software engineering as occupation",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.97,
+            "source_ref": "employment_record"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_engineer",
+        "was_separated": false
+      }
+    ]
+  },
+  {
+    "name": "bmb_separation_preserves_retrieval",
+    "description": "Both beliefs remain retrievable after separation",
+    "category": "pattern_separation",
+    "requires": [
+      "store",
+      "pattern_separation"
+    ],
+    "actions": [
+      {
+        "label": "store_peanut",
+        "type": "store",
+        "claim": "user is allergic to peanuts",
+        "evidence": [
+          {
+            "content": "Allergy test positive for peanuts",
+            "polarity": "supports",
+            "weight": 0.98,
+            "reliability": 0.98,
+            "source_ref": "allergy_panel"
+          }
+        ]
+      },
+      {
+        "label": "store_treenut",
+        "type": "store",
+        "claim": "user is allergic to tree nuts",
+        "evidence": [
+          {
+            "content": "Allergy test positive for tree nuts",
+            "polarity": "supports",
+            "weight": 0.97,
+            "reliability": 0.98,
+            "source_ref": "allergy_panel_tree"
+          }
+        ]
+      },
+      {
+        "label": "query_peanut",
+        "type": "query",
+        "claim": "peanut allergy"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "query_peanut",
+        "query_returns_claim": true
+      }
+    ]
+  },
+  {
+    "name": "bmb_separation_prevents_false_merge",
+    "description": "Similar but distinct beliefs not deduplicated after separation",
+    "category": "pattern_separation",
+    "requires": [
+      "store",
+      "pattern_separation"
+    ],
+    "actions": [
+      {
+        "label": "store_works_google",
+        "type": "store",
+        "claim": "user works at Google",
+        "evidence": [
+          {
+            "content": "Employee ID badge confirms Google employment",
+            "polarity": "supports",
+            "weight": 0.95,
+            "reliability": 0.97,
+            "source_ref": "employment_verification"
+          }
+        ]
+      },
+      {
+        "label": "store_interviewed_google",
+        "type": "store",
+        "claim": "user used to work at Google",
+        "evidence": [
+          {
+            "content": "Resume shows Google as a previous employer",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "calendar_record"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_interviewed_google",
+        "was_separated": true,
+        "merged": false
+      }
+    ]
+  },
+  {
+    "name": "bmb_separation_no_contradiction",
+    "description": "Similar non-contradictory claims don't produce BOTH state",
+    "category": "pattern_separation",
+    "requires": [
+      "store",
+      "pattern_separation"
+    ],
+    "actions": [
+      {
+        "label": "store_black_coffee",
+        "type": "store",
+        "claim": "user prefers black coffee",
+        "evidence": [
+          {
+            "content": "User always orders black coffee with no sugar",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "order_history"
+          }
+        ]
+      },
+      {
+        "label": "store_espresso",
+        "type": "store",
+        "claim": "user prefers espresso",
+        "evidence": [
+          {
+            "content": "User frequently orders espresso shots",
+            "polarity": "supports",
+            "weight": 0.88,
+            "reliability": 0.88,
+            "source_ref": "cafe_record"
+          }
+        ]
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "store_espresso",
+        "contradiction_detected": false
+      }
+    ]
+  },
+  {
+    "name": "bmb_separation_blocks_false_consolidation",
+    "description": "Separated similar-but-distinct beliefs processed safely by consolidation",
+    "category": "pattern_separation",
+    "requires": [
+      "store",
+      "pattern_separation",
+      "consolidation"
+    ],
+    "actions": [
+      {
+        "label": "store_google_sf",
+        "type": "store",
+        "claim": "user works at Google San Francisco office",
+        "evidence": [
+          {
+            "content": "Badge access logs show SF office entry",
+            "polarity": "supports",
+            "weight": 0.9,
+            "reliability": 0.9,
+            "source_ref": "office_logs"
+          }
+        ]
+      },
+      {
+        "label": "store_google_nyc",
+        "type": "store",
+        "claim": "user interviewed at Google New York City office",
+        "evidence": [
+          {
+            "content": "Interview invite sent from Google NYC recruiter",
+            "polarity": "supports",
+            "weight": 0.88,
+            "reliability": 0.88,
+            "source_ref": "email_record"
+          }
+        ]
+      },
+      {
+        "label": "store_google_campus",
+        "type": "store",
+        "claim": "user visited Google Mountain View campus",
+        "evidence": [
+          {
+            "content": "Visitor log shows campus visit for tech tour",
+            "polarity": "supports",
+            "weight": 0.85,
+            "reliability": 0.85,
+            "source_ref": "visitor_log"
+          }
+        ]
+      },
+      {
+        "label": "consolidate_google",
+        "type": "consolidate"
+      }
+    ],
+    "expectations": [
+      {
+        "action_label": "consolidate_google",
+        "semantic_beliefs_created_gte": 0
+      }
+    ]
+  }
+]

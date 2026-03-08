@@ -1,0 +1,449 @@
+[
+  {
+    "name": "project_timeline_updates",
+    "description": "Project Alpha launch date and budget undergo multiple revisions over several months.",
+    "category": "project_management",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "Project Alpha is scheduled to launch in Q3 2026 with a budget of 2 million dollars.",
+        "evidence": [
+          {"content": "Initial project plan approved by steering committee for Q3 2026 launch.", "polarity": "supporting", "weight": 0.9, "reliability": 0.85, "source_ref": "steering-committee-minutes-2026-01-15"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Project Alpha development team expanded from 8 to 12 engineers to meet Q3 2026 deadline.",
+        "evidence": [
+          {"content": "Four additional engineers onboarded to accelerate development timeline.", "polarity": "supporting", "weight": 0.8, "reliability": 0.9, "source_ref": "hr-onboarding-2026-02-01"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Project Alpha launch has been postponed from Q3 2026 to Q4 2026 due to regulatory review requirements.",
+        "evidence": [
+          {"content": "Regulatory compliance team identified additional review steps that require 3 extra months.", "polarity": "supporting", "weight": 0.95, "reliability": 0.92, "source_ref": "compliance-report-2026-03-10"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Project Alpha budget has been increased from 2 million to 3 million dollars to cover extended timeline and additional compliance costs.",
+        "evidence": [
+          {"content": "CFO approved budget increase of 1 million dollars for regulatory compliance and extended development.", "polarity": "supporting", "weight": 0.95, "reliability": 0.95, "source_ref": "budget-approval-2026-03-15"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Project Alpha Q4 2026 launch confirmed with final budget of 3 million dollars after board approval.",
+        "evidence": [
+          {"content": "Board of directors ratified revised timeline and budget at quarterly meeting.", "polarity": "supporting", "weight": 0.98, "reliability": 0.97, "source_ref": "board-minutes-2026-04-01"}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "When is Project Alpha scheduled to launch?",
+        "expected_keywords": ["Q4 2026"],
+        "rejected_keywords": ["Q3 2026"]
+      },
+      {
+        "query": "What is the current budget for Project Alpha?",
+        "expected_keywords": ["3 million"],
+        "rejected_keywords": ["2 million"]
+      },
+      {
+        "query": "Why was the Project Alpha launch delayed?",
+        "expected_keywords": ["regulatory"],
+        "rejected_keywords": []
+      }
+    ]
+  },
+  {
+    "name": "team_changes_with_retraction",
+    "description": "A false rumor about mass resignations is retracted, and the correct team size is established.",
+    "category": "project_management",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "The engineering department currently has 20 full-time employees across three teams.",
+        "evidence": [
+          {"content": "HR records show 20 FTEs in engineering as of Q1 headcount review.", "polarity": "supporting", "weight": 0.9, "reliability": 0.95, "source_ref": "hr-headcount-2026-01-31"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Company-wide morale survey shows 85 percent satisfaction rate in engineering.",
+        "evidence": [
+          {"content": "Anonymous survey completed by 18 of 20 engineers showed high satisfaction.", "polarity": "supporting", "weight": 0.8, "reliability": 0.88, "source_ref": "morale-survey-2026-02-15"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Five engineers have submitted resignation letters, reducing the engineering team from 20 to 15 members.",
+        "evidence": [
+          {"content": "Unverified internal memo circulated claiming five resignations were submitted.", "polarity": "supporting", "weight": 0.6, "reliability": 0.3, "source_ref": "internal-rumor-2026-03-01"}
+        ]
+      },
+      {
+        "type": "retract",
+        "target_index": 2
+      },
+      {
+        "type": "store",
+        "claim": "HR confirmed no resignations have been submitted; the engineering team remains at 20 full-time employees.",
+        "evidence": [
+          {"content": "VP of HR issued official statement confirming all 20 engineers remain employed.", "polarity": "supporting", "weight": 0.95, "reliability": 0.98, "source_ref": "hr-statement-2026-03-02"}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "How many engineers are on the engineering team?",
+        "expected_keywords": ["20"],
+        "rejected_keywords": ["15"]
+      },
+      {
+        "query": "Were there any resignations in the engineering department?",
+        "expected_keywords": ["no"],
+        "rejected_keywords": ["five", "5 engineers"]
+      },
+      {
+        "query": "What is the morale level in engineering?",
+        "expected_keywords": ["85", "satisfaction"],
+        "rejected_keywords": []
+      }
+    ]
+  },
+  {
+    "name": "medical_diagnosis_revision",
+    "description": "A patient initially diagnosed with Type 2 diabetes has the diagnosis revised to insulin resistance after additional testing.",
+    "category": "medical",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "Patient John Doe, age 52, presented with elevated fasting glucose of 140 mg/dL and HbA1c of 6.8 percent.",
+        "evidence": [
+          {"content": "Lab results from annual physical showing elevated glucose markers.", "polarity": "supporting", "weight": 0.9, "reliability": 0.95, "source_ref": "lab-report-2026-01-10"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Patient John Doe diagnosed with Type 2 diabetes based on fasting glucose and HbA1c levels.",
+        "evidence": [
+          {"content": "Primary care physician documented Type 2 diabetes diagnosis in patient chart.", "polarity": "supporting", "weight": 0.85, "reliability": 0.8, "source_ref": "clinical-note-2026-01-15"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Endocrinologist ordered additional testing including oral glucose tolerance test and C-peptide levels for John Doe.",
+        "evidence": [
+          {"content": "Specialist referral for comprehensive metabolic panel and insulin function testing.", "polarity": "supporting", "weight": 0.8, "reliability": 0.9, "source_ref": "referral-2026-02-01"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "John Doe diagnosis revised from Type 2 diabetes to insulin resistance based on normal C-peptide levels and OGTT results showing impaired glucose tolerance without diabetic threshold.",
+        "evidence": [
+          {"content": "Endocrinologist revised diagnosis after C-peptide came back at 2.8 ng/mL (normal) and OGTT peaked at 185 mg/dL (below 200 threshold).", "polarity": "supporting", "weight": 0.95, "reliability": 0.95, "source_ref": "endo-report-2026-02-20"}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "What is John Doe's current diagnosis?",
+        "expected_keywords": ["insulin resistance"],
+        "rejected_keywords": ["Type 2 diabetes"]
+      },
+      {
+        "query": "What tests led to the revised diagnosis for John Doe?",
+        "expected_keywords": ["C-peptide", "OGTT"],
+        "rejected_keywords": []
+      },
+      {
+        "query": "What were John Doe's initial glucose findings?",
+        "expected_keywords": ["140", "6.8"],
+        "rejected_keywords": []
+      }
+    ]
+  },
+  {
+    "name": "legal_contract_amendments",
+    "description": "A service contract undergoes amendments to payment terms and duration after negotiation rounds.",
+    "category": "legal",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "Service contract between Acme Corp and Beta LLC signed with monthly payment of 50000 dollars and 12-month term starting January 2026.",
+        "evidence": [
+          {"content": "Original contract executed with standard terms: $50,000/month for 12 months.", "polarity": "supporting", "weight": 0.9, "reliability": 0.95, "source_ref": "contract-v1-2026-01-05"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Acme Corp requested scope expansion to include data analytics services in addition to original consulting services.",
+        "evidence": [
+          {"content": "Change request submitted by Acme Corp project manager for additional analytics deliverables.", "polarity": "supporting", "weight": 0.85, "reliability": 0.9, "source_ref": "change-request-2026-02-10"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Contract amendment 1 approved: monthly payment increased from 50000 to 65000 dollars to cover expanded analytics scope.",
+        "evidence": [
+          {"content": "Amendment signed by both parties increasing monthly fee by $15,000 for analytics services.", "polarity": "supporting", "weight": 0.95, "reliability": 0.97, "source_ref": "amendment-1-2026-02-25"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Contract amendment 2 approved: term extended from 12 months to 18 months with the revised monthly payment of 65000 dollars.",
+        "evidence": [
+          {"content": "Both parties agreed to 6-month extension at current rate to complete analytics integration.", "polarity": "supporting", "weight": 0.95, "reliability": 0.97, "source_ref": "amendment-2-2026-03-05"}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "What is the current monthly payment in the Acme Corp contract?",
+        "expected_keywords": ["65000"],
+        "rejected_keywords": ["50000"]
+      },
+      {
+        "query": "How long is the current contract term between Acme Corp and Beta LLC?",
+        "expected_keywords": ["18"],
+        "rejected_keywords": ["12 month"]
+      },
+      {
+        "query": "Why was the contract payment increased?",
+        "expected_keywords": ["analytics"],
+        "rejected_keywords": []
+      }
+    ]
+  },
+  {
+    "name": "scientific_hypothesis_revision",
+    "description": "A pharmaceutical compound shows initially promising results that are significantly revised after Phase 2 trials.",
+    "category": "scientific",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "Compound X showed 40 percent efficacy rate in Phase 1 clinical trials for treatment of chronic pain with no significant side effects observed.",
+        "evidence": [
+          {"content": "Phase 1 trial with 50 participants showed 40% pain reduction vs placebo, no adverse events reported.", "polarity": "supporting", "weight": 0.85, "reliability": 0.8, "source_ref": "phase1-results-2026-01-20"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Research team published preliminary findings recommending Compound X for Phase 2 trials based on promising 40 percent efficacy.",
+        "evidence": [
+          {"content": "Peer-reviewed publication in Journal of Clinical Pharmacology recommending advancement to Phase 2.", "polarity": "supporting", "weight": 0.85, "reliability": 0.85, "source_ref": "publication-2026-02-01"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Phase 2 trials of Compound X with 500 participants showed revised efficacy of only 15 percent, significantly lower than the Phase 1 result of 40 percent.",
+        "evidence": [
+          {"content": "Larger trial population revealed efficacy of 15% vs placebo, suggesting Phase 1 results were inflated by small sample size.", "polarity": "supporting", "weight": 0.95, "reliability": 0.92, "source_ref": "phase2-interim-2026-03-01"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Phase 2 trials also revealed Compound X causes mild hepatotoxicity in 8 percent of participants, a side effect not observed in Phase 1.",
+        "evidence": [
+          {"content": "Safety monitoring board flagged elevated liver enzymes in 40 of 500 participants (8%).", "polarity": "supporting", "weight": 0.95, "reliability": 0.94, "source_ref": "safety-report-2026-03-05"}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "What is the current efficacy rate of Compound X?",
+        "expected_keywords": ["15 percent"],
+        "rejected_keywords": ["40 percent"]
+      },
+      {
+        "query": "Were any side effects found for Compound X?",
+        "expected_keywords": ["hepatotoxicity"],
+        "rejected_keywords": ["no significant side effects"]
+      },
+      {
+        "query": "How did Phase 2 results compare to Phase 1 for Compound X?",
+        "expected_keywords": ["lower", "15"],
+        "rejected_keywords": []
+      }
+    ]
+  },
+  {
+    "name": "budget_retraction_and_correction",
+    "description": "Quarterly revenue figures are corrected after an audit reveals accounting errors in the initial report.",
+    "category": "project_management",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "Q1 2026 revenue reported at 5.2 million dollars based on preliminary accounting figures.",
+        "evidence": [
+          {"content": "Preliminary financial report showed Q1 revenue of $5.2M before audit review.", "polarity": "supporting", "weight": 0.7, "reliability": 0.6, "source_ref": "prelim-financials-2026-04-01"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Q1 2026 operating expenses totaled 3.8 million dollars across all departments.",
+        "evidence": [
+          {"content": "Expense report consolidated from all department budgets for Q1.", "polarity": "supporting", "weight": 0.85, "reliability": 0.88, "source_ref": "expense-report-2026-04-01"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Internal audit found that Q1 2026 revenue was overstated due to double-counted receivables; corrected revenue is 4.7 million dollars.",
+        "evidence": [
+          {"content": "Audit team identified $500K in duplicate invoice entries inflating Q1 revenue.", "polarity": "supporting", "weight": 0.95, "reliability": 0.95, "source_ref": "audit-findings-2026-04-10"}
+        ]
+      },
+      {
+        "type": "retract",
+        "target_index": 0
+      },
+      {
+        "type": "store",
+        "claim": "Official Q1 2026 revenue confirmed at 4.7 million dollars after audit correction of double-counted receivables.",
+        "evidence": [
+          {"content": "CFO signed off on corrected Q1 financials showing $4.7M revenue.", "polarity": "supporting", "weight": 0.98, "reliability": 0.98, "source_ref": "corrected-financials-2026-04-15"}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "What is the Q1 2026 revenue?",
+        "expected_keywords": ["4.7 million"],
+        "rejected_keywords": ["5.2 million"]
+      },
+      {
+        "query": "Why was the Q1 revenue figure corrected?",
+        "expected_keywords": ["double-counted", "audit"],
+        "rejected_keywords": []
+      },
+      {
+        "query": "What were the Q1 2026 operating expenses?",
+        "expected_keywords": ["3.8"],
+        "rejected_keywords": []
+      }
+    ]
+  },
+  {
+    "name": "treatment_plan_evolution",
+    "description": "A patient treatment plan evolves through multiple adjustments as new imaging reveals a different underlying condition.",
+    "category": "medical",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "Patient Sarah Chen prescribed physical therapy twice per week and ibuprofen 400mg for chronic lower back pain.",
+        "evidence": [
+          {"content": "Orthopedist prescribed conservative treatment: PT 2x/week and NSAIDs for 6 weeks.", "polarity": "supporting", "weight": 0.85, "reliability": 0.9, "source_ref": "ortho-note-2026-01-05"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "After 4 weeks, Sarah Chen reported minimal improvement; physical therapy increased to three times per week.",
+        "evidence": [
+          {"content": "Follow-up visit showed VAS pain score unchanged at 7/10; PT frequency increased.", "polarity": "supporting", "weight": 0.85, "reliability": 0.9, "source_ref": "followup-2026-02-02"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Sarah Chen switched from ibuprofen to acetaminophen 500mg due to gastrointestinal side effects from prolonged NSAID use.",
+        "evidence": [
+          {"content": "Patient reported stomach upset and mild gastritis symptoms; medication changed to acetaminophen.", "polarity": "supporting", "weight": 0.9, "reliability": 0.92, "source_ref": "med-change-2026-02-15"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "MRI scan revealed herniated disc at L4-L5 in Sarah Chen, explaining persistent pain despite conservative treatment.",
+        "evidence": [
+          {"content": "MRI report showed moderate L4-L5 disc herniation with mild nerve root compression.", "polarity": "supporting", "weight": 0.95, "reliability": 0.95, "source_ref": "mri-report-2026-03-01"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "Sarah Chen referred to neurosurgeon for evaluation of L4-L5 herniated disc; physical therapy continued at three times per week with modified exercises.",
+        "evidence": [
+          {"content": "Orthopedist referred patient to neurosurgery while continuing modified PT program.", "polarity": "supporting", "weight": 0.9, "reliability": 0.93, "source_ref": "referral-2026-03-05"}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "How often does Sarah Chen attend physical therapy?",
+        "expected_keywords": ["three times"],
+        "rejected_keywords": ["twice"]
+      },
+      {
+        "query": "What pain medication is Sarah Chen currently taking?",
+        "expected_keywords": ["acetaminophen"],
+        "rejected_keywords": ["ibuprofen"]
+      },
+      {
+        "query": "What did the MRI reveal for Sarah Chen?",
+        "expected_keywords": ["herniated", "L4-L5"],
+        "rejected_keywords": []
+      },
+      {
+        "query": "Why was Sarah Chen referred to a neurosurgeon?",
+        "expected_keywords": ["herniated disc"],
+        "rejected_keywords": []
+      }
+    ]
+  },
+  {
+    "name": "clause_retraction_legal",
+    "description": "A non-compete clause is removed from employment contracts after a change in state law renders it unenforceable.",
+    "category": "legal",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "Standard employment contract at TechCo includes a 2-year non-compete clause covering all competitors within 50-mile radius.",
+        "evidence": [
+          {"content": "Employment agreement template section 8.3 specifies 2-year non-compete with geographic restriction.", "polarity": "supporting", "weight": 0.9, "reliability": 0.95, "source_ref": "employment-template-v3-2025-06"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "TechCo has 150 employees currently bound by the 2-year non-compete clause in their employment agreements.",
+        "evidence": [
+          {"content": "HR records show 150 active employees signed agreements containing non-compete provisions.", "polarity": "supporting", "weight": 0.85, "reliability": 0.9, "source_ref": "hr-records-2026-01-15"}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "State legislature passed Senate Bill 1247 effective March 1 2026, prohibiting non-compete clauses for employees earning below 150000 dollars annually.",
+        "evidence": [
+          {"content": "New state law invalidates non-compete agreements for employees below $150K salary threshold.", "polarity": "supporting", "weight": 0.95, "reliability": 0.98, "source_ref": "sb-1247-2026-03-01"}
+        ]
+      },
+      {
+        "type": "retract",
+        "target_index": 0
+      },
+      {
+        "type": "store",
+        "claim": "TechCo non-compete clause removed from all employment contracts effective March 2026 following Senate Bill 1247; affected 120 of 150 employees earning below the 150000 dollar threshold.",
+        "evidence": [
+          {"content": "Legal department issued contract amendments removing non-compete for employees below salary threshold.", "polarity": "supporting", "weight": 0.95, "reliability": 0.97, "source_ref": "legal-memo-2026-03-10"}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "Does TechCo still enforce a non-compete clause?",
+        "expected_keywords": ["removed"],
+        "rejected_keywords": ["2-year non-compete"]
+      },
+      {
+        "query": "What law changed the non-compete situation at TechCo?",
+        "expected_keywords": ["Senate Bill 1247"],
+        "rejected_keywords": []
+      },
+      {
+        "query": "How many TechCo employees were affected by the non-compete removal?",
+        "expected_keywords": ["120"],
+        "rejected_keywords": []
+      }
+    ]
+  }
+]

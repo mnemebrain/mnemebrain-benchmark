@@ -1,0 +1,538 @@
+[
+  {
+    "name": "diet_vegetarian_to_flexitarian",
+    "description": "User transitions from strict vegetarian to flexitarian after trying steak.",
+    "category": "dietary",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "User is a strict vegetarian and has been for five years.",
+        "evidence": [
+          {"content": "I've been vegetarian for five years now.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User avoids all meat products including poultry and fish.",
+        "evidence": [
+          {"content": "I don't eat any meat at all, not even fish or chicken.", "polarity": "positive", "weight": 0.9}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User tried a steak at a barbecue and enjoyed it.",
+        "evidence": [
+          {"content": "I had a steak at my friend's barbecue last weekend and actually loved it.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User now identifies as flexitarian and eats meat occasionally.",
+        "evidence": [
+          {"content": "I'd say I'm flexitarian now. I eat meat once or twice a week.", "polarity": "positive", "weight": 1.0}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "What is the user's current diet?",
+        "expected_keywords": ["flexitarian"],
+        "rejected_keywords": ["strict vegetarian", "no meat"]
+      },
+      {
+        "query": "Does the user eat meat?",
+        "expected_keywords": ["meat", "occasionally", "steak"],
+        "rejected_keywords": ["avoids all meat", "doesn't eat meat"]
+      },
+      {
+        "query": "How has the user's diet changed?",
+        "expected_keywords": ["flexitarian", "changed"],
+        "rejected_keywords": []
+      },
+      {
+        "query": "What triggered the user's dietary change?",
+        "expected_keywords": ["steak", "barbecue"],
+        "rejected_keywords": []
+      }
+    ]
+  },
+  {
+    "name": "allergy_discovery",
+    "description": "User who loves dairy discovers they are lactose intolerant.",
+    "category": "dietary",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "User's favorite food is cheese pizza.",
+        "evidence": [
+          {"content": "I could eat cheese pizza every day, it's my absolute favorite.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User enjoys trying different artisan cheeses.",
+        "evidence": [
+          {"content": "I love visiting cheese shops and trying new artisan varieties.", "polarity": "positive", "weight": 0.8}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User was diagnosed with lactose intolerance by their doctor.",
+        "evidence": [
+          {"content": "My doctor confirmed I'm lactose intolerant after running tests.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User now avoids dairy and uses plant-based alternatives.",
+        "evidence": [
+          {"content": "I've switched to oat milk and vegan cheese. No more dairy for me.", "polarity": "positive", "weight": 1.0}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "Can the user eat dairy products?",
+        "expected_keywords": ["lactose intolerant", "avoids dairy", "no dairy"],
+        "rejected_keywords": ["loves cheese pizza", "favorite food is cheese"]
+      },
+      {
+        "query": "What dietary restrictions does the user have?",
+        "expected_keywords": ["lactose", "intolerant", "dairy"],
+        "rejected_keywords": []
+      },
+      {
+        "query": "What alternatives does the user use for dairy?",
+        "expected_keywords": ["oat milk", "vegan cheese", "plant-based"],
+        "rejected_keywords": ["artisan cheeses"]
+      }
+    ]
+  },
+  {
+    "name": "city_relocation",
+    "description": "User relocates from New York City to Austin, Texas.",
+    "category": "location",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "User lives in New York City and works in Manhattan.",
+        "evidence": [
+          {"content": "I live in Brooklyn and commute to my office in Manhattan.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User enjoys the NYC restaurant scene and nightlife.",
+        "evidence": [
+          {"content": "The restaurant scene here in NYC is unbeatable. I go out most weekends.", "polarity": "positive", "weight": 0.7}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User accepted a remote job and decided to move to Austin.",
+        "evidence": [
+          {"content": "I got a fully remote position so I'm moving to Austin next month.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User now lives in Austin, Texas and loves the lower cost of living.",
+        "evidence": [
+          {"content": "Just settled into my new place in Austin. The rent is half what I paid in Brooklyn!", "polarity": "positive", "weight": 1.0}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "Where does the user currently live?",
+        "expected_keywords": ["Austin"],
+        "rejected_keywords": ["New York City", "Brooklyn", "Manhattan"]
+      },
+      {
+        "query": "Did the user relocate recently?",
+        "expected_keywords": ["Austin", "moved", "relocated"],
+        "rejected_keywords": []
+      },
+      {
+        "query": "What does the user like about their current city?",
+        "expected_keywords": ["cost of living", "rent"],
+        "rejected_keywords": ["NYC restaurant scene"]
+      }
+    ]
+  },
+  {
+    "name": "schedule_shift",
+    "description": "Morning person transitions to night owl after taking a night shift job.",
+    "category": "schedule",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "User wakes up at 5:30 AM every day and is a morning person.",
+        "evidence": [
+          {"content": "I'm up at 5:30 AM every morning. I love the early hours.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User goes to bed by 9 PM and avoids late-night activities.",
+        "evidence": [
+          {"content": "I'm in bed by 9 PM. I never go out late at night.", "polarity": "positive", "weight": 0.8}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User started working a night shift at the hospital.",
+        "evidence": [
+          {"content": "I just started the night shift at the hospital, 10 PM to 6 AM.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User now sleeps during the day and is most productive at night.",
+        "evidence": [
+          {"content": "I've completely flipped my schedule. I sleep from 8 AM to 4 PM now and feel most alert around midnight.", "polarity": "positive", "weight": 1.0}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "When does the user typically sleep?",
+        "expected_keywords": ["day", "8 AM", "night shift"],
+        "rejected_keywords": ["5:30 AM", "bed by 9 PM"]
+      },
+      {
+        "query": "Is the user a morning person or night owl?",
+        "expected_keywords": ["night", "productive at night"],
+        "rejected_keywords": ["morning person", "5:30 AM"]
+      },
+      {
+        "query": "What is the user's work schedule?",
+        "expected_keywords": ["night shift", "hospital", "10 PM"],
+        "rejected_keywords": []
+      }
+    ]
+  },
+  {
+    "name": "music_taste_evolution",
+    "description": "User's music preference evolves from classical to electronic.",
+    "category": "media",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "User listens exclusively to classical music, especially Beethoven.",
+        "evidence": [
+          {"content": "I only listen to classical music. Beethoven's symphonies are my go-to.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User dislikes electronic music and finds it repetitive.",
+        "evidence": [
+          {"content": "I can't stand electronic music. It's just repetitive beats with no soul.", "polarity": "positive", "weight": 0.9}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User attended a Boiler Room set and discovered a love for techno.",
+        "evidence": [
+          {"content": "A friend dragged me to a Boiler Room event and I was completely blown away by the techno sets.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User now primarily listens to electronic music and has started DJing.",
+        "evidence": [
+          {"content": "I've been deep into electronic music for months now. I even bought a DJ controller and started mixing.", "polarity": "positive", "weight": 1.0}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "What kind of music does the user prefer now?",
+        "expected_keywords": ["electronic", "techno", "DJing"],
+        "rejected_keywords": ["dislikes electronic", "only classical"]
+      },
+      {
+        "query": "Does the user still listen to only classical music?",
+        "expected_keywords": ["electronic", "techno", "changed"],
+        "rejected_keywords": ["exclusively classical", "only listen to classical"]
+      },
+      {
+        "query": "What sparked the user's interest in electronic music?",
+        "expected_keywords": ["Boiler Room", "techno"],
+        "rejected_keywords": []
+      }
+    ]
+  },
+  {
+    "name": "social_introvert_to_extrovert",
+    "description": "Introverted user becomes more social after joining a hiking club.",
+    "category": "social",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "User is introverted and prefers staying home alone on weekends.",
+        "evidence": [
+          {"content": "I'm very introverted. I'd rather stay home with a book than go out.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User avoids group activities and large social gatherings.",
+        "evidence": [
+          {"content": "I don't do group activities. Large gatherings give me anxiety.", "polarity": "positive", "weight": 0.9}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User joined a local hiking club and made several new friends.",
+        "evidence": [
+          {"content": "I joined a hiking club on a whim and I've already made a bunch of great friends there.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User now enjoys socializing regularly and hosts weekend gatherings.",
+        "evidence": [
+          {"content": "I host game nights every other weekend now. I really enjoy socializing these days.", "polarity": "positive", "weight": 1.0}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "How social is the user?",
+        "expected_keywords": ["enjoys socializing", "hosts", "game nights"],
+        "rejected_keywords": ["introverted", "prefers staying home"]
+      },
+      {
+        "query": "Does the user participate in group activities?",
+        "expected_keywords": ["hiking club", "game nights", "socializing"],
+        "rejected_keywords": ["avoids group activities", "anxiety"]
+      },
+      {
+        "query": "What changed the user's social habits?",
+        "expected_keywords": ["hiking club", "friends"],
+        "rejected_keywords": []
+      }
+    ]
+  },
+  {
+    "name": "travel_preference_update",
+    "description": "User switches from beach vacations to mountain hiking after a knee injury recovery.",
+    "category": "location",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "User loves beach vacations and goes to the Caribbean every year.",
+        "evidence": [
+          {"content": "I go to the Caribbean every winter. Beach vacations are my thing.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User dislikes hiking and mountain trips due to a knee injury.",
+        "evidence": [
+          {"content": "I can't do mountain hikes because of my bad knee. Not my thing anyway.", "polarity": "positive", "weight": 0.8}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User had knee surgery and completed physical therapy successfully.",
+        "evidence": [
+          {"content": "My knee surgery went great. After six months of PT my knee feels stronger than ever.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User now prefers mountain hiking vacations and plans to hike the Appalachian Trail.",
+        "evidence": [
+          {"content": "I'm all about mountain trips now. I'm planning a section hike of the Appalachian Trail this summer.", "polarity": "positive", "weight": 1.0}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "What type of vacation does the user prefer?",
+        "expected_keywords": ["mountain", "hiking", "Appalachian"],
+        "rejected_keywords": ["Caribbean", "beach vacations"]
+      },
+      {
+        "query": "Can the user go hiking?",
+        "expected_keywords": ["mountain", "hiking", "knee surgery", "recovered"],
+        "rejected_keywords": ["can't do mountain hikes", "bad knee"]
+      },
+      {
+        "query": "What are the user's travel plans?",
+        "expected_keywords": ["Appalachian Trail", "mountain"],
+        "rejected_keywords": ["Caribbean every winter"]
+      }
+    ]
+  },
+  {
+    "name": "dietary_retraction",
+    "description": "User's celiac diagnosis is retracted after further testing.",
+    "category": "dietary",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "User enjoys eating bread and pasta regularly.",
+        "evidence": [
+          {"content": "I eat pasta almost every day and I love fresh sourdough bread.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User was diagnosed with celiac disease and must avoid all gluten.",
+        "evidence": [
+          {"content": "I was just diagnosed with celiac disease. My doctor says I must avoid all gluten.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User has been following a strict gluten-free diet for three months.",
+        "evidence": [
+          {"content": "I've been gluten-free for three months now. It's tough but necessary.", "polarity": "positive", "weight": 0.9}
+        ]
+      },
+      {
+        "type": "retract",
+        "target_index": 1
+      },
+      {
+        "type": "store",
+        "claim": "Follow-up testing showed user does not have celiac disease; the initial diagnosis was a false positive.",
+        "evidence": [
+          {"content": "Great news! Follow-up testing confirmed I don't actually have celiac disease. It was a false positive.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User has resumed eating gluten and is enjoying bread and pasta again.",
+        "evidence": [
+          {"content": "I'm back to eating bread and pasta. Had the best sourdough yesterday!", "polarity": "positive", "weight": 1.0}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "Does the user have celiac disease?",
+        "expected_keywords": ["does not have", "false positive", "no celiac"],
+        "rejected_keywords": ["diagnosed with celiac", "must avoid gluten"]
+      },
+      {
+        "query": "Can the user eat gluten?",
+        "expected_keywords": ["can eat", "resumed", "bread", "pasta"],
+        "rejected_keywords": ["must avoid all gluten", "gluten-free"]
+      },
+      {
+        "query": "What does the user enjoy eating?",
+        "expected_keywords": ["bread", "pasta", "sourdough"],
+        "rejected_keywords": ["gluten-free diet"]
+      }
+    ]
+  },
+  {
+    "name": "exercise_routine_change",
+    "description": "User switches from daily yoga to weightlifting.",
+    "category": "schedule",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "User practices yoga every morning at 6 AM.",
+        "evidence": [
+          {"content": "I do yoga every morning at 6 AM. It's been my routine for two years.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User finds weightlifting boring and prefers flexibility exercises.",
+        "evidence": [
+          {"content": "Weightlifting isn't for me. I prefer flexibility and mindfulness exercises.", "polarity": "positive", "weight": 0.8}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User started weightlifting with a personal trainer and enjoys it.",
+        "evidence": [
+          {"content": "I hired a personal trainer and started weightlifting. I'm actually really enjoying the strength gains.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User now does weightlifting five days a week and has stopped daily yoga.",
+        "evidence": [
+          {"content": "I'm at the gym five days a week now doing weights. I dropped the daily yoga routine.", "polarity": "positive", "weight": 1.0}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "What is the user's current exercise routine?",
+        "expected_keywords": ["weightlifting", "gym", "five days"],
+        "rejected_keywords": ["yoga every morning", "6 AM yoga"]
+      },
+      {
+        "query": "Does the user enjoy weightlifting?",
+        "expected_keywords": ["enjoys", "weightlifting", "strength"],
+        "rejected_keywords": ["weightlifting isn't for me", "boring"]
+      },
+      {
+        "query": "Does the user still do yoga every morning?",
+        "expected_keywords": ["stopped", "dropped", "weightlifting"],
+        "rejected_keywords": ["yoga every morning at 6 AM"]
+      }
+    ]
+  },
+  {
+    "name": "pet_preference_evolution",
+    "description": "User goes from being afraid of dogs to adopting one.",
+    "category": "social",
+    "actions": [
+      {
+        "type": "store",
+        "claim": "User is afraid of dogs due to a childhood incident.",
+        "evidence": [
+          {"content": "I've been afraid of dogs since I was bitten as a kid. I avoid them whenever I can.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User prefers cats and has two cats at home.",
+        "evidence": [
+          {"content": "I'm definitely a cat person. I have two cats, Luna and Mochi.", "polarity": "positive", "weight": 0.8}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User started volunteering at a dog shelter and overcame their fear.",
+        "evidence": [
+          {"content": "I started volunteering at a dog shelter to face my fear, and it totally worked. Dogs are amazing.", "polarity": "positive", "weight": 1.0}
+        ]
+      },
+      {
+        "type": "store",
+        "claim": "User adopted a golden retriever named Max and loves dogs now.",
+        "evidence": [
+          {"content": "I adopted a golden retriever named Max! I absolutely love dogs now.", "polarity": "positive", "weight": 1.0}
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "query": "How does the user feel about dogs?",
+        "expected_keywords": ["loves dogs", "adopted", "golden retriever"],
+        "rejected_keywords": ["afraid of dogs", "avoids dogs"]
+      },
+      {
+        "query": "Does the user have any pets?",
+        "expected_keywords": ["Max", "golden retriever"],
+        "rejected_keywords": []
+      },
+      {
+        "query": "How did the user overcome their fear of dogs?",
+        "expected_keywords": ["volunteering", "dog shelter"],
+        "rejected_keywords": []
+      }
+    ]
+  }
+]
