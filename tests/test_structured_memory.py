@@ -1,10 +1,10 @@
 """Tests for mnemebrain_benchmark.adapters.structured_memory."""
 from __future__ import annotations
 
+from helpers import HighSimEmbedder, LowSimEmbedder
+
 from mnemebrain_benchmark.adapters.structured_memory import StructuredMemoryBaseline
 from mnemebrain_benchmark.interface import Capability
-
-from helpers import HighSimEmbedder, LowSimEmbedder
 
 
 class TestStructuredMemoryBaseline:

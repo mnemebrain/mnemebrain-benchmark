@@ -10,8 +10,8 @@ from __future__ import annotations
 import argparse
 import sys
 
-from mnemebrain_benchmark.task_evals.preference_tracking import load_preference_scenarios
 from mnemebrain_benchmark.task_evals.long_horizon_qa import load_qa_scenarios
+from mnemebrain_benchmark.task_evals.preference_tracking import load_preference_scenarios
 from mnemebrain_benchmark.task_evals.runner import TaskEvalRunner, format_task_eval_table
 
 
@@ -28,7 +28,10 @@ def _build_adapters(adapter_filter: str | None = None):
             try:
                 from sentence_transformers import SentenceTransformer
             except ImportError:
-                print("sentence-transformers required: pip install mnemebrain-benchmark[embeddings]")
+                print(
+                    "sentence-transformers required: "
+                    "pip install mnemebrain-benchmark[embeddings]"
+                )
                 sys.exit(1)
 
 
@@ -42,7 +45,12 @@ def _build_adapters(adapter_filter: str | None = None):
                 def similarity(self, a: list[float], b: list[float]) -> float:
                     import numpy as np
                     a_arr, b_arr = np.array(a), np.array(b)
-                    return float(np.dot(a_arr, b_arr) / (np.linalg.norm(a_arr) * np.linalg.norm(b_arr) + 1e-10))
+                    dot = np.dot(a_arr, b_arr)
+                    norm = (
+                        np.linalg.norm(a_arr)
+                        * np.linalg.norm(b_arr) + 1e-10
+                    )
+                    return float(dot / norm)
 
             embedder = STProvider()
         return embedder

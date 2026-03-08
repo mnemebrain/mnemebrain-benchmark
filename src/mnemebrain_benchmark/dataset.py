@@ -67,7 +67,8 @@ class BenchmarkDataset:
                     f"expected one of {VALID_DIFFICULTIES}"
                 )
 
-            pairs.append(ClaimPair(**{k: entry[k] for k in vars(ClaimPair)["__dataclass_fields__"]}))
+            fields = vars(ClaimPair)["__dataclass_fields__"]
+            pairs.append(ClaimPair(**{k: entry[k] for k in fields}))
 
         return cls(pairs)
 

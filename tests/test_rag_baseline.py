@@ -1,10 +1,10 @@
 """Tests for mnemebrain_benchmark.adapters.rag_baseline."""
 from __future__ import annotations
 
+from helpers import FakeEmbedder, HighSimEmbedder, LowSimEmbedder
+
 from mnemebrain_benchmark.adapters.rag_baseline import RAGBaseline
 from mnemebrain_benchmark.interface import Capability
-
-from helpers import FakeEmbedder, HighSimEmbedder, LowSimEmbedder
 
 
 class TestRAGBaseline:

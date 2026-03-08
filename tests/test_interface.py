@@ -17,7 +17,6 @@ from mnemebrain_benchmark.interface import (
     StoreResult,
 )
 
-
 # -- Capability enum --
 
 class TestCapability:
@@ -43,7 +42,11 @@ class TestCapability:
 
 class TestStoreResult:
     def test_defaults(self):
-        r = StoreResult(belief_id="b1", merged=False, contradiction_detected=False, truth_state="true", confidence=0.9)
+        r = StoreResult(
+            belief_id="b1", merged=False,
+            contradiction_detected=False,
+            truth_state="true", confidence=0.9,
+        )
         assert r.was_separated is False
         assert r.memory_tier == "episodic"
 
@@ -74,7 +77,11 @@ class TestRetractResult:
 
 class TestExplainResult:
     def test_defaults(self):
-        r = ExplainResult(claim="x", has_evidence=True, supporting_count=1, attacking_count=0, truth_state="true", confidence=0.9)
+        r = ExplainResult(
+            claim="x", has_evidence=True,
+            supporting_count=1, attacking_count=0,
+            truth_state="true", confidence=0.9,
+        )
         assert r.expired_count == 0
 
 

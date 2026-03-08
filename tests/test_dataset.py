@@ -29,7 +29,10 @@ def _make_pair(**overrides):
 
 class TestClaimPair:
     def test_frozen(self):
-        p = ClaimPair(id="1", claim_a="a", claim_b="b", label="same", category="fact", difficulty="easy")
+        p = ClaimPair(
+            id="1", claim_a="a", claim_b="b",
+            label="same", category="fact", difficulty="easy",
+        )
         with pytest.raises(AttributeError):
             p.id = "2"  # type: ignore[misc]
 

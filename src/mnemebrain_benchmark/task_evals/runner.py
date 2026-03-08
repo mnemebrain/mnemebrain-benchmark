@@ -121,7 +121,8 @@ def format_task_eval_table(report: TaskEvalReport) -> str:
         total_questions = sum(s.total for s in scenario_scores)
         accuracy = total_correct / total_questions if total_questions > 0 else 0.0
         lines.append(
-            f"{adapter_name:<{name_width}} {total_correct:>8} {total_questions:>8} {accuracy * 100:>9.1f}%"
+            f"{adapter_name:<{name_width}} {total_correct:>8}"
+            f" {total_questions:>8} {accuracy * 100:>9.1f}%"
         )
 
     lines.append("=" * (name_width + 30))

@@ -8,8 +8,8 @@ from mnemebrain_benchmark.interface import (
     StoreResult,
 )
 from mnemebrain_benchmark.task_evals.base import TaskScenario
-from mnemebrain_benchmark.task_evals.preference_tracking import load_preference_scenarios
 from mnemebrain_benchmark.task_evals.long_horizon_qa import load_qa_scenarios
+from mnemebrain_benchmark.task_evals.preference_tracking import load_preference_scenarios
 
 
 class TestPreferenceScenarios:
@@ -101,7 +101,7 @@ class KeywordMemory(MemorySystem):
 
 class TestIntegration:
     def test_preference_scenarios_run(self):
-        from mnemebrain_benchmark.task_evals.runner import TaskEvalRunner, format_task_eval_table
+        from mnemebrain_benchmark.task_evals.runner import TaskEvalRunner
         scenarios = load_preference_scenarios()
         runner = TaskEvalRunner()
         system = KeywordMemory()

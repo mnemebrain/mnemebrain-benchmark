@@ -88,14 +88,32 @@ def _print_metrics(name: str, metrics: BenchmarkMetrics) -> None:
     print(f"  {name}")
     print(f"{'=' * 60}")
     print("  Classification (threshold-based):")
-    print(f"    Precision: {metrics.precision:.3f}  Recall: {metrics.recall:.3f}  F1: {metrics.f1:.3f}")
-    print(f"    Accuracy:  {metrics.accuracy:.3f}  (TP={metrics.tp} FP={metrics.fp} TN={metrics.tn} FN={metrics.fn})")
+    print(
+        f"    Precision: {metrics.precision:.3f}"
+        f"  Recall: {metrics.recall:.3f}"
+        f"  F1: {metrics.f1:.3f}"
+    )
+    print(
+        f"    Accuracy:  {metrics.accuracy:.3f}"
+        f"  (TP={metrics.tp} FP={metrics.fp}"
+        f" TN={metrics.tn} FN={metrics.fn})"
+    )
     print("  Similarity distribution:")
-    print(f"    Same pairs:      mean={metrics.mean_sim_same:.4f}  std={metrics.std_sim_same:.4f}")
-    print(f"    Different pairs: mean={metrics.mean_sim_different:.4f}  std={metrics.std_sim_different:.4f}")
+    print(
+        f"    Same pairs:      mean={metrics.mean_sim_same:.4f}"
+        f"  std={metrics.std_sim_same:.4f}"
+    )
+    print(
+        f"    Different pairs: mean={metrics.mean_sim_different:.4f}"
+        f"  std={metrics.std_sim_different:.4f}"
+    )
     print(f"    Separation gap:  {metrics.separation_gap:.4f}")
     print("  Latency:")
-    print(f"    Mean: {metrics.mean_embed_ms:.1f}ms  P95: {metrics.p95_embed_ms:.1f}ms  P99: {metrics.p99_embed_ms:.1f}ms")
+    print(
+        f"    Mean: {metrics.mean_embed_ms:.1f}ms"
+        f"  P95: {metrics.p95_embed_ms:.1f}ms"
+        f"  P99: {metrics.p99_embed_ms:.1f}ms"
+    )
     print(f"    Throughput: {metrics.throughput_pairs_per_sec:.1f} pairs/sec")
     print()
 
@@ -184,9 +202,15 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--threshold", type=float, default=0.92)
     parser.add_argument("--dataset", type=str, default=None)
     parser.add_argument("--output", type=str, default="benchmark_report.json")
-    parser.add_argument("--provider", type=str, default=None, choices=["sentence_transformers", "openai"])
+    parser.add_argument(
+        "--provider", type=str, default=None,
+        choices=["sentence_transformers", "openai"],
+    )
     parser.add_argument("--model", type=str, default=None)
-    parser.add_argument("--category", type=str, default=None, choices=["fact", "preference", "inference", "prediction"])
+    parser.add_argument(
+        "--category", type=str, default=None,
+        choices=["fact", "preference", "inference", "prediction"],
+    )
     parser.add_argument("--difficulty", type=str, default=None, choices=["easy", "medium", "hard"])
 
     args = parser.parse_args(argv)

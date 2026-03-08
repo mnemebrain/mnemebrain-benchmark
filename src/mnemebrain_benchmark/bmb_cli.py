@@ -15,8 +15,8 @@ import sys
 
 from mnemebrain_benchmark.interface import MemorySystem
 from mnemebrain_benchmark.scenarios.loader import load_bmb_scenarios
+from mnemebrain_benchmark.system_report import export_json, format_scorecard
 from mnemebrain_benchmark.system_runner import SystemBenchmarkRunner
-from mnemebrain_benchmark.system_report import format_scorecard, export_json
 
 BMB_CATEGORIES = [
     "contradiction",
@@ -85,7 +85,10 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
             adapters.append(MnemeBrainAdapter(base_url=base_url))
         except ImportError:
             if adapter_filter == "mnemebrain":
-                print("mnemebrain adapter requires the SDK: pip install mnemebrain-benchmark[mnemebrain]")
+                print(
+                    "mnemebrain adapter requires the SDK: "
+                    "pip install mnemebrain-benchmark[mnemebrain]"
+                )
                 sys.exit(1)
 
     if adapter_filter is None or adapter_filter == "naive_baseline":
@@ -94,7 +97,10 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
             adapters.append(NaiveBaseline(_lazy_embedder()))
         except ImportError:
             if adapter_filter == "naive_baseline":
-                print("naive_baseline requires sentence-transformers: pip install mnemebrain-benchmark[embeddings]")
+                print(
+                    "naive_baseline requires sentence-transformers: "
+                    "pip install mnemebrain-benchmark[embeddings]"
+                )
                 sys.exit(1)
 
     if adapter_filter is None or adapter_filter == "langchain_buffer":
@@ -107,7 +113,10 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
             adapters.append(RAGBaseline(_lazy_embedder()))
         except ImportError:
             if adapter_filter == "rag_baseline":
-                print("rag_baseline requires sentence-transformers: pip install mnemebrain-benchmark[embeddings]")
+                print(
+                    "rag_baseline requires sentence-transformers: "
+                    "pip install mnemebrain-benchmark[embeddings]"
+                )
                 sys.exit(1)
 
     if adapter_filter is None or adapter_filter == "structured_memory":
@@ -116,7 +125,10 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
             adapters.append(StructuredMemoryBaseline(_lazy_embedder()))
         except ImportError:
             if adapter_filter == "structured_memory":
-                print("structured_memory requires sentence-transformers: pip install mnemebrain-benchmark[embeddings]")
+                print(
+                    "structured_memory requires sentence-transformers:"
+                    " pip install mnemebrain-benchmark[embeddings]"
+                )
                 sys.exit(1)
 
     if adapter_filter is None or adapter_filter == "mem0":

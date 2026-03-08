@@ -13,9 +13,9 @@ from mnemebrain_benchmark.task_evals.base import (
     TaskScenario,
 )
 from mnemebrain_benchmark.task_evals.runner import (
-    TaskEvalRunner,
     ScenarioTaskScore,
     TaskEvalReport,
+    TaskEvalRunner,
     format_task_eval_table,
 )
 

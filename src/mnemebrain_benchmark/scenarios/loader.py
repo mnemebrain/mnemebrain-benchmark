@@ -6,10 +6,10 @@ import json
 from pathlib import Path
 
 from mnemebrain_benchmark.scenarios.schema import (
+    VALID_ACTION_TYPES,
     Action,
     Expectation,
     Scenario,
-    VALID_ACTION_TYPES,
 )
 
 
@@ -46,7 +46,10 @@ def load_scenarios(path: Path | str | None = None) -> list[Scenario]:
         with open(path, encoding="utf-8") as f:
             raw = json.load(f)
     else:
-        ref = importlib.resources.files("mnemebrain_benchmark.scenarios") / "data" / "scenarios.json"
+        ref = (
+            importlib.resources.files("mnemebrain_benchmark.scenarios")
+            / "data" / "scenarios.json"
+        )
         raw = json.loads(ref.read_text(encoding="utf-8"))
 
     scenarios: list[Scenario] = []
@@ -72,7 +75,10 @@ def load_bmb_scenarios(path: Path | str | None = None) -> list[Scenario]:
     if path is not None:
         return load_scenarios(path)
 
-    ref = importlib.resources.files("mnemebrain_benchmark.scenarios") / "data" / "bmb_scenarios.json"
+    ref = (
+        importlib.resources.files("mnemebrain_benchmark.scenarios")
+        / "data" / "bmb_scenarios.json"
+    )
     raw = json.loads(ref.read_text(encoding="utf-8"))
 
     scenarios: list[Scenario] = []

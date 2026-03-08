@@ -1,7 +1,6 @@
 """Tests for mnemebrain_benchmark.adapters.openai_rag_adapter (mocked OpenAI)."""
 from __future__ import annotations
 
-import importlib
 import sys
 from types import ModuleType
 from unittest.mock import MagicMock

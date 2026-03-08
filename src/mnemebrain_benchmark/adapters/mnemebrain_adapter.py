@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import os
 
-from mnemebrain import MnemeBrainClient, EvidenceInput
+from mnemebrain import EvidenceInput, MnemeBrainClient
 
 from mnemebrain_benchmark.interface import (
     AttackResult,
@@ -202,7 +202,10 @@ class MnemeBrainAdapter(MemorySystem):
 
     # -- Attack (benchmark) --
 
-    def add_attack(self, attacker_id: str, target_id: str, attack_type: str, weight: float) -> AttackResult:
+    def add_attack(
+        self, attacker_id: str, target_id: str,
+        attack_type: str, weight: float,
+    ) -> AttackResult:
         result = self._client.benchmark_attack(attacker_id, target_id, attack_type, weight)
         return AttackResult(
             edge_id=result.edge_id,

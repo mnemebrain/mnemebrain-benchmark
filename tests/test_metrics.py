@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from mnemebrain_benchmark.dataset import ClaimPair
 from mnemebrain_benchmark.metrics import (
-    BenchmarkMetrics,
     PairResult,
     compute_metrics,
     evaluate_pair,
