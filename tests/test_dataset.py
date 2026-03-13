@@ -39,7 +39,7 @@ class TestClaimPair:
             difficulty="easy",
         )
         with pytest.raises(AttributeError):
-            p.id = "2"  # type: ignore[misc]
+            p.id = "2"
 
 
 class TestValidSets:

@@ -40,6 +40,22 @@ src/mnemebrain_benchmark/
     data/
       preference_scenarios.json  # 10 preference tracking scenarios
       qa_scenarios.json          # 8 long-horizon QA scenarios
+  external_evals/
+    __init__.py            # Re-exports: ExternalBenchmarkAdapter, Scenario, scoring
+    __main__.py            # CLI: mnemebrain-external-benchmark
+    base.py                # Scenario dataclass + ExternalBenchmarkAdapter ABC
+    scorer.py              # token_f1, exact_match, BenchmarkReport, SubsetScore
+    claim_extractor.py     # ExtractedClaim, sentence/LLM extraction
+    answer_generator.py    # answer_from_beliefs (QueryResult to text)
+    longmemeval/
+      __init__.py
+      loader.py            # Parse LongMemEval JSON/JSONL/directory
+      adapter.py           # LongMemEvalAdapter
+      run.py               # run_longmemeval + system creation
+    hotpotqa/
+      __init__.py
+      loader.py            # Parse HotpotQA JSON/JSONL
+      adapter.py           # HotpotQAAdapter (multi-hop + single-hop fallback)
   data/
     claim_pairs.json       # Embedding benchmark dataset
 ```
@@ -102,6 +118,10 @@ Flagship evaluation. 48 tasks across 8 categories testing belief dynamics. See [
 ### 4. Task-Level Evaluations
 
 18 real-world scenarios (preference tracking + long-horizon QA) measuring downstream task improvement from better memory capabilities.
+
+### 5. External Benchmarks
+
+3rd-party academic benchmarks (LongMemEval, HotpotQA) using standard QA metrics (token F1, exact match). Unlike the internal benchmarks above, these use established datasets and scoring conventions for comparability with published results. See [external-benchmarks.md](external-benchmarks.md) for details.
 
 ## Adapters
 

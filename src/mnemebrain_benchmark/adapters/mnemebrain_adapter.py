@@ -76,6 +76,7 @@ class MnemeBrainAdapter(MemorySystem):
             contradiction_detected=result.conflict,
             truth_state=result.truth_state,
             confidence=result.confidence,
+            was_separated=getattr(result, "was_separated", False),
         )
 
     def query(self, claim: str) -> list[QueryResult]:

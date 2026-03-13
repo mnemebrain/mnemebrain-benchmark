@@ -25,6 +25,7 @@ dev = ["pytest>=8.0", "pytest-cov>=5.0", "ruff>=0.8", "mypy>=1.13"]
 mnemebrain-bmb = "mnemebrain_benchmark.bmb_cli:main"
 mnemebrain-benchmark = "mnemebrain_benchmark.system_cli:main"
 mnemebrain-task-eval = "mnemebrain_benchmark.task_evals.__main__:main"
+mnemebrain-external-benchmark = "mnemebrain_benchmark.external_evals.__main__:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mnemebrain_benchmark"]

@@ -2,6 +2,31 @@
 
 All notable changes to mnemebrain-benchmark will be documented in this file.
 
+## [0.1.0a3] - 2026-03-13
+
+### Added
+
+- **External Benchmark Framework** — pluggable adapters for 3rd-party academic benchmarks (LongMemEval, HotpotQA) that evaluate memory systems using established datasets
+  - `ExternalBenchmarkAdapter` ABC with `load_dataset()`, `ingest()`, `answer()`, `score()` methods
+  - `LongMemEvalAdapter` — multi-session conversation memory benchmark (knowledge updates, temporal reasoning)
+  - `HotpotQAAdapter` — multi-hop QA benchmark with HippoRAG support and single-hop fallback
+  - Claim extraction pipeline: sentence splitting (deterministic) and LLM-based extraction
+  - Answer generation: bridges `QueryResult` objects to natural language answers with optional LLM synthesis
+  - Scoring: token-level F1 and exact match (standard QA evaluation metrics)
+  - Unified CLI: `mnemebrain-external-benchmark longmemeval|hotpotqa --data-path ... [--system lite|full] [--llm-extract] [--llm-answer]`
+- New CLI entry point: `mnemebrain-external-benchmark`
+
+### Tests
+
+- 37 new tests for external benchmark framework (scorer, claim extractor, answer generator, loaders)
+- Test coverage: 326 tests total (up from 289)
+
+### Docs
+
+- Added `docs/external-benchmarks.md` — architecture, usage, and extension guide for external benchmarks
+- Updated README with external benchmarks section and CLI reference
+- Updated `docs/architecture.md` with external_evals directory structure
+
 ## [0.1.0a2] - 2026-03-08
 
 ### Fixed

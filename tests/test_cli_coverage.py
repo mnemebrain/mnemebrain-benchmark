@@ -73,17 +73,23 @@ class TestBmbCliBuildAdapters:
         assert "langchain_buffer" in names
 
     def test_build_adapters_mnemebrain_import_error(self):
+        import sys as _sys
+
         from mnemebrain_benchmark.bmb_cli import _build_adapters
 
-        with patch.dict("sys.modules", {"mnemebrain": None}):
-            with patch(
-                "mnemebrain_benchmark.bmb_cli._build_adapters",
-                wraps=_build_adapters,
-            ):
+        # Must also evict the cached adapter module so the lazy import
+        # inside _build_adapters re-triggers `from mnemebrain import …`.
+        adapter_key = "mnemebrain_benchmark.adapters.mnemebrain_adapter"
+        saved_adapter = _sys.modules.pop(adapter_key, None)
+        try:
+            with patch.dict("sys.modules", {"mnemebrain": None}):
                 # When filter is None, ImportError is silently skipped
                 adapters = _build_adapters(adapter_filter=None)
                 names = [a.name() for a in adapters]
                 assert "mnemebrain" not in names
+        finally:
+            if saved_adapter is not None:
+                _sys.modules[adapter_key] = saved_adapter
 
     def test_build_adapters_langchain_only(self):
         from mnemebrain_benchmark.bmb_cli import _build_adapters

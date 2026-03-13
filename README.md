@@ -92,6 +92,23 @@ Different systems expose different memory abstractions; BMB evaluates them throu
 - **mnemebrain (full)** = research system with extended capabilities (12 capabilities). Requires backend server.
 - The benchmark evaluates both via declared capabilities — the 7% gap comes from edge cases in dedup/temporal thresholds, not fundamental design differences.
 
+## External Benchmarks
+
+Evaluate MnemeBrain against established academic datasets using standard QA metrics (token F1, exact match):
+
+- **LongMemEval** — multi-session conversation memory (knowledge updates, temporal reasoning, multi-session recall)
+- **HotpotQA** — multi-hop QA requiring reasoning across multiple documents (bridge and comparison questions)
+
+```bash
+# Run LongMemEval
+mnemebrain-external-benchmark longmemeval --data-path /path/to/data.json --system lite
+
+# Run HotpotQA with multi-hop retrieval
+mnemebrain-external-benchmark hotpotqa --data-path /path/to/data.json --system full --llm-answer
+```
+
+See [docs/external-benchmarks.md](docs/external-benchmarks.md) for architecture, claim extraction modes, and how to add new benchmarks.
+
 ## Task-Level Evaluations
 
 18 scenarios (~59 questions) measuring whether better memory produces correct downstream answers:
@@ -127,6 +144,11 @@ mnemebrain-task-eval                               # All evaluations
 mnemebrain-task-eval --eval preference             # Preference tracking only
 mnemebrain-task-eval --eval qa                     # Long-horizon QA only
 
+# External benchmarks (3rd-party academic datasets)
+mnemebrain-external-benchmark longmemeval --data-path data.json
+mnemebrain-external-benchmark hotpotqa --data-path data.json --system full
+mnemebrain-external-benchmark longmemeval --data-path data.json --llm-extract --llm-answer -v
+
 # Embedding benchmark
 python -m mnemebrain.benchmark                     # All providers
 python -m mnemebrain.benchmark --provider sentence_transformers --model all-MiniLM-L6-v2
@@ -143,7 +165,8 @@ mnemebrain_benchmark/
 ├── system_runner.py      # Scenario executor (capability-aware skip logic)
 ├── adapters/             # 8 memory system implementations
 ├── scenarios/            # Scenario schema + JSON loader
-└── task_evals/           # Task-level evaluation framework
+├── task_evals/           # Task-level evaluation framework
+└── external_evals/       # 3rd-party benchmarks (LongMemEval, HotpotQA)
 ```
 
 See [docs/architecture.md](docs/architecture.md) for the full project structure and design.
@@ -155,6 +178,7 @@ See [docs/architecture.md](docs/architecture.md) for the full project structure 
 - [docs/reproducing-results.md](docs/reproducing-results.md) — exact commands to reproduce each adapter's score
 - [docs/architecture.md](docs/architecture.md) — project structure and core abstractions
 - [docs/adding-adapters.md](docs/adding-adapters.md) — implementing new memory system adapters
+- [docs/external-benchmarks.md](docs/external-benchmarks.md) — LongMemEval, HotpotQA, and adding new external benchmarks
 
 ## Contributing
 

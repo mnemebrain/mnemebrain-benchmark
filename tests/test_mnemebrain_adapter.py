@@ -14,6 +14,12 @@ from mnemebrain_benchmark.interface import Capability
 @pytest.fixture(autouse=True)
 def mock_mnemebrain_sdk():
     """Inject a fake mnemebrain module so we can import the adapter without the real SDK."""
+    # Remove any previously-cached adapter module so it gets re-imported
+    # with our fake mnemebrain module (fixes test-ordering issues).
+    adapter_key = "mnemebrain_benchmark.adapters.mnemebrain_adapter"
+    saved_adapter = sys.modules.pop(adapter_key, None)
+    saved_mnemebrain = sys.modules.get("mnemebrain")
+
     fake_mod = ModuleType("mnemebrain")
 
     class FakeEvidenceInput:
@@ -142,7 +148,14 @@ def mock_mnemebrain_sdk():
     fake_mod.EvidenceInput = FakeEvidenceInput
     sys.modules["mnemebrain"] = fake_mod
     yield
-    del sys.modules["mnemebrain"]
+    # Restore original modules
+    sys.modules.pop(adapter_key, None)
+    if saved_adapter is not None:
+        sys.modules[adapter_key] = saved_adapter
+    if saved_mnemebrain is not None:
+        sys.modules["mnemebrain"] = saved_mnemebrain
+    else:
+        sys.modules.pop("mnemebrain", None)
 
 
 def _get_adapter():

@@ -103,7 +103,9 @@ def _serialize_report(report: dict) -> dict:
             return round(obj, 6)
         return obj
 
-    return _convert(report)  # type: ignore[return-value]
+    result = _convert(report)
+    assert isinstance(result, dict)
+    return result
 
 
 def save_report(report: dict, path: Path | str) -> None:

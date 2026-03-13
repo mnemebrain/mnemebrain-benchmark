@@ -143,7 +143,8 @@ class TestMemoryTierResult:
 class TestMemorySystemABC:
     def test_cannot_instantiate(self):
         with pytest.raises(TypeError):
-            MemorySystem()  # type: ignore[abstract]
+            cls: type = MemorySystem
+            cls()
 
     def test_optional_methods_raise(self):
         """All optional methods should raise NotImplementedError by default."""
