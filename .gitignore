@@ -17,3 +17,4 @@ htmlcov/
 !src/mnemebrain_benchmark/task_evals/data/*.json
 !src/mnemebrain_benchmark/data/*.json
 .dirigent/
+src/mnemebrain_benchmark/data/

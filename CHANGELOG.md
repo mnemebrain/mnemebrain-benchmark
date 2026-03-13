@@ -2,17 +2,36 @@
 
 All notable changes to mnemebrain-benchmark will be documented in this file.
 
+## [0.1.0a4] - 2026-03-13
+
+### Added
+
+- **Shared adapter factory** (`adapter_factory.py`) — centralizes adapter instantiation so all CLIs share one `build_adapters()` function and `ALL_ADAPTERS` list
+- **Unified BMB + external benchmark CLI** — `mnemebrain-bmb` now supports running external benchmarks alongside BMB via `--include-external`, `--external-only`, `--data-path`, `--external-benchmark`, `--external-limit` flags
+- **All 8 adapters in external benchmarks CLI** — `--system` accepts any adapter name instead of only "lite"/"full"
+- `--embedder` and `--embedder-model` args added to external benchmark CLI
+
+### Changed
+
+- `bmb_cli.py`, `system_cli.py`, `external_evals/__main__.py`, `external_evals/longmemeval/run.py` all use shared `adapter_factory.build_adapters()`
+- `run_longmemeval()` accepts a pre-built `system` argument; `_create_system()` supports legacy "lite"/"full" aliases via adapter factory
+
+### Tests
+
+- 66 new tests for adapter factory and external benchmark integration
+- Test coverage for modified files: 99% (383 tests total, up from 326)
+
 ## [0.1.0a3] - 2026-03-13
 
 ### Added
 
-- **External Benchmark Framework** — pluggable adapters for 3rd-party academic benchmarks (LongMemEval, HotpotQA) that evaluate memory systems using established datasets
+- **External Benchmark Framework** — pluggable adapters for 3rd-party academic benchmarks (LongMemEval, HotpotQA) that test memory systems using established datasets
   - `ExternalBenchmarkAdapter` ABC with `load_dataset()`, `ingest()`, `answer()`, `score()` methods
   - `LongMemEvalAdapter` — multi-session conversation memory benchmark (knowledge updates, temporal reasoning)
   - `HotpotQAAdapter` — multi-hop QA benchmark with HippoRAG support and single-hop fallback
   - Claim extraction pipeline: sentence splitting (deterministic) and LLM-based extraction
   - Answer generation: bridges `QueryResult` objects to natural language answers with optional LLM synthesis
-  - Scoring: token-level F1 and exact match (standard QA evaluation metrics)
+  - Scoring: token-level F1 and exact match (standard QA metrics)
   - Unified CLI: `mnemebrain-external-benchmark longmemeval|hotpotqa --data-path ... [--system lite|full] [--llm-extract] [--llm-answer]`
 - New CLI entry point: `mnemebrain-external-benchmark`
 

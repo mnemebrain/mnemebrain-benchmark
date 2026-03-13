@@ -20,7 +20,7 @@ class TestBmbCli:
         assert exc_info.value.code == 0
 
     def test_all_adapters_list(self):
-        from mnemebrain_benchmark.bmb_cli import ALL_ADAPTERS
+        from mnemebrain_benchmark.adapter_factory import ALL_ADAPTERS
 
         assert "mnemebrain" in ALL_ADAPTERS
         assert "langchain_buffer" in ALL_ADAPTERS
@@ -33,7 +33,7 @@ class TestBmbCli:
         assert "consolidation" in BMB_CATEGORIES
         assert len(BMB_CATEGORIES) == 8
 
-    @patch("mnemebrain_benchmark.bmb_cli._build_adapters")
+    @patch("mnemebrain_benchmark.bmb_cli.build_adapters")
     @patch("mnemebrain_benchmark.bmb_cli.load_bmb_scenarios")
     def test_run_bmb_with_langchain(self, mock_load, mock_adapters, tmp_path):
         from mnemebrain_benchmark.adapters.langchain_buffer import LangChainBufferBaseline
@@ -77,9 +77,9 @@ class TestBmbCli:
         assert "N/A" in captured.out
 
     def test_build_adapters_langchain(self):
-        from mnemebrain_benchmark.bmb_cli import _build_adapters
+        from mnemebrain_benchmark.adapter_factory import build_adapters
 
-        adapters = _build_adapters("langchain_buffer")
+        adapters = build_adapters("langchain_buffer")
         assert len(adapters) == 1
         assert adapters[0].name() == "langchain_buffer"
 

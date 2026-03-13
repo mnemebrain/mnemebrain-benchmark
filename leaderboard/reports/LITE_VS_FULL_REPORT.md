@@ -40,15 +40,18 @@ The benchmark adapter wraps `mnemebrain_core.BeliefMemory` directly — no SDK, 
 48 tasks | 8 categories | ~100 checks
 
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  mnemebrain (full)    ████████████████████ 100%
-  mnemebrain_lite      ████████████████████ 100%
-  structured_memory    ███████              36%
-  mem0 (real API)      █████                29%
-  naive_baseline                             0%
-  rag_baseline                               0%
-  langchain_buffer                           0%
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Scores are coverage-weighted: score × (categories_attempted / total)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  System               Weighted   Raw (attempted)  Coverage
+  ─────────────────────────────────────────────────────────
+  mnemebrain (full)    ████████████████████ 100%   100% [8/8]
+  mnemebrain_lite      ██████████           50%   100% [4/8]
+  structured_memory    █████                14%    36% [3/8]
+  mem0 (real API)      ████                 11%    29% [3/8]
+  naive_baseline       █                     0%     0% [1/8]
+  rag_baseline         █                     0%     0% [1/8]
+  langchain_buffer     █                     0%     0% [1/8]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ### Per-Category Breakdown: Lite vs Full
@@ -64,7 +67,7 @@ The benchmark adapter wraps `mnemebrain_core.BeliefMemory` directly — no SDK, 
 | Multi-hop Retrieval | **100%** | N/A (skipped) | — | Requires HippoRAG (full only) |
 | Pattern Separation | **100%** | N/A (skipped) | — | Requires ANN index (full only) |
 
-**Key takeaway**: On the 4 categories Lite supports, it scores **100%** — full parity with the backend on core belief operations.
+**Key takeaway**: On the 4 categories Lite supports, it scores **100% raw** — full parity with the backend on core belief operations. The **weighted score is 50%** because Lite covers 4 of 8 categories.
 
 ### What changed: 93% → 100%
 
@@ -143,7 +146,8 @@ Lite wins on overall score (80.6% vs 66.7%) and scores on 6 categories vs baseli
 | **Pattern separation** | ❌ | ✅ |
 | **Working memory frames** | ✅ | ✅ |
 | **REST API** | ✅ (optional) | ✅ |
-| **BMB Score** | 100% (4 categories) | 100% (8 categories) |
+| **BMB Score (raw)** | 100% (4/8 categories) | 100% (8/8 categories) |
+| **BMB Score (weighted)** | 50% | 100% |
 | **Task Eval Accuracy** | ~75% | ~95%* |
 
 *Full backend task eval scores from prior runs.
@@ -152,9 +156,9 @@ Lite wins on overall score (80.6% vs 66.7%) and scores on 6 categories vs baseli
 
 ## 5. Conclusions
 
-1. **Lite is production-ready for core belief maintenance.** 100% BMB on supported categories, 74-76% task accuracy — dramatically better than any baseline (0-36% BMB, 24-32% task accuracy).
+1. **Lite is production-ready for core belief maintenance.** 100% raw BMB on 4/8 supported categories (50% weighted), 74-76% task accuracy — dramatically better than any baseline (0-36% raw BMB, 24-32% task accuracy).
 
-2. **The core engine is the differentiator.** The 100% vs 0% gap between Lite and baselines proves that Belnap logic + evidence ledger + temporal decay is what matters. The full backend's extensions (consolidation, HippoRAG, sandbox) add 4 additional capability categories.
+2. **The core engine is the differentiator.** The 50% weighted vs 0-14% weighted gap between Lite and baselines proves that Belnap logic + evidence ledger + temporal decay is what matters. The full backend's extensions (consolidation, HippoRAG, sandbox) bring it to 100% weighted by covering all 8 categories.
 
 3. **Lite needs no server.** `pip install mnemebrain-lite` and call `BeliefMemory(db_path)` directly. Useful for embedded agents, local tools, and lightweight deployments.
 

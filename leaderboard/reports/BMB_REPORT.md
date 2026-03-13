@@ -222,19 +222,22 @@ All results are from actual benchmark execution with real embeddings (`text-embe
 ```
 Belief Maintenance Benchmark (BMB)
 48 tasks | 8 categories | ~100 checks
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  mnemebrain (full)    ████████████████████ 100%
-  mnemebrain_lite      ████████████████████ 100%
-  structured_memory    ███████              36%
-  mem0 (real API)      █████                29%
-  naive_baseline                             0%
-  rag_baseline                               0%
-  openai_rag (real)                          0%
-  langchain_buffer                           0%
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Scores are coverage-weighted: score × (categories_attempted / total)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  System               Weighted   Raw (attempted)  Coverage
+  ─────────────────────────────────────────────────────────
+  mnemebrain (full)    ████████████████████ 100%   100% [8/8]
+  mnemebrain_lite      ██████████           50%   100% [4/8]
+  structured_memory    █████                14%    36% [3/8]
+  mem0 (real API)      ████                 11%    29% [3/8]
+  naive_baseline       █                     0%     0% [1/8]
+  rag_baseline         █                     0%     0% [1/8]
+  openai_rag (real)    █                     0%     0% [1/8]
+  langchain_buffer     █                     0%     0% [1/8]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Note: Non-MnemeBrain systems skip all 18 Phase 5 scenarios (consolidation, multi-hop, pattern separation) due to missing capabilities. Lite skips categories requiring capabilities it doesn't support (sandbox, consolidation, hipporag, pattern separation).
+**Scoring methodology**: Each system is scored on the categories it supports (Raw), then weighted by the fraction of total categories attempted (Weighted = Raw × Coverage). This prevents systems that skip categories from appearing equivalent to systems that pass all of them. Lite scores 100% on its 4 supported categories but 50% weighted because it covers half the benchmark.
 
 ### MnemeBrain (full backend): 100%, 48/48 scenarios
 
@@ -249,7 +252,7 @@ Note: Non-MnemeBrain systems skip all 18 Phase 5 scenarios (consolidation, multi
 | Pattern Separation | 6/6 | **100%** |
 | Consolidation | 6/6 | **100%** |
 
-### MnemeBrain Lite: 100% on supported categories (24/24 scenarios)
+### MnemeBrain Lite: 100% raw / 50% weighted (24/48 scenarios, 4/8 categories)
 
 | Category | Scenarios | Score |
 |----------|-----------|-------|
@@ -262,7 +265,7 @@ Note: Non-MnemeBrain systems skip all 18 Phase 5 scenarios (consolidation, multi
 | Multi-hop Retrieval | N/A | skipped (requires hipporag) |
 | Pattern Separation | N/A | skipped (requires pattern separation) |
 
-Lite achieves full parity with the backend on the 4 core categories. The 93% → 100% improvement (v0.1.0a4 → v0.1.0a6) came from adapter-level fixes:
+Lite achieves full parity with the backend on the 4 core categories (100% raw). The weighted score of 50% reflects that Lite covers 4 of 8 categories — it does not support sandbox, consolidation, HippoRAG, or pattern separation. The 93% → 100% raw improvement (v0.1.0a4 → v0.1.0a6) came from adapter-level fixes:
 
 1. **Evidence-level retraction**: The benchmark runner tracks per-store `evidence_ids` and retracts specific evidence instead of entire beliefs, fixing the contradiction-resolved-by-retraction scenario.
 2. **Embedding preservation**: The adapter re-embeds beliefs after `retract()` and `revise()` operations, preserving vector search capability.

@@ -7,22 +7,24 @@
 
 ## Belief Maintenance Benchmark (BMB)
 
-48 tasks | 8 categories | ~100 checks
+48 tasks | 8 categories | ~100 checks | Scores are coverage-weighted: score x (categories_attempted / total)
 
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  mnemebrain (full)    ████████████████████ 100%
-  mnemebrain_lite      ████████████████████ 100%
-  structured_memory    ███████              36%
-  mem0 (real API)      █████                29%
-  naive_baseline                             0%
-  rag_baseline                               0%
-  openai_rag (real)                          0%
-  langchain_buffer                           0%
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  System               Weighted   Raw (attempted)  Coverage
+  ─────────────────────────────────────────────────────────
+  mnemebrain (full)    ████████████████████ 100%   100% [8/8]
+  mnemebrain_lite      ██████████           50%   100% [4/8]
+  structured_memory    █████                14%    36% [3/8]
+  mem0 (real API)      ████                 11%    29% [3/8]
+  naive_baseline       █                     0%     0% [1/8]
+  rag_baseline         █                     0%     0% [1/8]
+  openai_rag (real)    █                     0%     0% [1/8]
+  langchain_buffer     █                     0%     0% [1/8]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-### Per-Category Breakdown
+### Per-Category Breakdown (raw scores)
 
 | Category | mnemebrain | mnemebrain_lite | structured_memory | mem0 | naive | rag | openai_rag | langchain |
 |----------|:----------:|:---------------:|:-----------------:|:----:|:-----:|:---:|:----------:|:---------:|
@@ -36,6 +38,8 @@
 | Pattern Separation | **100%** | -- | -- | -- | -- | -- | -- | -- |
 
 `--` = skipped (adapter lacks required capability)
+
+**Scoring**: Raw scores show per-category accuracy on attempted scenarios only. The weighted leaderboard score = raw × (categories_attempted / 8). See [scoring details](../docs/scoring.md).
 
 ---
 
@@ -96,10 +100,11 @@
 
 ## Key Findings
 
-1. **Core belief engine is the differentiator**: MnemeBrain Lite scores 100% BMB (on supported categories) vs 0-36% for all baselines using only 7 of 12 capabilities.
-2. **Baselines fail structurally**: No baseline supports Belnap four-valued logic, temporal decay, or sandbox reasoning.
-3. **Mem0 (real API, graph enabled)**: 29% despite graph memory -- no epistemic operations, aggressive deduplication loses evidence.
-4. **Task accuracy follows capability**: 74-76% downstream accuracy (Lite) vs 24-32% (baselines) confirms memory capabilities translate to correct answers.
+1. **Core belief engine is the differentiator**: MnemeBrain Lite scores 50% weighted (100% raw on 4/8 categories) vs 0-14% weighted for all baselines, using only 7 of 12 capabilities.
+2. **Full backend covers the complete benchmark**: 100% weighted (8/8 categories) — the only system that attempts and passes all 48 scenarios.
+3. **Baselines fail structurally**: No baseline supports Belnap four-valued logic, temporal decay, or sandbox reasoning.
+4. **Mem0 (real API, graph enabled)**: 11% weighted (29% raw on 3/8 categories) despite graph memory — no epistemic operations, aggressive deduplication loses evidence.
+5. **Task accuracy follows capability**: 74-76% downstream accuracy (Lite) vs 24-32% (baselines) confirms memory capabilities translate to correct answers.
 
 ---
 

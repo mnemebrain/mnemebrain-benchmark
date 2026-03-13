@@ -56,11 +56,35 @@ Categories where all scenarios are skipped show `--` (no score).
 
 ## Per-Adapter Aggregation
 
+BMB reports three metrics per adapter:
+
+### 1. Raw score (attempted categories only)
+
 ```python
-overall_score = mean(scenario.score() for scenario in all_scenarios if not scenario.skipped)
+raw_score = mean(cat.score for cat in categories if not cat.skipped)
 ```
 
-This is a flat mean across all non-skipped scenarios, not a mean of category scores. Since each category has 6 scenarios and categories are either fully attempted or fully skipped for a given adapter, the two approaches are equivalent in practice.
+This is the average across non-skipped categories. It answers: "How well does the adapter perform on what it supports?"
+
+### 2. Coverage
+
+```python
+coverage = categories_attempted / total_categories
+```
+
+The fraction of BMB categories the adapter actually runs. An adapter that skips 4 of 8 categories has 50% coverage.
+
+### 3. Weighted score (overall)
+
+```python
+weighted_score = raw_score × coverage
+```
+
+This is the headline number on the leaderboard. It penalises adapters that skip categories, preventing a system that passes 4/8 categories from appearing equivalent to one that passes 8/8.
+
+**Why weighted?** Without coverage weighting, an adapter that only implements `store` + `query` and skips 7/8 categories could score 0% (raw) — the same as one that attempts all 8 and fails everything. That's fine. But an adapter that implements 4 capabilities and scores 100% raw on those 4 categories would show 100% — identical to a system that passes all 48 scenarios. The weighted score makes this distinction visible: 100% × 4/8 = **50%** vs 100% × 8/8 = **100%**.
+
+Since each category has 6 scenarios and categories are either fully attempted or fully skipped for a given adapter, the raw score is equivalent to a flat mean across all non-skipped scenarios.
 
 ## Worked Example: Full Transparency Breakdown
 
@@ -70,12 +94,15 @@ This is a flat mean across all non-skipped scenarios, not a mean of category sco
 Total BMB scenarios:   48
 Skipped (missing caps): 43  (require retract/explain/contradiction/decay/sandbox/etc.)
 Attempted:              5   (only scenarios requiring just store + query)
+Categories attempted:   1/8 (contradiction only)
 
 Checks from attempted scenarios: 12
 Passed:   0   (baselines return truth_state=None, contradiction_detected=False)
 Failed:  12   (expectations require belief states the baseline doesn't compute)
 
-Score: 0 / 12 = 0%
+Raw score:      0 / 12 = 0%
+Coverage:       1/8 = 12.5%
+Weighted score: 0% × 12.5% = 0%
 ```
 
 ### mnemebrain_lite (7 capabilities)
@@ -84,12 +111,15 @@ Score: 0 / 12 = 0%
 Total BMB scenarios:   48
 Skipped (missing caps): 24  (require sandbox/attack/consolidation/hipporag/pattern_separation)
 Attempted:             24   (contradiction, belief_revision, evidence_tracking, temporal)
+Categories attempted:   4/8
 
 Checks from attempted scenarios: ~50
-Passed:  ~47
-Failed:   ~3  (edge cases in temporal decay thresholds and dedup similarity)
+Passed:  ~50
+Failed:    0
 
-Score: ~47 / ~50 = 93%
+Raw score:      ~50 / ~50 = 100%
+Coverage:       4/8 = 50%
+Weighted score: 100% × 50% = 50%
 ```
 
 ### mnemebrain (12 capabilities)
@@ -98,17 +128,31 @@ Score: ~47 / ~50 = 93%
 Total BMB scenarios:   48
 Skipped:                0
 Attempted:             48
+Categories attempted:   8/8
 
 Checks from attempted scenarios: ~100
 Passed:  ~100
 Failed:    0
 
-Score: ~100 / ~100 = 100%
+Raw score:      ~100 / ~100 = 100%
+Coverage:       8/8 = 100%
+Weighted score: 100% × 100% = 100%
 ```
 
-The key insight: rag_baseline's 0% and mnemebrain's 100% are computed over **different denominators**. The rag_baseline is not "failing 48 tasks" — it attempts 5 and fails the belief-state checks within those 5.
+The key insight: Lite and Full both score 100% raw, but they cover different amounts of the benchmark. The weighted score makes this visible — Lite at **50%** vs Full at **100%** correctly reflects that Lite covers half the categories.
 
 ## Score Interpretation Guide
+
+### Weighted score (leaderboard headline)
+
+| Score Range | Interpretation |
+|------------|---------------|
+| 100% | All 8 categories attempted and passed |
+| 50% | Either passes all of 4/8 categories, or passes half of all 8 |
+| 10-15% | Passes some checks on 2-3 categories, skips the rest |
+| 0% | No belief maintenance — fails all attempted checks |
+
+### Raw score (per-category detail)
 
 | Score Range | Interpretation |
 |------------|---------------|

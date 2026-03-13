@@ -12,9 +12,9 @@ BMB does not measure retrieval speed, embedding quality, or storage scalability.
 
 ## How scoring works
 
-BMB is **capability-aware**. Each scenario declares the capabilities it requires. Before execution, the runner checks the adapter's declared capabilities against the scenario's requirements. If the adapter lacks any required capability, the scenario is **skipped** — not counted as a failure, and excluded from the score denominator.
+BMB is **capability-aware**. Each scenario declares the capabilities it requires. Before execution, the runner checks the adapter's declared capabilities against the scenario's requirements. If the adapter lacks any required capability, the scenario is **skipped** — not counted as a failure in the raw score.
 
-This means a system supporting 2 of 12 capabilities is evaluated on a smaller task set than one supporting all 12. Scores reflect performance on attempted tasks only. See [docs/methodology.md](docs/methodology.md) for the full scoring rules.
+To prevent systems that skip categories from appearing equivalent to systems that pass all of them, BMB reports a **coverage-weighted score**: `raw_score × (categories_attempted / total_categories)`. A system that scores 100% on 4 of 8 categories gets a weighted score of 50%, not 100%. See [docs/scoring.md](docs/scoring.md) for the full scoring rules.
 
 ## Quickstart
 
@@ -31,10 +31,6 @@ mnemebrain-bmb --adapter mnemebrain
 mnemebrain-task-eval
 ```
 
-## Scoring methodology
-
-> Adapters are scored only on scenarios matching their declared capabilities. Unsupported scenarios are skipped and reported separately — not counted as failures. A system supporting 2 of 12 capabilities is evaluated on a smaller task set than one supporting all 12. The "Tasks Attempted" and "Tasks Skipped" columns below make this explicit.
-
 ## Results
 
 ```
@@ -42,16 +38,18 @@ Belief Maintenance Benchmark (BMB)
 48 tasks | 8 categories | ~100 checks
 ```
 
-| System | Score | Tasks Attempted | Tasks Skipped | Capabilities |
-|--------|------:|:---------------:|:-------------:|:------------:|
-| mnemebrain (full) | **100%** | 48 | 0 | 12 |
-| mnemebrain_lite | 93% | 24 | 24 | 7 |
-| structured_memory | 36% | 18 | 30 | 6 |
-| mem0 (real API) | 29% | 18 | 30 | 5 |
-| naive_baseline | 0% | 5 | 43 | 2 |
-| rag_baseline | 0% | 5 | 43 | 2 |
-| openai_rag (real API) | 0% | 5 | 43 | 2 |
-| langchain_buffer | 0% | 5 | 43 | 2 |
+| System | Score | Raw (attempted) | Tasks Attempted | Tasks Skipped | Capabilities |
+|--------|------:|:---------------:|:---------------:|:-------------:|:------------:|
+| mnemebrain (full) | **100%** | 100% | 48 | 0 | 12 |
+| mnemebrain_lite | **50%** | 100% | 24 | 24 | 7 |
+| structured_memory | 14% | 36% | 18 | 30 | 6 |
+| mem0 (real API) | 11% | 29% | 18 | 30 | 5 |
+| naive_baseline | 0% | 0% | 5 | 43 | 2 |
+| rag_baseline | 0% | 0% | 5 | 43 | 2 |
+| openai_rag (real API) | 0% | 0% | 5 | 43 | 2 |
+| langchain_buffer | 0% | 0% | 5 | 43 | 2 |
+
+**Score** = coverage-weighted: raw × (categories_attempted / 8). **Raw** = accuracy on attempted categories only. See [docs/scoring.md](docs/scoring.md).
 
 Full analysis with failure breakdowns: [BMB_REPORT.md](leaderboard/reports/BMB_REPORT.md) | Lite vs full comparison: [LITE_VS_FULL_REPORT.md](leaderboard/reports/LITE_VS_FULL_REPORT.md)
 
@@ -90,7 +88,7 @@ Different systems expose different memory abstractions; BMB evaluates them throu
 
 - **mnemebrain_lite** = open-source embedded reference implementation (7 capabilities). Install with `pip install mnemebrain-lite[embeddings]`.
 - **mnemebrain (full)** = research system with extended capabilities (12 capabilities). Requires backend server.
-- The benchmark evaluates both via declared capabilities — the 7% gap comes from edge cases in dedup/temporal thresholds, not fundamental design differences.
+- Lite scores 100% raw on its 4 supported categories (50% weighted). Full scores 100% on all 8 categories. The gap is coverage — Lite doesn't support sandbox, consolidation, HippoRAG, or pattern separation.
 
 ## External Benchmarks
 
@@ -100,11 +98,17 @@ Evaluate MnemeBrain against established academic datasets using standard QA metr
 - **HotpotQA** — multi-hop QA requiring reasoning across multiple documents (bridge and comparison questions)
 
 ```bash
-# Run LongMemEval
-mnemebrain-external-benchmark longmemeval --data-path /path/to/data.json --system lite
+# Run LongMemEval with any adapter
+mnemebrain-external-benchmark longmemeval --data-path /path/to/data.json --system mnemebrain_lite
 
-# Run HotpotQA with multi-hop retrieval
-mnemebrain-external-benchmark hotpotqa --data-path /path/to/data.json --system full --llm-answer
+# Run HotpotQA with a specific adapter
+mnemebrain-external-benchmark hotpotqa --data-path /path/to/data.json --system structured_memory --llm-answer
+
+# Run BMB + external benchmarks in one command
+mnemebrain-bmb --include-external --data-path /path/to/data.json
+
+# Run external benchmarks only (skip BMB)
+mnemebrain-bmb --external-only --data-path /path/to/data.json --external-benchmark longmemeval
 ```
 
 See [docs/external-benchmarks.md](docs/external-benchmarks.md) for architecture, claim extraction modes, and how to add new benchmarks.
@@ -135,6 +139,11 @@ mnemebrain-bmb --category contradiction            # Single category
 mnemebrain-bmb --scenario bmb_vegetarian_contradiction  # Single scenario
 mnemebrain-bmb --output results/bmb_report.json    # Custom output
 
+# BMB + external benchmarks (unified)
+mnemebrain-bmb --include-external --data-path data.json
+mnemebrain-bmb --external-only --data-path data.json --external-benchmark longmemeval
+mnemebrain-bmb --external-only --data-path data.json --adapter mnemebrain_lite --external-limit 50
+
 # System benchmark
 mnemebrain-benchmark                               # All adapters
 mnemebrain-benchmark --adapter mnemebrain --category contradiction
@@ -144,9 +153,9 @@ mnemebrain-task-eval                               # All evaluations
 mnemebrain-task-eval --eval preference             # Preference tracking only
 mnemebrain-task-eval --eval qa                     # Long-horizon QA only
 
-# External benchmarks (3rd-party academic datasets)
-mnemebrain-external-benchmark longmemeval --data-path data.json
-mnemebrain-external-benchmark hotpotqa --data-path data.json --system full
+# External benchmarks (standalone CLI)
+mnemebrain-external-benchmark longmemeval --data-path data.json --system mnemebrain_lite
+mnemebrain-external-benchmark hotpotqa --data-path data.json --system structured_memory
 mnemebrain-external-benchmark longmemeval --data-path data.json --llm-extract --llm-answer -v
 
 # Embedding benchmark

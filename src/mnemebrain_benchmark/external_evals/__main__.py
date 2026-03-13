@@ -3,6 +3,7 @@
 Usage:
     python -m mnemebrain_benchmark.external_evals longmemeval --data-path ... [options]
     python -m mnemebrain_benchmark.external_evals hotpotqa --data-path ... [options]
+    python -m mnemebrain_benchmark.external_evals longmemeval --data-path ... --system structured_memory
 """
 
 from __future__ import annotations
@@ -12,6 +13,7 @@ import json
 import sys
 import time
 
+from mnemebrain_benchmark.adapter_factory import ALL_ADAPTERS, build_adapters
 from mnemebrain_benchmark.external_evals.scorer import (
     BenchmarkReport,
     QuestionScore,
@@ -19,6 +21,7 @@ from mnemebrain_benchmark.external_evals.scorer import (
     exact_match,
     token_f1,
 )
+from mnemebrain_benchmark.providers import EMBEDDER_CHOICES
 
 
 def _add_common_args(parser: argparse.ArgumentParser) -> None:
@@ -30,9 +33,22 @@ def _add_common_args(parser: argparse.ArgumentParser) -> None:
     )
     parser.add_argument(
         "--system",
-        choices=["lite", "full"],
-        default="lite",
-        help="System to benchmark (default: lite)",
+        choices=ALL_ADAPTERS,
+        default=None,
+        help="Adapter to benchmark (default: all available)",
+    )
+    parser.add_argument(
+        "--embedder",
+        type=str,
+        default=None,
+        choices=EMBEDDER_CHOICES,
+        help="Embedding provider (default: auto-detect)",
+    )
+    parser.add_argument(
+        "--embedder-model",
+        type=str,
+        default=None,
+        help="Model name override for the embedding provider",
     )
     parser.add_argument(
         "--limit",
@@ -94,92 +110,117 @@ def _write_json_report(report: BenchmarkReport, output_path: str) -> None:
     print(f"\nDetailed results written to {output_path}", file=sys.stderr)
 
 
+def _build_systems(args: argparse.Namespace) -> list:
+    """Build memory system(s) from CLI args, using the shared adapter factory."""
+    adapters = build_adapters(args.system, args.embedder, args.embedder_model)
+    if not adapters:
+        print("No matching adapters found.")
+        sys.exit(1)
+    return adapters
+
+
+def _output_path_for(base_path: str, system_name: str, count: int) -> str:
+    """Generate output path, appending system name when running multiple."""
+    if count <= 1:
+        return base_path
+    if "." in base_path:
+        base, ext = base_path.rsplit(".", 1)
+        return f"{base}_{system_name}.{ext}"
+    return f"{base_path}_{system_name}.json"
+
+
 def _run_longmemeval(args: argparse.Namespace) -> None:
     """Run LongMemEval benchmark."""
     from mnemebrain_benchmark.external_evals.longmemeval.run import run_longmemeval
 
-    report = run_longmemeval(
-        data_path=args.data_path,
-        system_type=args.system,
-        subset=args.subset,
-        limit=args.limit,
-        llm_extract=args.llm_extract,
-        llm_answer=args.llm_answer,
-        verbose=args.verbose,
-    )
-    print(report.summary())
-    if args.output_json:
-        _write_json_report(report, args.output_json)
+    systems = _build_systems(args)
+
+    for sys_adapter in systems:
+        report = run_longmemeval(
+            data_path=args.data_path,
+            system=sys_adapter,
+            subset=args.subset,
+            limit=args.limit,
+            llm_extract=args.llm_extract,
+            llm_answer=args.llm_answer,
+            verbose=args.verbose,
+        )
+        print(report.summary())
+        if args.output_json:
+            output = _output_path_for(args.output_json, sys_adapter.name(), len(systems))
+            _write_json_report(report, output)
 
 
 def _run_hotpotqa(args: argparse.Namespace) -> None:
     """Run HotpotQA benchmark."""
     from mnemebrain_benchmark.external_evals.hotpotqa.adapter import HotpotQAAdapter
-    from mnemebrain_benchmark.external_evals.longmemeval.run import _create_system
 
-    adapter = HotpotQAAdapter(
-        use_llm_extract=args.llm_extract,
-        use_llm_answer=args.llm_answer,
-    )
+    systems = _build_systems(args)
 
-    scenarios = adapter.load_dataset(args.data_path)
-    if args.limit:
-        scenarios = scenarios[:args.limit]
+    for sys_adapter in systems:
+        adapter = HotpotQAAdapter(
+            use_llm_extract=args.llm_extract,
+            use_llm_answer=args.llm_answer,
+        )
 
-    if args.verbose:
-        print(f"Loaded {len(scenarios)} scenarios", file=sys.stderr)
+        scenarios = adapter.load_dataset(args.data_path)
+        if args.limit:
+            scenarios = scenarios[:args.limit]
 
-    system = _create_system(args.system)
-    report = BenchmarkReport(
-        benchmark_name="hotpotqa",
-        system_name=system.name(),
-    )
-
-    for i, scenario in enumerate(scenarios):
         if args.verbose:
-            print(
-                f"  [{i + 1}/{len(scenarios)}] {scenario.scenario_id} "
-                f"({scenario.subset})",
-                file=sys.stderr,
-            )
+            print(f"Loaded {len(scenarios)} scenarios", file=sys.stderr)
 
-        system.reset()
-        adapter.ingest(system, scenario)
+        report = BenchmarkReport(
+            benchmark_name="hotpotqa",
+            system_name=sys_adapter.name(),
+        )
 
-        for q in scenario.questions:
-            t1 = time.monotonic()
-            predicted = adapter.answer(system, q)
-            answer_time = time.monotonic() - t1
-
-            gold = q.get("gold_answer", "")
-            f1 = token_f1(predicted, gold)
-            em = exact_match(predicted, gold)
-
-            q_score = QuestionScore(
-                question_id=f"{scenario.scenario_id}_{q.get('question', '')[:30]}",
-                question=q.get("question", ""),
-                gold_answer=gold,
-                predicted_answer=predicted,
-                f1=f1,
-                em=em,
-            )
-
-            subset_name = q.get("type") or scenario.subset
-            if subset_name not in report.subsets:
-                report.subsets[subset_name] = SubsetScore(subset=subset_name)
-            report.subsets[subset_name].question_scores.append(q_score)
-
+        for i, scenario in enumerate(scenarios):
             if args.verbose:
                 print(
-                    f"    Q: {q.get('question', '')[:50]}... "
-                    f"F1={f1:.3f} EM={em:.0f} "
-                    f"({answer_time:.2f}s)",
+                    f"  [{i + 1}/{len(scenarios)}] {scenario.scenario_id} "
+                    f"({scenario.subset})",
                     file=sys.stderr,
                 )
 
-    print(report.summary())
-    if args.output_json:
-        _write_json_report(report, args.output_json)
+            sys_adapter.reset()
+            adapter.ingest(sys_adapter, scenario)
+
+            for q in scenario.questions:
+                t1 = time.monotonic()
+                predicted = adapter.answer(sys_adapter, q)
+                answer_time = time.monotonic() - t1
+
+                gold = q.get("gold_answer", "")
+                f1 = token_f1(predicted, gold)
+                em = exact_match(predicted, gold)
+
+                q_score = QuestionScore(
+                    question_id=f"{scenario.scenario_id}_{q.get('question', '')[:30]}",
+                    question=q.get("question", ""),
+                    gold_answer=gold,
+                    predicted_answer=predicted,
+                    f1=f1,
+                    em=em,
+                )
+
+                subset_name = q.get("type") or scenario.subset
+                if subset_name not in report.subsets:
+                    report.subsets[subset_name] = SubsetScore(subset=subset_name)
+                report.subsets[subset_name].question_scores.append(q_score)
+
+                if args.verbose:
+                    print(
+                        f"    Q: {q.get('question', '')[:50]}... "
+                        f"F1={f1:.3f} EM={em:.0f} "
+                        f"({answer_time:.2f}s)",
+                        file=sys.stderr,
+                    )
+
+        print(report.summary())
+        if args.output_json:
+            output = _output_path_for(args.output_json, sys_adapter.name(), len(systems))
+            _write_json_report(report, output)
 
 
 def main(argv: list[str] | None = None) -> None:

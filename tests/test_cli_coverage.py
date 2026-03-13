@@ -60,31 +60,28 @@ def _make_scenario(name: str = "s1", category: str = "contradiction") -> Scenari
 # ===========================================================================
 
 
-class TestBmbCliBuildAdapters:
-    """Test _build_adapters branches for adapters that require optional deps."""
+class TestAdapterFactory:
+    """Test build_adapters from the shared adapter_factory module."""
 
     def test_build_adapters_no_filter_skips_unavailable(self):
         """With no filter, unavailable adapters are silently skipped."""
-        from mnemebrain_benchmark.bmb_cli import _build_adapters
+        from mnemebrain_benchmark.adapter_factory import build_adapters
 
         # At minimum langchain_buffer should always be available
-        adapters = _build_adapters(adapter_filter=None)
+        adapters = build_adapters(adapter_filter=None)
         names = [a.name() for a in adapters]
         assert "langchain_buffer" in names
 
     def test_build_adapters_mnemebrain_import_error(self):
         import sys as _sys
 
-        from mnemebrain_benchmark.bmb_cli import _build_adapters
+        from mnemebrain_benchmark.adapter_factory import build_adapters
 
-        # Must also evict the cached adapter module so the lazy import
-        # inside _build_adapters re-triggers `from mnemebrain import …`.
         adapter_key = "mnemebrain_benchmark.adapters.mnemebrain_adapter"
         saved_adapter = _sys.modules.pop(adapter_key, None)
         try:
             with patch.dict("sys.modules", {"mnemebrain": None}):
-                # When filter is None, ImportError is silently skipped
-                adapters = _build_adapters(adapter_filter=None)
+                adapters = build_adapters(adapter_filter=None)
                 names = [a.name() for a in adapters]
                 assert "mnemebrain" not in names
         finally:
@@ -92,20 +89,19 @@ class TestBmbCliBuildAdapters:
                 _sys.modules[adapter_key] = saved_adapter
 
     def test_build_adapters_langchain_only(self):
-        from mnemebrain_benchmark.bmb_cli import _build_adapters
+        from mnemebrain_benchmark.adapter_factory import build_adapters
 
-        adapters = _build_adapters("langchain_buffer")
+        adapters = build_adapters("langchain_buffer")
         assert len(adapters) == 1
         assert adapters[0].name() == "langchain_buffer"
 
     def test_build_adapters_mem0_import_error_with_filter(self):
         """When filtering to mem0 and it's not available, should sys.exit."""
-        from mnemebrain_benchmark import bmb_cli
+        from mnemebrain_benchmark import adapter_factory
 
-        original = bmb_cli._build_adapters
+        original = adapter_factory.build_adapters
 
-        def patched_build(adapter_filter=None):
-            # Simulate mem0 import failure
+        def patched_build(adapter_filter=None, embedder_name=None, embedder_model=None):
             if adapter_filter == "mem0":
                 import builtins
 
@@ -120,17 +116,17 @@ class TestBmbCliBuildAdapters:
                     return original(adapter_filter)
             return original(adapter_filter)
 
-        with patch.object(bmb_cli, "_build_adapters", patched_build):
+        with patch.object(adapter_factory, "build_adapters", patched_build):
             with pytest.raises(SystemExit):
                 patched_build("mem0")
 
     def test_build_adapters_openai_rag_import_error_with_filter(self):
         """When filtering to openai_rag and it's not available, should sys.exit."""
-        from mnemebrain_benchmark import bmb_cli
+        from mnemebrain_benchmark import adapter_factory
 
-        original = bmb_cli._build_adapters
+        original = adapter_factory.build_adapters
 
-        def patched_build(adapter_filter=None):
+        def patched_build(adapter_filter=None, embedder_name=None, embedder_model=None):
             if adapter_filter == "openai_rag":
                 import builtins
 
@@ -145,13 +141,13 @@ class TestBmbCliBuildAdapters:
                     return original(adapter_filter)
             return original(adapter_filter)
 
-        with patch.object(bmb_cli, "_build_adapters", patched_build):
+        with patch.object(adapter_factory, "build_adapters", patched_build):
             with pytest.raises(SystemExit):
                 patched_build("openai_rag")
 
 
 class TestBmbCliRunBmb:
-    @patch("mnemebrain_benchmark.bmb_cli._build_adapters")
+    @patch("mnemebrain_benchmark.bmb_cli.build_adapters")
     @patch("mnemebrain_benchmark.bmb_cli.load_bmb_scenarios")
     def test_run_bmb_category_filter(self, mock_load, mock_adapters, tmp_path):
         from mnemebrain_benchmark.bmb_cli import run_bmb
@@ -165,7 +161,7 @@ class TestBmbCliRunBmb:
         results = run_bmb(category="contradiction", output=output)
         assert "fake" in results
 
-    @patch("mnemebrain_benchmark.bmb_cli._build_adapters")
+    @patch("mnemebrain_benchmark.bmb_cli.build_adapters")
     @patch("mnemebrain_benchmark.bmb_cli.load_bmb_scenarios")
     def test_run_bmb_scenario_filter(self, mock_load, mock_adapters, tmp_path):
         from mnemebrain_benchmark.bmb_cli import run_bmb
@@ -179,7 +175,7 @@ class TestBmbCliRunBmb:
         results = run_bmb(scenario_name="target_scen", output=output)
         assert "fake" in results
 
-    @patch("mnemebrain_benchmark.bmb_cli._build_adapters")
+    @patch("mnemebrain_benchmark.bmb_cli.build_adapters")
     @patch("mnemebrain_benchmark.bmb_cli.load_bmb_scenarios")
     def test_run_bmb_no_matching_scenarios(self, mock_load, mock_adapters):
         from mnemebrain_benchmark.bmb_cli import run_bmb
@@ -189,7 +185,7 @@ class TestBmbCliRunBmb:
         with pytest.raises(SystemExit):
             run_bmb(category="nonexistent_category")
 
-    @patch("mnemebrain_benchmark.bmb_cli._build_adapters")
+    @patch("mnemebrain_benchmark.bmb_cli.build_adapters")
     @patch("mnemebrain_benchmark.bmb_cli.load_bmb_scenarios")
     def test_run_bmb_no_adapters(self, mock_load, mock_adapters):
         from mnemebrain_benchmark.bmb_cli import run_bmb
@@ -209,6 +205,13 @@ class TestBmbCliRunBmb:
             category="contradiction",
             scenario_name=None,
             output="out.json",
+            embedder_name=None,
+            embedder_model=None,
+            include_external=False,
+            external_only=False,
+            data_path=None,
+            external_benchmark="all",
+            external_limit=None,
         )
 
     @patch("mnemebrain_benchmark.bmb_cli.run_bmb")
@@ -221,6 +224,33 @@ class TestBmbCliRunBmb:
             category=None,
             scenario_name="my_scen",
             output="bmb_report.json",
+            embedder_name=None,
+            embedder_model=None,
+            include_external=False,
+            external_only=False,
+            data_path=None,
+            external_benchmark="all",
+            external_limit=None,
+        )
+
+    @patch("mnemebrain_benchmark.bmb_cli.run_bmb")
+    def test_main_with_external_flags(self, mock_run):
+        from mnemebrain_benchmark.bmb_cli import main
+
+        main(["--external-only", "--data-path", "/tmp/data.json",
+              "--external-benchmark", "longmemeval", "--external-limit", "10"])
+        mock_run.assert_called_once_with(
+            adapter_filter=None,
+            category=None,
+            scenario_name=None,
+            output="bmb_report.json",
+            embedder_name=None,
+            embedder_model=None,
+            include_external=False,
+            external_only=True,
+            data_path="/tmp/data.json",
+            external_benchmark="longmemeval",
+            external_limit=10,
         )
 
 
@@ -230,21 +260,21 @@ class TestBmbCliRunBmb:
 
 
 class TestSystemCliBuildAdapters:
+    """System CLI now delegates to adapter_factory.build_adapters.
+    These tests verify the adapter_factory integration via the CLI path."""
+
     def test_build_adapters_no_filter(self):
         """Without filter, builds whatever is importable."""
-        from mnemebrain_benchmark.system_cli import _build_adapters
+        from mnemebrain_benchmark.adapter_factory import build_adapters
 
-        # Will fail to import ST-based adapters but shouldn't crash
-        adapters = _build_adapters(adapter_filter=None)
-        # At minimum we get an empty list (no sentence-transformers)
-        # or a list of adapters if sentence-transformers is installed
+        adapters = build_adapters(adapter_filter=None)
         assert isinstance(adapters, list)
 
     def test_build_adapters_mnemebrain_import_error_with_filter(self):
         """Filtering to mnemebrain when SDK is missing exits."""
         import builtins
 
-        from mnemebrain_benchmark.system_cli import _build_adapters
+        from mnemebrain_benchmark.adapter_factory import build_adapters
 
         real_import = builtins.__import__
 
@@ -255,13 +285,13 @@ class TestSystemCliBuildAdapters:
 
         with patch("builtins.__import__", side_effect=fake_import):
             with pytest.raises(SystemExit):
-                _build_adapters("mnemebrain")
+                build_adapters("mnemebrain")
 
     def test_build_adapters_mnemebrain_lite_import_error_with_filter(self):
         """Filtering to mnemebrain_lite when not available exits."""
         import builtins
 
-        from mnemebrain_benchmark.system_cli import _build_adapters
+        from mnemebrain_benchmark.adapter_factory import build_adapters
 
         real_import = builtins.__import__
 
@@ -272,13 +302,13 @@ class TestSystemCliBuildAdapters:
 
         with patch("builtins.__import__", side_effect=fake_import):
             with pytest.raises(SystemExit):
-                _build_adapters("mnemebrain_lite")
+                build_adapters("mnemebrain_lite")
 
     def test_build_adapters_naive_import_error_with_filter(self):
         """Filtering to naive_baseline when ST is missing exits."""
         import builtins
 
-        from mnemebrain_benchmark.system_cli import _build_adapters
+        from mnemebrain_benchmark.adapter_factory import build_adapters
 
         real_import = builtins.__import__
 
@@ -289,11 +319,11 @@ class TestSystemCliBuildAdapters:
 
         with patch("builtins.__import__", side_effect=fake_import):
             with pytest.raises(SystemExit):
-                _build_adapters("naive_baseline")
+                build_adapters("naive_baseline")
 
 
 class TestSystemCliMain:
-    @patch("mnemebrain_benchmark.system_cli._build_adapters")
+    @patch("mnemebrain_benchmark.system_cli.build_adapters")
     @patch("mnemebrain_benchmark.system_cli.load_scenarios")
     def test_main_full_flow(self, mock_load, mock_adapters, tmp_path, capsys):
         from mnemebrain_benchmark.system_cli import main
@@ -306,7 +336,7 @@ class TestSystemCliMain:
         assert "Running" in captured.out
         assert (tmp_path / "report.json").exists()
 
-    @patch("mnemebrain_benchmark.system_cli._build_adapters")
+    @patch("mnemebrain_benchmark.system_cli.build_adapters")
     @patch("mnemebrain_benchmark.system_cli.load_scenarios")
     def test_main_category_filter(self, mock_load, mock_adapters, tmp_path, capsys):
         from mnemebrain_benchmark.system_cli import main
@@ -321,7 +351,7 @@ class TestSystemCliMain:
         captured = capsys.readouterr()
         assert "Running 1 scenarios" in captured.out
 
-    @patch("mnemebrain_benchmark.system_cli._build_adapters")
+    @patch("mnemebrain_benchmark.system_cli.build_adapters")
     @patch("mnemebrain_benchmark.system_cli.load_scenarios")
     def test_main_scenario_filter(self, mock_load, mock_adapters, tmp_path, capsys):
         from mnemebrain_benchmark.system_cli import main
@@ -333,7 +363,7 @@ class TestSystemCliMain:
         captured = capsys.readouterr()
         assert "Running" in captured.out
 
-    @patch("mnemebrain_benchmark.system_cli._build_adapters")
+    @patch("mnemebrain_benchmark.system_cli.build_adapters")
     @patch("mnemebrain_benchmark.system_cli.load_scenarios")
     def test_main_no_matching_scenarios(self, mock_load, mock_adapters):
         from mnemebrain_benchmark.system_cli import main
@@ -342,7 +372,7 @@ class TestSystemCliMain:
         with pytest.raises(SystemExit):
             main([])
 
-    @patch("mnemebrain_benchmark.system_cli._build_adapters")
+    @patch("mnemebrain_benchmark.system_cli.build_adapters")
     @patch("mnemebrain_benchmark.system_cli.load_scenarios")
     def test_main_no_adapters(self, mock_load, mock_adapters):
         from mnemebrain_benchmark.system_cli import main

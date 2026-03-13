@@ -28,7 +28,7 @@ pip install mnemebrain-lite[embeddings]
 mnemebrain-bmb --adapter mnemebrain_lite
 ```
 
-Expected: ~93% (24 tasks attempted, 24 skipped)
+Expected: 100% raw / 50% weighted (24 tasks attempted, 24 skipped, 4/8 categories)
 
 ### MnemeBrain Full
 

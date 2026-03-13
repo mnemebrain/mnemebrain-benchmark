@@ -6,6 +6,7 @@
 src/mnemebrain_benchmark/
   __init__.py              # Package exports
   __main__.py              # python -m mnemebrain.benchmark
+  adapter_factory.py       # Shared adapter factory (build_adapters, ALL_ADAPTERS)
   bmb_cli.py               # BMB CLI entry point
   system_cli.py            # System benchmark CLI entry point
   runner.py                # Embedding benchmark orchestrator
@@ -164,7 +165,7 @@ Every benchmark run follows this sequence per adapter, per scenario:
       └─ score = passed / total
 ```
 
-The runner collects `ScenarioScore` objects across all scenarios, then aggregates by category (mean of non-skipped scenario scores) and overall (mean of all non-skipped scenario scores).
+The runner collects `ScenarioScore` objects across all scenarios, then aggregates by category (mean of non-skipped scenario scores). The overall score is coverage-weighted: `raw_score × (categories_attempted / total_categories)`. See [scoring.md](scoring.md) for details.
 
 Key invariants:
 - `reset()` is called before every scenario — adapters must not carry state between scenarios

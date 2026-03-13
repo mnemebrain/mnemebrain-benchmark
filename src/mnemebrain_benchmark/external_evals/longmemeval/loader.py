@@ -87,22 +87,31 @@ def _load_jsonl_file(fp: Path) -> list[dict]:
 
 def _parse_scenario(item: dict) -> Scenario | None:
     """Parse a single LongMemEval item into a Scenario."""
-    scenario_id = item.get("id") or item.get("example_id") or ""
+    scenario_id = (
+        item.get("id") or item.get("example_id") or item.get("question_id") or ""
+    )
     if not scenario_id:
         return None
 
     subset = (
         item.get("category")
+        or item.get("question_type")
         or item.get("type")
         or item.get("subset")
         or "unknown"
     )
 
     history: list[dict] = []
-    sessions = item.get("sessions") or item.get("conversation") or []
+    sessions = (
+        item.get("sessions")
+        or item.get("haystack_sessions")
+        or item.get("conversation")
+        or []
+    )
 
     if isinstance(sessions, list) and sessions:
         if isinstance(sessions[0], dict) and "turns" in sessions[0]:
+            # Format: [{session_id, timestamp, turns: [{role, content}]}]
             for sess in sessions:
                 session_id = sess.get("session_id", "")
                 timestamp = sess.get("timestamp", "")
@@ -113,7 +122,21 @@ def _parse_scenario(item: dict) -> Scenario | None:
                         "timestamp": timestamp,
                         "session": session_id,
                     })
+        elif isinstance(sessions[0], list):
+            # Format: [[{role, content}, ...], ...] (haystack_sessions)
+            haystack_dates = item.get("haystack_dates", [])
+            for sess_idx, sess_turns in enumerate(sessions):
+                timestamp = haystack_dates[sess_idx] if sess_idx < len(haystack_dates) else ""
+                for turn in sess_turns:
+                    if isinstance(turn, dict):
+                        history.append({
+                            "role": turn.get("role", "user"),
+                            "content": turn.get("content", ""),
+                            "timestamp": timestamp,
+                            "session": str(sess_idx),
+                        })
         elif isinstance(sessions[0], dict) and "role" in sessions[0]:
+            # Format: [{role, content, timestamp?, session?}]
             for turn in sessions:
                 history.append({
                     "role": turn.get("role", "user"),
@@ -162,8 +185,9 @@ def _parse_scenario(item: dict) -> Scenario | None:
         history=history,
         questions=questions,
         metadata={k: v for k, v in item.items() if k not in {
-            "id", "example_id", "category", "type", "subset",
-            "sessions", "conversation", "questions", "qa_pairs",
-            "question", "answer", "gold_answer",
+            "id", "example_id", "question_id", "category", "type",
+            "question_type", "subset", "sessions", "haystack_sessions",
+            "conversation", "questions", "qa_pairs", "question", "answer",
+            "gold_answer",
         }},
     )

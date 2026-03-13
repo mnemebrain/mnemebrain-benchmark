@@ -15,7 +15,7 @@ Multi-session conversation memory benchmark. Tests whether a memory system can r
 ```bash
 mnemebrain-external-benchmark longmemeval \
     --data-path /path/to/longmemeval.json \
-    --system lite \
+    --system mnemebrain_lite \
     --subset knowledge_update \
     --limit 50 \
     --llm-extract \
@@ -33,7 +33,7 @@ Multi-hop QA benchmark requiring reasoning across multiple documents. Tests whet
 ```bash
 mnemebrain-external-benchmark hotpotqa \
     --data-path /path/to/hotpotqa.json \
-    --system full \
+    --system structured_memory \
     --difficulty hard \
     --limit 100 \
     --llm-answer \
@@ -53,7 +53,7 @@ external_evals/
   longmemeval/
     loader.py           # Parse LongMemEval JSON/JSONL/directory
     adapter.py          # LongMemEvalAdapter (ingest sessions, answer questions)
-    run.py              # run_longmemeval() + _create_system()
+    run.py              # run_longmemeval() + legacy system creation
   hotpotqa/
     loader.py           # Parse HotpotQA JSON/JSONL
     adapter.py          # HotpotQAAdapter (multi-hop with HippoRAG fallback)
@@ -112,10 +112,35 @@ Two modes for converting raw text into beliefs:
 
 ## System Selection
 
-The `--system` flag selects which memory system to benchmark:
+The `--system` flag selects which memory system to benchmark. All 8 adapters from the shared adapter factory are available:
 
-- `lite` (default) -- uses `MnemeBrainLiteAdapter` with `SentenceTransformerProvider` (no server needed)
-- `full` -- uses `MnemeBrainAdapter` (requires running MnemeBrain backend)
+- `mnemebrain_lite` (default) — embedded implementation, no server needed
+- `mnemebrain` — full backend (requires running MnemeBrain server)
+- `naive_baseline` — flat vector store with local embeddings
+- `langchain_buffer` — append-only text buffer
+- `rag_baseline` — RAG with local embeddings
+- `structured_memory` — Mem0-style structured memory (local)
+- `mem0` — Mem0 cloud API (requires API key)
+- `openai_rag` — RAG with OpenAI embeddings (requires API key)
+
+Legacy aliases `lite` and `full` are still accepted and map to `mnemebrain_lite` and `mnemebrain` respectively.
+
+Custom embedder selection is available via `--embedder` and `--embedder-model` flags.
+
+## Unified CLI
+
+External benchmarks can also be run via the BMB CLI for a single unified workflow:
+
+```bash
+# BMB + external benchmarks in one command
+mnemebrain-bmb --include-external --data-path /path/to/data.json
+
+# External benchmarks only (skip BMB)
+mnemebrain-bmb --external-only --data-path /path/to/data.json --external-benchmark longmemeval
+
+# External only, specific adapter and limit
+mnemebrain-bmb --external-only --data-path /path/to/data.json --adapter mnemebrain_lite --external-limit 50
+```
 
 ## Adding a New External Benchmark
 

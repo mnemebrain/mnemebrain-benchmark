@@ -81,11 +81,27 @@ If all scenarios in a category are skipped, the category score is `None` (displa
 
 ### Overall scoring
 
-The overall BMB score is the mean of all non-skipped scenario scores across all categories:
+BMB reports three metrics per adapter:
+
+**Raw score** — the mean of all non-skipped scenario scores (how well the adapter performs on what it supports):
 
 ```
-overall_score = mean(all scenario_scores where not skipped)
+raw_score = mean(all scenario_scores where not skipped)
 ```
+
+**Coverage** — the fraction of BMB categories the adapter actually runs:
+
+```
+coverage = categories_attempted / total_categories
+```
+
+**Weighted score** — the headline leaderboard number, penalising adapters that skip categories:
+
+```
+weighted_score = raw_score × coverage
+```
+
+This prevents an adapter that passes 4/8 categories from appearing equivalent to one that passes 8/8. See [scoring.md](scoring.md) for worked examples.
 
 ## Check Types
 
@@ -119,7 +135,7 @@ This is by design — BMB measures belief maintenance, not retrieval. A system t
 
 ## Fairness Considerations
 
-- Adapters are **never penalised** for missing capabilities — skipped scenarios don't count
-- The denominator for each adapter's score is only the checks from tasks it actually attempted
+- Skipped scenarios don't count as failures in the **raw score** — they are excluded from the per-category average
+- The **weighted score** penalises low coverage: an adapter scoring 100% raw on 4/8 categories gets a weighted score of 50%, not 100%
 - Different adapters may have very different denominators (5 checks vs 100+ checks)
-- The leaderboard reports attempted/skipped counts alongside scores for transparency
+- The leaderboard reports raw score, coverage, and weighted score for full transparency

@@ -55,7 +55,8 @@ def format_scorecard(results: dict[str, list[ScenarioScore]]) -> str:
 
     lines.append("-" * separator_width)
 
-    overall_row = f"{'Overall':<{cat_width}}"
+    # Raw score (average of attempted categories only)
+    raw_row = f"{'Score (attempted)':<{cat_width}}"
     for name in system_names:
         cats = system_cats.get(name, {})
         scored = [c for c in cats.values() if not c.skipped and c.score is not None]
@@ -64,8 +65,35 @@ def format_scorecard(results: dict[str, list[ScenarioScore]]) -> str:
             cell = f"{avg * 100:.1f}%"
         else:
             cell = "N/A"
-        overall_row += f"{cell:<{col_width}}"
-    lines.append(overall_row)
+        raw_row += f"{cell:<{col_width}}"
+    lines.append(raw_row)
+
+    # Coverage (categories attempted / total)
+    coverage_row = f"{'Coverage':<{cat_width}}"
+    total_cats = len(sorted_cats)
+    for name in system_names:
+        cats = system_cats.get(name, {})
+        scored = [c for c in cats.values() if not c.skipped and c.score is not None]
+        if total_cats > 0:
+            cell = f"{len(scored)}/{total_cats}"
+        else:
+            cell = "N/A"
+        coverage_row += f"{cell:<{col_width}}"
+    lines.append(coverage_row)
+
+    # Weighted overall (score × coverage)
+    weighted_row = f"{'Overall (weighted)':<{cat_width}}"
+    for name in system_names:
+        cats = system_cats.get(name, {})
+        scored = [c for c in cats.values() if not c.skipped and c.score is not None]
+        if scored and total_cats > 0:
+            avg = sum(c.score or 0.0 for c in scored) / len(scored)
+            weighted = avg * len(scored) / total_cats
+            cell = f"{weighted * 100:.1f}%"
+        else:
+            cell = "N/A"
+        weighted_row += f"{cell:<{col_width}}"
+    lines.append(weighted_row)
 
     lines.append("=" * separator_width)
     lines.append("")
