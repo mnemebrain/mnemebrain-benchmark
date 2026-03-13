@@ -213,29 +213,30 @@ Tests ANN-first orthogonalisation that pushes similar-but-distinct belief embedd
 
 ## Results
 
-Benchmark run date: 2026-03-07. Full results in `bmb_report_all.json`.
+Benchmark run date: 2026-03-13. Full results in `bmb_report_all.json`.
 
-### Overall Scores (7 systems, real benchmark run)
+### Overall Scores (8 systems, real benchmark runs)
 
-All results are from actual benchmark execution with real sentence-transformers embeddings (`all-MiniLM-L6-v2`).
+All results are from actual benchmark execution with real embeddings (`text-embedding-3-small` via OpenAI API or `all-MiniLM-L6-v2` via sentence-transformers).
 
 ```
 Belief Maintenance Benchmark (BMB)
 48 tasks | 8 categories | ~100 checks
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  mnemebrain           ████████████████████ 100%
-  structured_memory    ███████ 36%
-  mem0 (real API)      █████ 29%
-  naive_baseline        0%
-  rag_baseline          0%
-  openai_rag (real API) 0%
-  langchain_buffer      0%
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  mnemebrain (full)    ████████████████████ 100%
+  mnemebrain_lite      ████████████████████ 100%
+  structured_memory    ███████              36%
+  mem0 (real API)      █████                29%
+  naive_baseline                             0%
+  rag_baseline                               0%
+  openai_rag (real)                          0%
+  langchain_buffer                           0%
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Note: Non-MnemeBrain systems skip all 18 Phase 5 scenarios (consolidation, multi-hop, pattern separation) due to missing capabilities.
+Note: Non-MnemeBrain systems skip all 18 Phase 5 scenarios (consolidation, multi-hop, pattern separation) due to missing capabilities. Lite skips categories requiring capabilities it doesn't support (sandbox, consolidation, hipporag, pattern separation).
 
-### MnemeBrain: 100%, 48/48 scenarios
+### MnemeBrain (full backend): 100%, 48/48 scenarios
 
 | Category | Scenarios | Score |
 |----------|-----------|-------|
@@ -248,7 +249,25 @@ Note: Non-MnemeBrain systems skip all 18 Phase 5 scenarios (consolidation, multi
 | Pattern Separation | 6/6 | **100%** |
 | Consolidation | 6/6 | **100%** |
 
-All 48 scenarios pass with real sentence-transformers embeddings. Scenario claims are calibrated to the embedding model's similarity thresholds (merge: 0.92, consolidation clustering: 0.82, pattern separation: 0.85).
+### MnemeBrain Lite: 100% on supported categories (24/24 scenarios)
+
+| Category | Scenarios | Score |
+|----------|-----------|-------|
+| Belief Revision | 6/6 | **100%** |
+| Contradiction Detection | 6/6 | **100%** |
+| Evidence Tracking | 6/6 | **100%** |
+| Temporal Updates | 6/6 | **100%** |
+| Counterfactual Reasoning | N/A | skipped (requires sandbox) |
+| Consolidation | N/A | skipped (requires consolidation) |
+| Multi-hop Retrieval | N/A | skipped (requires hipporag) |
+| Pattern Separation | N/A | skipped (requires pattern separation) |
+
+Lite achieves full parity with the backend on the 4 core categories. The 93% → 100% improvement (v0.1.0a4 → v0.1.0a6) came from adapter-level fixes:
+
+1. **Evidence-level retraction**: The benchmark runner tracks per-store `evidence_ids` and retracts specific evidence instead of entire beliefs, fixing the contradiction-resolved-by-retraction scenario.
+2. **Embedding preservation**: The adapter re-embeds beliefs after `retract()` and `revise()` operations, preserving vector search capability.
+
+All scenarios pass with both OpenAI (`text-embedding-3-small`) and local (`all-MiniLM-L6-v2`) embeddings. The benchmark CLI supports `--embedder {sentence_transformers,openai,ollama}` for provider selection.
 
 ### Mem0 (real API, graph enabled): 29%, 18/48 scenarios attempted
 
@@ -323,8 +342,16 @@ All three use local embeddings with store + query only. 0% on all attempted cont
 ## Reproducibility
 
 ```bash
-pip install mnemebrain
-python run_bmb_benchmark.py
+pip install mnemebrain-benchmark
+
+# Run with default embedder (sentence-transformers)
+mnemebrain-bmb
+
+# Run with OpenAI embeddings
+mnemebrain-bmb --embedder openai
+
+# Run specific adapter
+mnemebrain-bmb --adapter mnemebrain_lite --embedder openai
 ```
 
 Results are deterministic for the same embedding model. The benchmark uses no LLM calls -- all logic is computed by the belief engine.

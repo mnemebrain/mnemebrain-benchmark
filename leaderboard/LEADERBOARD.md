@@ -1,7 +1,7 @@
 # MnemeBrain Benchmark Leaderboard
 
-**Last updated**: 2026-03-08
-**Embedding model**: `all-MiniLM-L6-v2` (sentence-transformers)
+**Last updated**: 2026-03-13
+**Embedding model**: `text-embedding-3-small` (OpenAI) / `all-MiniLM-L6-v2` (sentence-transformers)
 
 ---
 
@@ -12,7 +12,7 @@
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   mnemebrain (full)    ████████████████████ 100%
-  mnemebrain_lite      ██████████████████   93%
+  mnemebrain_lite      ████████████████████ 100%
   structured_memory    ███████              36%
   mem0 (real API)      █████                29%
   naive_baseline                             0%
@@ -26,10 +26,10 @@
 
 | Category | mnemebrain | mnemebrain_lite | structured_memory | mem0 | naive | rag | openai_rag | langchain |
 |----------|:----------:|:---------------:|:-----------------:|:----:|:-----:|:---:|:----------:|:---------:|
-| Contradiction Detection | **100%** | 91.7% | 0% | 0% | 0% | 0% | 0% | 0% |
-| Belief Revision | **100%** | 100% | 39% | 39% | -- | -- | -- | -- |
-| Evidence Tracking | **100%** | 100% | 69% | 47% | -- | -- | -- | -- |
-| Temporal Updates | **100%** | 83.3% | -- | -- | -- | -- | -- | -- |
+| Contradiction Detection | **100%** | **100%** | 0% | 0% | 0% | 0% | 0% | 0% |
+| Belief Revision | **100%** | **100%** | 39% | 39% | -- | -- | -- | -- |
+| Evidence Tracking | **100%** | **100%** | 69% | 47% | -- | -- | -- | -- |
+| Temporal Updates | **100%** | **100%** | -- | -- | -- | -- | -- | -- |
 | Counterfactual Reasoning | **100%** | -- | -- | -- | -- | -- | -- | -- |
 | Consolidation | **100%** | -- | -- | -- | -- | -- | -- | -- |
 | Multi-hop Retrieval | **100%** | -- | -- | -- | -- | -- | -- | -- |
@@ -96,7 +96,7 @@
 
 ## Key Findings
 
-1. **Core belief engine is the differentiator**: MnemeBrain Lite scores 93% BMB vs 0-36% for all baselines using only 7 of 12 capabilities.
+1. **Core belief engine is the differentiator**: MnemeBrain Lite scores 100% BMB (on supported categories) vs 0-36% for all baselines using only 7 of 12 capabilities.
 2. **Baselines fail structurally**: No baseline supports Belnap four-valued logic, temporal decay, or sandbox reasoning.
 3. **Mem0 (real API, graph enabled)**: 29% despite graph memory -- no epistemic operations, aggressive deduplication loses evidence.
 4. **Task accuracy follows capability**: 74-76% downstream accuracy (Lite) vs 24-32% (baselines) confirms memory capabilities translate to correct answers.
@@ -118,8 +118,10 @@ pip install mnemebrain-lite[embeddings] sentence-transformers
 # From mnemebrain-benchmark repo:
 pip install -e ".[embeddings]" -e "../mnemebrain-lite[embeddings]"
 
-mnemebrain-bmb                              # BMB (all adapters)
+mnemebrain-bmb                              # BMB (all adapters, default embedder)
 mnemebrain-bmb --adapter mnemebrain_lite    # BMB (lite only)
+mnemebrain-bmb --embedder openai            # BMB with OpenAI embeddings
+mnemebrain-bmb --embedder sentence_transformers  # BMB with local embeddings
 mnemebrain-benchmark --adapter mnemebrain_lite  # System benchmark
 python -m mnemebrain_benchmark.task_evals --adapter mnemebrain_lite  # Task evals
 ```

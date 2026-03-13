@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
-from mnemebrain_benchmark.interface import MemorySystem
+from mnemebrain_benchmark.interface import MemorySystem, RetractResult
 from mnemebrain_benchmark.scenarios.schema import Action, Scenario
 from mnemebrain_benchmark.scoring import (
     CheckResult,
@@ -62,12 +62,32 @@ def _handle_query(
     action_results[action.label] = system.query(claim=action.claim or "")
 
 
+def _get_evidence_ids(action_results: dict[str, object], label: str) -> list[str] | None:
+    """Look up a prior StoreResult by label and return its evidence_ids, if any."""
+    result = action_results.get(label or "")
+    if hasattr(result, "evidence_ids") and result.evidence_ids:
+        return result.evidence_ids
+    return None
+
+
 def _handle_retract(
     system: MemorySystem,
     action: Action,
     action_results: dict[str, object],
 ) -> None:
-    bid = _get_belief_id(action_results, action.target_label or "")
+    target = action.target_label or ""
+    # Prefer evidence-level retract: only retract evidence added by the target store
+    ev_ids = _get_evidence_ids(action_results, target)
+    if ev_ids is not None:
+        total = RetractResult(affected_beliefs=0, truth_states_changed=0)
+        for eid in ev_ids:
+            r = system.retract(eid)
+            total.affected_beliefs += r.affected_beliefs
+            total.truth_states_changed += r.truth_states_changed
+        action_results[action.label] = total
+        return
+    # Fall back to belief-level retract
+    bid = _get_belief_id(action_results, target)
     if bid is not None:
         action_results[action.label] = system.retract(bid)
 

@@ -31,6 +31,7 @@ class StoreResult:
     confidence: float | None
     was_separated: bool = False
     memory_tier: str = "episodic"
+    evidence_ids: list[str] | None = None
 
 
 @dataclass

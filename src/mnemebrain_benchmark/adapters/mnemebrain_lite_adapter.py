@@ -104,17 +104,35 @@ class MnemeBrainLiteAdapter(MemorySystem):
         belief_type_str = evidence[0].get("belief_type", "inference") if evidence else "inference"
         belief_type = BeliefType(belief_type_str)
 
+        store = self._memory._store  # pylint: disable=protected-access
+
+        # Snapshot existing evidence IDs before believe() merges
+        existing_ev_ids: set[str] = set()
+        existing_belief = store.get_by_claim(claim) if hasattr(store, 'get_by_claim') else store.find_by_claim(claim)
+        if existing_belief is not None:
+            existing_ev_ids = {str(ev.id) for ev in existing_belief.evidence}
+
         result = self._memory.believe(
             claim=claim,
             evidence_items=ev_items,
             belief_type=belief_type,
         )
+
+        # Diff to find newly added evidence IDs
+        belief = store.get(result.id)
+        new_ev_ids = (
+            [str(ev.id) for ev in belief.evidence if str(ev.id) not in existing_ev_ids]
+            if belief
+            else []
+        )
+
         return StoreResult(
             belief_id=str(result.id),
             merged=False,
             contradiction_detected=result.conflict,
             truth_state=result.truth_state.value,
             confidence=result.confidence,
+            evidence_ids=new_ev_ids,
         )
 
     def query(self, claim: str) -> list[QueryResult]:
@@ -129,11 +147,23 @@ class MnemeBrainLiteAdapter(MemorySystem):
             for belief, _sim, _conf, _rank in results
         ]
 
-    def retract(self, belief_id: str) -> RetractResult:
-        # The benchmark runner passes belief_id (from StoreResult).
-        # mnemebrain-lite's retract needs an actual evidence UUID.
-        # Try as belief_id first: find all evidence and retract them.
-        uid = UUID(belief_id)
+    def retract(self, id_str: str) -> RetractResult:
+        """Retract by evidence ID or belief ID.
+
+        The runner now passes evidence IDs when available (from StoreResult.evidence_ids).
+        Falls back to belief-level retract (all evidence) if given a belief ID.
+        """
+        uid = UUID(id_str)
+        # Try as evidence ID first
+        results = self._memory.retract(uid)
+        if results:
+            # Core retract() doesn't pass embedding to upsert — re-embed affected beliefs
+            self._re_embed_affected(results)
+            return RetractResult(
+                affected_beliefs=len(results),
+                truth_states_changed=len(results),
+            )
+        # Fall back: try as belief ID — retract all evidence
         belief = self._memory._store.get(uid)  # pylint: disable=protected-access
         if belief is not None:
             count = 0
@@ -141,16 +171,33 @@ class MnemeBrainLiteAdapter(MemorySystem):
                 if ev.valid:
                     self._memory.retract(ev.id)
                     count += 1
+            if count > 0:
+                self._re_embed_belief(belief.id)
             return RetractResult(
                 affected_beliefs=1 if count > 0 else 0,
                 truth_states_changed=1 if count > 0 else 0,
             )
-        # Fall back: try as actual evidence UUID
-        results = self._memory.retract(uid)
-        return RetractResult(
-            affected_beliefs=len(results),
-            truth_states_changed=len(results),
-        )
+        return RetractResult(affected_beliefs=0, truth_states_changed=0)
+
+    def _re_embed_affected(self, results) -> None:
+        """Re-embed beliefs after retract to preserve vector search."""
+        if self._embedder is None:
+            return
+        seen = set()
+        for r in results:
+            if r.id not in seen:
+                seen.add(r.id)
+                self._re_embed_belief(r.id)
+
+    def _re_embed_belief(self, belief_id) -> None:
+        """Re-embed a single belief to preserve its embedding in the store."""
+        if self._embedder is None:
+            return
+        store = self._memory._store  # pylint: disable=protected-access
+        belief = store.get(belief_id)
+        if belief is not None:
+            emb = self._embedder.embed(belief.claim)
+            store.upsert(belief, embedding=emb)
 
     def explain(self, claim: str) -> ExplainResult:
         result = self._memory.explain(claim)
@@ -184,6 +231,14 @@ class MnemeBrainLiteAdapter(MemorySystem):
             reliability=float(ev_data.get("reliability", 0.9)),
         )
         result = self._memory.revise(UUID(belief_id), ev_input)
+
+        # Core revise() doesn't pass embedding to upsert — re-embed to preserve
+        # vector search. Without this, find_similar won't find the belief.
+        belief = self._memory._store.get(result.id)  # pylint: disable=protected-access
+        if belief is not None and self._embedder is not None:
+            emb = self._embedder.embed(belief.claim)
+            self._memory._store.upsert(belief, embedding=emb)  # pylint: disable=protected-access
+
         return ReviseResult(
             belief_id=str(result.id),
             truth_state=result.truth_state.value,

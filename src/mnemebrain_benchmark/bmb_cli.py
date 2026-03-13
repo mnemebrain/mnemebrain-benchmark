@@ -5,6 +5,8 @@ Runs 48 tasks across 8 categories against memory system adapters.
 Usage:
     mnemebrain-bmb
     mnemebrain-bmb --adapter mnemebrain
+    mnemebrain-bmb --embedder openai
+    mnemebrain-bmb --embedder ollama --embedder-model nomic-embed-text
     python -m mnemebrain_benchmark.bmb_cli
 """
 
@@ -15,8 +17,7 @@ import os
 import sys
 
 from mnemebrain_benchmark.interface import MemorySystem
-from mnemebrain_benchmark.protocols import EmbeddingProvider
-from mnemebrain_benchmark.providers import SentenceTransformerProvider
+from mnemebrain_benchmark.providers import EMBEDDER_CHOICES, build_embedder
 from mnemebrain_benchmark.scenarios.loader import load_bmb_scenarios
 from mnemebrain_benchmark.system_report import export_json, format_scorecard
 from mnemebrain_benchmark.system_runner import SystemBenchmarkRunner
@@ -45,12 +46,11 @@ ALL_ADAPTERS = [
 ]
 
 
-def _get_embedder() -> EmbeddingProvider:
-    """Lazily create a SentenceTransformer embedding provider."""
-    return SentenceTransformerProvider()
-
-
-def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
+def _build_adapters(
+    adapter_filter: str | None = None,
+    embedder_name: str | None = None,
+    embedder_model: str | None = None,
+) -> list[MemorySystem]:
     adapters: list[MemorySystem] = []
 
     embedder = None
@@ -58,7 +58,7 @@ def _build_adapters(adapter_filter: str | None = None) -> list[MemorySystem]:
     def _lazy_embedder():
         nonlocal embedder
         if embedder is None:
-            embedder = _get_embedder()
+            embedder = build_embedder(embedder_name, embedder_model)
         return embedder
 
     if adapter_filter is None or adapter_filter == "mnemebrain":
@@ -182,6 +182,8 @@ def run_bmb(
     category: str | None = None,
     scenario_name: str | None = None,
     output: str = "bmb_report.json",
+    embedder_name: str | None = None,
+    embedder_model: str | None = None,
 ) -> dict[str, list]:
     scenarios = load_bmb_scenarios()
 
@@ -194,7 +196,7 @@ def run_bmb(
         print("No matching BMB scenarios found.")
         sys.exit(1)
 
-    adapters = _build_adapters(adapter_filter)
+    adapters = _build_adapters(adapter_filter, embedder_name, embedder_model)
     if not adapters:
         print("No matching adapters found.")
         sys.exit(1)
@@ -218,6 +220,19 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--category", type=str, default=None, choices=BMB_CATEGORIES)
     parser.add_argument("--scenario", type=str, default=None)
     parser.add_argument("--output", type=str, default="bmb_report.json")
+    parser.add_argument(
+        "--embedder",
+        type=str,
+        default=None,
+        choices=EMBEDDER_CHOICES,
+        help="Embedding provider (default: auto-detect — openai if OPENAI_API_KEY set, else sentence_transformers)",
+    )
+    parser.add_argument(
+        "--embedder-model",
+        type=str,
+        default=None,
+        help="Model name override for the embedding provider",
+    )
 
     args = parser.parse_args(argv)
     run_bmb(
@@ -225,6 +240,8 @@ def main(argv: list[str] | None = None) -> None:
         category=args.category,
         scenario_name=args.scenario,
         output=args.output,
+        embedder_name=args.embedder,
+        embedder_model=args.embedder_model,
     )
 
 
