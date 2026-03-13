@@ -25,8 +25,26 @@ class ExtractedClaim:
 # Sentence-ending pattern: period/question/exclamation followed by space or end.
 _SENT_SPLIT = re.compile(r"(?<=[.!?])\s+")
 
-# Filter out very short fragments that aren't real claims.
-_MIN_CLAIM_LENGTH = 10
+# Minimum character length for a claim.  Lowered from 10 to 5 so that
+# short factual fragments ("MIT", "NYC", "2019") are kept via _is_keepable
+# while pure filler ("yes.", "ok.") is discarded.
+_MIN_CLAIM_LENGTH = 5
+
+
+def _is_keepable(text: str) -> bool:
+    """Check if a short text fragment contains factual content worth keeping.
+
+    Short sentences (below _MIN_CLAIM_LENGTH) are normally discarded, but
+    fragments containing proper nouns or numbers are kept because they may
+    be answer-bearing (e.g. "MIT", "2019", "NYC").
+    """
+    # Contains digits (years, quantities, dates).
+    if re.search(r"\d", text):
+        return True
+    # Contains a capitalised word or all-caps acronym (3+ letters, likely proper noun).
+    if re.search(r"[A-Z][a-z]|[A-Z]{3,}", text):
+        return True
+    return False
 
 
 def extract_claims_sentence(
@@ -53,7 +71,7 @@ def extract_claims_sentence(
     claims = []
     for sent in sentences:
         sent = sent.strip()
-        if len(sent) < _MIN_CLAIM_LENGTH:
+        if len(sent) < _MIN_CLAIM_LENGTH and not _is_keepable(sent):
             continue
         claims.append(
             ExtractedClaim(

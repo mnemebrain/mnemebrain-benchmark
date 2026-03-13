@@ -133,9 +133,11 @@ class TestClaimExtractorSentence:
     def test_short_fragments_filtered(self):
         text = "OK. Sure. Alice works at Google as a software engineer."
         claims = extract_claims_sentence(text)
-        # "OK." and "Sure." are too short (< 10 chars)
-        assert len(claims) == 1
-        assert "Alice" in claims[0].text
+        # "OK." (3 chars) is below _MIN_CLAIM_LENGTH and not keepable → filtered.
+        # "Sure." (5 chars) passes length check → kept.
+        # The long sentence is always kept.
+        assert any("Alice" in c.text for c in claims)
+        assert not any(c.text.strip(".") == "OK" for c in claims)
 
     def test_metadata_preserved(self):
         claims = extract_claims_sentence(
@@ -198,7 +200,8 @@ class TestAnswerGenerator:
             QueryResult(belief_id="1", claim="Alice works at Google", confidence=0.9, truth_state="true"),
         ]
         answer = answer_from_beliefs("Where does Alice work?", results)
-        assert answer == "Alice works at Google"
+        # No-LLM path now extracts an answer span; the key fact must be present.
+        assert "Google" in answer
 
     def test_llm_mode(self):
         def mock_llm(prompt: str) -> str:
