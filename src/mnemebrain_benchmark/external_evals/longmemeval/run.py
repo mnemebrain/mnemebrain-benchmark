@@ -4,14 +4,12 @@ Usage:
     python -m mnemebrain_benchmark.external_evals longmemeval \
         --data-path /path/to/longmemeval.json \
         --subset knowledge_update \
-        --system lite \
+        --system mnemebrain_lite \
         [--llm-extract] [--llm-answer] [--limit 50]
 """
 
 from __future__ import annotations
 
-import argparse
-import json
 import sys
 import time
 
@@ -25,33 +23,70 @@ from mnemebrain_benchmark.external_evals.scorer import (
 )
 
 
+def _build_openai_llm_fn():
+    """Build an OpenAI-based LLM callable for claim extraction / answer generation.
+
+    Requires OPENAI_API_KEY in environment.
+    """
+    import os
+
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        print("--llm-extract / --llm-answer requires OPENAI_API_KEY")
+        sys.exit(1)
+
+    try:
+        import openai
+    except ImportError:
+        print("--llm-extract / --llm-answer requires: pip install openai")
+        sys.exit(1)
+
+    client = openai.OpenAI(api_key=api_key)
+
+    def _call(prompt: str) -> str:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=256,
+            temperature=0,
+        )
+        return response.choices[0].message.content or ""
+
+    return _call
+
+
 def _create_system(system_type: str, embedding_provider: object | None = None) -> object:
-    """Create a memory system adapter by type.
+    """Create a memory system adapter by type (legacy convenience).
 
     Args:
-        system_type: One of "lite", "full".
+        system_type: Adapter name from adapter_factory.ALL_ADAPTERS,
+            or legacy aliases "lite" / "full".
         embedding_provider: Optional embedding provider override.
 
     Returns:
         A MemorySystem-compatible object.
     """
+    # Support legacy "lite" / "full" aliases.
     if system_type == "lite":
-        from mnemebrain_benchmark.adapters.mnemebrain_lite_adapter import MnemeBrainLiteAdapter
-        from mnemebrain_benchmark.providers import SentenceTransformerProvider
-
-        embedder = embedding_provider or SentenceTransformerProvider()
-        return MnemeBrainLiteAdapter(embedder=embedder)
+        system_type = "mnemebrain_lite"
     elif system_type == "full":
-        from mnemebrain_benchmark.adapters.mnemebrain_adapter import MnemeBrainAdapter
+        system_type = "mnemebrain"
 
-        return MnemeBrainAdapter()
-    else:
-        raise ValueError(f"Unknown system type: {system_type!r}. Use 'lite' or 'full'.")
+    from mnemebrain_benchmark.adapter_factory import build_adapters
+
+    adapters = build_adapters(adapter_filter=system_type)
+    if not adapters:
+        raise ValueError(
+            f"Could not build adapter for system type: {system_type!r}. "
+            "Check dependencies are installed."
+        )
+    return adapters[0]
 
 
 def run_longmemeval(
     data_path: str,
     *,
+    system: object | None = None,
     system_type: str = "lite",
     subset: str | None = None,
     limit: int | None = None,
@@ -65,13 +100,14 @@ def run_longmemeval(
 
     Args:
         data_path: Path to LongMemEval dataset JSON/JSONL.
-        system_type: "lite" or "full".
+        system: Pre-built MemorySystem adapter. If provided, system_type is ignored.
+        system_type: Legacy: "lite" or "full" (ignored if system is provided).
         subset: Optional subset filter (e.g. "knowledge_update").
         limit: Max scenarios to process.
         llm_extract: Use LLM for claim extraction.
         llm_answer: Use LLM for answer generation.
         llm_fn: LLM callable for extraction/answering.
-        embedding_provider: Optional embedding provider.
+        embedding_provider: Optional embedding provider (legacy, ignored if system provided).
         verbose: Print progress to stderr.
 
     Returns:
@@ -90,7 +126,9 @@ def run_longmemeval(
     if verbose:
         print(f"Loaded {len(scenarios)} scenarios", file=sys.stderr)
 
-    system = _create_system(system_type, embedding_provider=embedding_provider)
+    if system is None:
+        system = _create_system(system_type, embedding_provider=embedding_provider)
+
     report = BenchmarkReport(
         benchmark_name="longmemeval",
         system_name=system.name(),
@@ -104,13 +142,9 @@ def run_longmemeval(
                 file=sys.stderr,
             )
 
-        # Reset system for each scenario.
         system.reset()
-
-        # Ingest.
         adapter.ingest(system, scenario)
 
-        # Answer each question.
         for q in scenario.questions:
             t1 = time.monotonic()
             predicted = adapter.answer(system, q)
@@ -146,7 +180,13 @@ def run_longmemeval(
 
 
 def main(argv: list[str] | None = None) -> None:
-    """CLI entry point."""
+    """CLI entry point (standalone, delegates to shared factory)."""
+    import argparse
+    import json
+
+    from mnemebrain_benchmark.adapter_factory import ALL_ADAPTERS, build_adapters
+    from mnemebrain_benchmark.providers import EMBEDDER_CHOICES
+
     parser = argparse.ArgumentParser(
         description="Run LongMemEval benchmark against MnemeBrain",
     )
@@ -157,9 +197,22 @@ def main(argv: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "--system",
-        choices=["lite", "full"],
-        default="lite",
-        help="System to benchmark (default: lite)",
+        choices=ALL_ADAPTERS,
+        default=None,
+        help="Adapter to benchmark (default: mnemebrain_lite)",
+    )
+    parser.add_argument(
+        "--embedder",
+        type=str,
+        default=None,
+        choices=EMBEDDER_CHOICES,
+        help="Embedding provider (default: auto-detect)",
+    )
+    parser.add_argument(
+        "--embedder-model",
+        type=str,
+        default=None,
+        help="Model name override for the embedding provider",
     )
     parser.add_argument(
         "--subset",
@@ -195,13 +248,26 @@ def main(argv: list[str] | None = None) -> None:
 
     args = parser.parse_args(argv)
 
+    # Build adapter via shared factory.
+    system_filter = args.system or "mnemebrain_lite"
+    adapters = build_adapters(system_filter, args.embedder, args.embedder_model)
+    if not adapters:
+        print(f"Could not build adapter: {system_filter}")
+        sys.exit(1)
+
+    # Build an LLM callable if LLM flags are set.
+    llm_fn = None
+    if args.llm_extract or args.llm_answer:
+        llm_fn = _build_openai_llm_fn()
+
     report = run_longmemeval(
         data_path=args.data_path,
-        system_type=args.system,
+        system=adapters[0],
         subset=args.subset,
         limit=args.limit,
         llm_extract=args.llm_extract,
         llm_answer=args.llm_answer,
+        llm_fn=llm_fn,
         verbose=args.verbose,
     )
 
